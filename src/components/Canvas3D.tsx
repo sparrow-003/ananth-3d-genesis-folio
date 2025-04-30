@@ -9,8 +9,8 @@ const Canvas3D = () => {
     <div className="canvas-container h-full">
       <Canvas
         camera={{ position: [0, 0, 10], fov: 75 }}
-        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
+        dpr={[1, 2]} // Reduced from 1.5 to 2 for better performance
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
@@ -27,6 +27,7 @@ const Canvas3D = () => {
             enableRotate={true}
             autoRotate
             autoRotateSpeed={0.5}
+            makeDefault
           />
         </Suspense>
       </Canvas>
