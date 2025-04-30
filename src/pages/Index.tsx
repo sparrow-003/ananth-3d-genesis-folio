@@ -34,10 +34,11 @@ const Index = () => {
 
   return (
     <>
-      {/* 3D Background wrapped in Suspense */}
-      <Suspense fallback={<div className="min-h-screen bg-dark" />}>
-        <Canvas3D />
-      </Suspense>
+      <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1]">
+        <Suspense fallback={<div className="w-full h-full bg-dark" />}>
+          <Canvas3D />
+        </Suspense>
+      </div>
       
       <ParticleBackground />
       

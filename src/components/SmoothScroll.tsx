@@ -19,7 +19,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     // Prevent mounting issues with 3D components by delaying initialization
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 300); // Increased delay to ensure 3D components initialize properly
+    }, 500); // Increased delay to ensure 3D components initialize properly
     
     // Smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -40,11 +40,10 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       {/* Only render children when mounted to prevent Three.js initialization issues */}
       {mounted && (
         <motion.div 
-          className="flex flex-col perspective-container"
-          initial={{ opacity: 0.8, scale: 0.985 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: "spring", stiffness: 60, damping: 20 }}
-          style={{ perspective: "1000px" }}
+          className="flex flex-col"
+          initial={{ opacity: 0.8 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5 }}
         >
           {children}
         </motion.div>

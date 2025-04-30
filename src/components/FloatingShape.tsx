@@ -26,31 +26,31 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.y += 0.003 * speed;
   });
 
-  // Create material outside of the JSX to avoid prop issues
-  const sharedMaterial = <meshStandardMaterial 
-    color={color} 
-    roughness={0.2}
-    metalness={0.8}
-    emissive={color}
-    emissiveIntensity={0.2}
-    transparent
-    opacity={0.8}
-  />;
+  // Create material directly instead of as JSX to avoid Three.js prop issues
+  const materialProps = {
+    color,
+    roughness: 0.2,
+    metalness: 0.8,
+    emissive: color,
+    emissiveIntensity: 0.2,
+    transparent: true,
+    opacity: 0.8
+  };
 
   // Render appropriate shape based on prop
   switch (shape) {
     case 'octahedron':
-      return <Octahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Octahedron>;
+      return <Octahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
     case 'tetrahedron':
-      return <Tetrahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Tetrahedron>;
+      return <Tetrahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
     case 'icosahedron':
-      return <Icosahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Icosahedron>;
+      return <Icosahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
     case 'sphere':
-      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>{sharedMaterial}</Sphere>;
+      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
     case 'torus':
-      return <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef}>{sharedMaterial}</Torus>;
+      return <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
     default:
-      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>{sharedMaterial}</Sphere>;
+      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
   }
 };
 

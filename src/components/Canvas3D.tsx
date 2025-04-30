@@ -6,8 +6,11 @@ import FloatingShape from './FloatingShape';
 
 const Canvas3D = () => {
   return (
-    <div className="canvas-container">
-      <Canvas shadows dpr={[1, 2]}>
+    <div className="canvas-container h-full">
+      <Canvas
+        shadows 
+        camera={{ position: [0, 0, 10], fov: 75 }}
+      >
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
