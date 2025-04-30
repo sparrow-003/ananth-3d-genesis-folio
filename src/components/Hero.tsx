@@ -23,7 +23,7 @@ const Hero = () => {
   const avatarY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const avatarRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 100]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0.3]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
 
   useEffect(() => {
     // Improved scroll handler with performance optimization
@@ -46,8 +46,7 @@ const Hero = () => {
       <motion.div 
         className="absolute inset-0 bg-gradient-radial from-purple/5 to-transparent"
         style={{ 
-          y: scrollY * 0.2,
-          opacity: useTransform(scrollYProgress, [0, 0.5], [0.3, 0])
+          y: scrollY * 0.2
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.3 }}
@@ -57,7 +56,8 @@ const Hero = () => {
       {/* Dynamic 3D grid background */}
       <motion.div
         className="absolute inset-0 grid grid-cols-8 grid-rows-8 pointer-events-none"
-        style={{ opacity: useTransform(scrollYProgress, [0, 0.5], [0.05, 0]) }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.05 }}
       >
         {Array.from({ length: 64 }).map((_, i) => (
           <motion.div
@@ -94,7 +94,10 @@ const Hero = () => {
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ y: contentY, opacity: contentOpacity }}
+          style={{ 
+            y: contentY,
+            opacity: contentOpacity 
+          }}
           className="z-10 text-center lg:text-left"
         >
           <motion.h2 
@@ -171,14 +174,12 @@ const Hero = () => {
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
         initial={{ opacity: 0, y: -10 }}
         animate={{ 
-          opacity: useTransform(scrollYProgress, [0, 0.1], [1, 0]),
-          y: [0, 10, 0] 
+          opacity: 1,
+          y: 0
         }}
         transition={{ 
           delay: 1.5,
-          duration: 1.5,
-          repeat: Infinity,
-          repeatType: "loop"
+          duration: 0.5
         }}
         style={{
           perspective: "500px",

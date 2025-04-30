@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from 'react';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
@@ -14,14 +14,6 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     damping: 30,
     restDelta: 0.001
   });
-  
-  // Enhanced parallax effect on scroll with improved values
-  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.1], [0.8, 0.9, 1]);
-  const scale = useTransform(scrollYProgress, [0, 0.1], [0.985, 1]);
-  
-  // Additional transform effects for 3D feeling
-  const rotateX = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
-  const translateY = useTransform(scrollYProgress, [0, 0.1], [3, 0]);
   
   useEffect(() => {
     // Prevent mounting issues with 3D components by delaying initialization
@@ -55,14 +47,12 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       {mounted && (
         <motion.div 
           className="flex flex-col perspective-container"
+          initial={{ opacity: 0.8, scale: 0.985 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: "spring", stiffness: 60, damping: 20 }}
           style={{ 
-            opacity, 
-            scale,
-            rotateX: rotateX, 
-            y: translateY,
             perspective: "1000px"
           }}
-          transition={{ type: "spring", stiffness: 60, damping: 20 }}
         >
           {children}
         </motion.div>
@@ -71,7 +61,9 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       {/* Scroll indicator that fades out as you scroll down */}
       <motion.div 
         className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
-        style={{ opacity: useTransform(scrollYProgress, [0, 0.1], [1, 0]) }}
+        initial={{ opacity: 1 }}
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 2, delay: 3 }}
       >
         <motion.div
           animate={{ y: [0, 10, 0] }}
