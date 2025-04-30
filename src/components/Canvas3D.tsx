@@ -53,27 +53,42 @@ const ProjectShapes = () => {
     <group>
       {/* Financial Dashboard - Yellow */}
       <Float speed={1.5} rotationIntensity={1} floatIntensity={2}>
-        <FloatingShape position={[5, 2, -8]} size={1.5} color="#EAB308" shape="octahedron" speed={0.8} />
+        <FloatingShape position={[5, 2, -8]} size={1.5} color="#EAB308" shape="octahedron" speed={0.8} text="Financial" />
       </Float>
       
       {/* AI Business - Green */}
       <Float speed={1.2} rotationIntensity={0.8} floatIntensity={1.5}>
-        <FloatingShape position={[-6, 3, -12]} size={2} color="#22C55E" shape="icosahedron" speed={0.5} />
+        <FloatingShape position={[-6, 3, -12]} size={2} color="#22C55E" shape="icosahedron" speed={0.5} text="AI Business" />
       </Float>
       
       {/* Chat Bot - Blue */}
       <Float speed={1.8} rotationIntensity={1.2} floatIntensity={2.2}>
-        <FloatingShape position={[0, -3, -10]} size={1.7} color="#3B82F6" shape="tetrahedron" speed={0.6} />
+        <FloatingShape position={[0, -3, -10]} size={1.7} color="#3B82F6" shape="tetrahedron" speed={0.6} text="Chatbot" />
       </Float>
       
       {/* Dev Hub - Purple */}
       <Float speed={1} rotationIntensity={0.5} floatIntensity={1.8}>
-        <FloatingShape position={[-4, -2, -6]} size={1.2} color="#8B5CF6" shape="sphere" speed={0.9} />
+        <FloatingShape position={[-4, -2, -6]} size={1.2} color="#8B5CF6" shape="sphere" speed={0.9} text="Dev Hub" />
       </Float>
       
-      {/* Additional decorative elements */}
-      <Float speed={0.8} rotationIntensity={0.4} floatIntensity={1}>
-        <FloatingShape position={[6, -1, -14]} size={1.8} color="#EC4899" shape="torus" speed={0.7} />
+      {/* MongoDB - Yellow Green */}
+      <Float speed={1.3} rotationIntensity={0.7} floatIntensity={1.7}>
+        <FloatingShape position={[6, -1, -14]} size={1.3} color="#4CAF50" shape="torus" speed={0.7} text="MongoDB" />
+      </Float>
+      
+      {/* Express - Orange */}
+      <Float speed={1.4} rotationIntensity={0.9} floatIntensity={1.6}>
+        <FloatingShape position={[-3, 5, -9]} size={1.2} color="#FF9800" shape="octahedron" speed={0.5} text="Express" />
+      </Float>
+      
+      {/* React - Blue */}
+      <Float speed={1.6} rotationIntensity={1} floatIntensity={1.9}>
+        <FloatingShape position={[3, -4, -7]} size={1.4} color="#61DAFB" shape="sphere" speed={0.8} text="React" />
+      </Float>
+      
+      {/* Python - Yellow & Blue */}
+      <Float speed={1.2} rotationIntensity={0.6} floatIntensity={2}>
+        <FloatingShape position={[-5, -1, -15]} size={1.6} color="#FFD43B" shape="icosahedron" speed={0.7} text="Python" />
       </Float>
     </group>
   );
@@ -116,7 +131,7 @@ const Canvas3D = () => {
             <Stars 
               radius={50} 
               depth={50} 
-              count={1000} 
+              count={1500} 
               factor={4} 
               saturation={1} 
               fade 
@@ -130,7 +145,7 @@ const Canvas3D = () => {
               enablePan={false}
               enableRotate={true}
               autoRotate
-              autoRotateSpeed={0.3}
+              autoRotateSpeed={0.5}
               makeDefault
               minPolarAngle={Math.PI / 3}
               maxPolarAngle={Math.PI / 1.5}

@@ -3,13 +3,15 @@ import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState, useRef } from 'react';
+import { Mail, ArrowRight, Download } from 'lucide-react';
 
 const Hero = () => {
   const roles = [
     "Python Developer",
     "JavaScript/TypeScript Developer",
+    "UI/UX Designer",
     "AI Prompt Engineer",
-    "AI Tools Expert"
+    "Full Stack Developer"
   ];
 
   const [scrollY, setScrollY] = useState(0);
@@ -24,6 +26,30 @@ const Hero = () => {
   const avatarRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const contentOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
+  
+  const handleHireMe = () => {
+    const subject = "Project Inquiry - I'd Like to Hire You";
+    const body = `Hello Ananth,
+
+I came across your impressive portfolio website and I'm interested in discussing a potential project with you.
+
+Project Overview:
+[Brief description of your project/requirements]
+
+Timeline:
+[Your expected timeline]
+
+Budget Range:
+[Your budget range if applicable]
+
+Looking forward to hearing from you soon!
+
+Best regards,
+[Your Name]`;
+
+    const mailtoLink = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
+  };
 
   useEffect(() => {
     // Improved scroll handler with performance optimization
@@ -44,7 +70,7 @@ const Hero = () => {
     <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Enhanced parallax background effect */}
       <motion.div 
-        className="absolute inset-0 bg-gradient-radial from-purple/5 to-transparent"
+        className="absolute inset-0 -z-10"
         style={{ 
           y: scrollY * 0.2
         }}
@@ -78,15 +104,21 @@ const Hero = () => {
           transition={{ duration: 0.8, type: "spring" }}
           className="perspective"
           style={{ y: avatarY, rotateY: avatarRotate }}
-          whileHover={{ scale: 1.05, rotateY: 5 }}
         >
-          <div className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform hover:shadow-2xl hover:shadow-purple/30 transition-all duration-300">
-            <Avatar className="w-full h-full rounded-full">
+          <motion.div 
+            className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border"
+            whileHover={{ 
+              rotate: [0, -5, 5, -5, 0],
+              scale: 1.05,
+              transition: { duration: 0.5 }
+            }}
+          >
+            <Avatar className="w-full h-full rounded-full image-3d">
               <AvatarImage src="/lovable-uploads/8efe32d5-ce31-4351-a27d-8fbc089a153d.png" alt="Ananth N" className="object-cover" />
               <AvatarFallback className="bg-purple text-4xl">AN</AvatarFallback>
             </Avatar>
-            <div className="absolute inset-0 bg-gradient-to-tr from-purple/20 to-transparent pointer-events-none" />
-          </div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-purple/20 via-green-500/10 to-yellow-400/10 pointer-events-none" />
+          </motion.div>
         </motion.div>
 
         {/* Text content with enhanced staggered animation */}
@@ -101,7 +133,7 @@ const Hero = () => {
           className="z-10 text-center lg:text-left"
         >
           <motion.h2 
-            className="text-xl md:text-2xl mb-4 text-purple-light"
+            className="text-xl md:text-2xl mb-4 text-gradient-green"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -109,7 +141,7 @@ const Hero = () => {
             Hello, I'm
           </motion.h2>
           <motion.h1 
-            className="text-5xl md:text-7xl font-bold mb-4"
+            className="text-5xl md:text-7xl font-bold mb-4 cinematic-text"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
@@ -139,9 +171,27 @@ const Hero = () => {
             transition={{ delay: 1, duration: 0.8 }}
           >
             {/* Enhanced buttons with 3D effect */}
+            <motion.button
+              className="px-8 py-3 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-700 rounded-full font-medium text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/50 transition-all relative overflow-hidden group"
+              whileHover={{ 
+                scale: 1.05, 
+                boxShadow: "0 0 25px rgba(124, 58, 237, 0.6)",
+                textShadow: "0 0 8px rgba(255, 255, 255, 0.5)"
+              }}
+              whileTap={{ scale: 0.98 }}
+              onClick={handleHireMe}
+            >
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                <Mail size={18} />
+                Hire Me Now
+                <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+              </span>
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-green-600 via-green-500 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            </motion.button>
+
             <motion.a
               href="#projects"
-              className="px-8 py-3 bg-purple rounded-full font-medium text-white shadow-lg shadow-purple/30 hover:bg-purple-vibrant transition-all relative overflow-hidden group"
+              className="px-8 py-3 border border-green-500 rounded-full font-medium text-light hover:bg-green-500/10 transition-all relative overflow-hidden group"
               whileHover={{ scale: 1.05, translateY: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -149,22 +199,48 @@ const Hero = () => {
                 document.querySelector('#projects')?.scrollIntoView({ behavior: 'smooth' });
               }}
             >
-              <span className="relative z-10">View My Work</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-vibrant to-purple opacity-0 group-hover:opacity-100 transition-opacity" />
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                View My Work
+                <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
+              </span>
             </motion.a>
-            <motion.a
-              href="#contact"
-              className="px-8 py-3 border border-purple rounded-full font-medium text-light hover:bg-purple/10 transition-all relative overflow-hidden group"
-              whileHover={{ scale: 1.05, translateY: -2 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.preventDefault();
-                document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth' });
-              }}
+          </motion.div>
+          
+          {/* Skills showcase cards */}
+          <motion.div
+            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.2, duration: 0.8 }}
+          >
+            <motion.div 
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              whileHover={{ scale: 1.05, rotate: 2 }}
             >
-              <span className="relative z-10">Contact Me</span>
-              <span className="absolute inset-0 bg-purple/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </motion.a>
+              <p className="text-sm text-gradient-green font-semibold">UX/UI Design</p>
+              <p className="text-xs text-gray-400">Figma Expert</p>
+            </motion.div>
+            <motion.div 
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              whileHover={{ scale: 1.05, rotate: -2 }}
+            >
+              <p className="text-sm text-gradient font-semibold">AI/ML</p>
+              <p className="text-xs text-gray-400">Prompt Engineering</p>
+            </motion.div>
+            <motion.div 
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              whileHover={{ scale: 1.05, rotate: 2 }}
+            >
+              <p className="text-sm text-gradient-yellow font-semibold">Web Dev</p>
+              <p className="text-xs text-gray-400">React, NextJS</p>
+            </motion.div>
+            <motion.div 
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              whileHover={{ scale: 1.05, rotate: -2 }}
+            >
+              <p className="text-sm text-gradient-green font-semibold">Backend</p>
+              <p className="text-xs text-gray-400">Flask, MongoDB</p>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>

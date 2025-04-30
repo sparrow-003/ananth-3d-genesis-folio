@@ -1,6 +1,5 @@
 
-import { useEffect, Suspense, lazy, useState } from "react";
-import React from "react";
+import React, { useEffect, Suspense, lazy, useState } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import ParticleBackground from "../components/ParticleBackground";
 import Navbar from "../components/Navbar";
@@ -109,7 +108,7 @@ const Index = () => {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('error', handleError);
     
-    // Simulate loading state
+    // Simulate loading state with cinematic fade-in
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);
@@ -122,13 +121,16 @@ const Index = () => {
     };
   }, []);
 
-  // Loading screen
+  // Loading screen with cinematic effect
   if (isLoading) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-dark z-50">
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p className="text-violet-300 animate-pulse text-lg">Loading Portfolio...</p>
+          <div className="w-16 h-16 relative">
+            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-b-transparent border-l-violet-500 border-r-green-500 animate-spin"></div>
+            <div className="absolute inset-1 rounded-full border-4 border-t-transparent border-b-transparent border-l-green-500 border-r-yellow-500 animate-spin-slow"></div>
+          </div>
+          <p className="text-gradient text-xl mt-4 animate-pulse">Loading Cinematic Experience...</p>
         </div>
       </div>
     );

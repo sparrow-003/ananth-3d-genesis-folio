@@ -1,7 +1,7 @@
 
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Octahedron, Tetrahedron, Icosahedron, Sphere, Torus } from '@react-three/drei';
+import { Octahedron, Tetrahedron, Icosahedron, Sphere, Torus, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface FloatingShapeProps {
@@ -10,9 +10,11 @@ interface FloatingShapeProps {
   color: string;
   shape: 'octahedron' | 'tetrahedron' | 'icosahedron' | 'sphere' | 'torus';
   speed: number;
+  text?: string;
+  rotation?: [number, number, number];
 }
 
-const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapeProps) => {
+const FloatingShape = ({ position, size, color, shape, speed, text, rotation = [0, 0, 0] }: FloatingShapeProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
   useFrame((state) => {
@@ -30,77 +32,114 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
 
   const wireframe = Math.random() > 0.7;
 
-  // Create a shared standard material
+  // Create a shared standard material with better visual appeal
   const material = new THREE.MeshStandardMaterial({
-    color: color,
-    emissive: color,
-    emissiveIntensity: 0.4,
-    roughness: 0.1,
+    color: new THREE.Color(color),
+    emissive: new THREE.Color(color).multiplyScalar(0.4),
     metalness: 0.9,
+    roughness: 0.1,
     transparent: true,
     opacity: 0.8,
     wireframe: wireframe
   });
 
-  // Render the appropriate shape
-  switch (shape) {
-    case 'octahedron':
-      return (
-        <Octahedron 
-          ref={meshRef} 
-          args={[size, 0]} 
-          position={position} 
-          castShadow 
-          receiveShadow
-          material={material}
-        />
-      );
-    case 'tetrahedron':
-      return (
-        <Tetrahedron 
-          ref={meshRef} 
-          args={[size, 0]} 
-          position={position} 
-          castShadow 
-          receiveShadow
-          material={material}
-        />
-      );
-    case 'icosahedron':
-      return (
-        <Icosahedron 
-          ref={meshRef} 
-          args={[size, 1]} 
-          position={position} 
-          castShadow 
-          receiveShadow
-          material={material}
-        />
-      );
-    case 'torus':
-      return (
-        <Torus 
-          ref={meshRef} 
-          args={[size, size/3, 16, 32]} 
-          position={position} 
-          castShadow 
-          receiveShadow
-          material={material}
-        />
-      );
-    case 'sphere':
-    default:
-      return (
-        <Sphere 
-          ref={meshRef} 
-          args={[size, 32, 32]} 
-          position={position} 
-          castShadow 
-          receiveShadow
-          material={material}
-        />
-      );
-  }
+  // Function to render text if provided
+  const renderText = () => {
+    if (!text) return null;
+    
+    return (
+      <Text
+        position={[0, 0, size + 0.5]}
+        fontSize={0.3}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor={color}
+      >
+        {text}
+      </Text>
+    );
+  };
+
+  // Render the appropriate shape with initial rotation
+  const renderShape = () => {
+    switch (shape) {
+      case 'octahedron':
+        return (
+          <group rotation={[rotation[0], rotation[1], rotation[2]]}>
+            <Octahedron 
+              ref={meshRef} 
+              args={[size, 0]} 
+              position={position} 
+              castShadow 
+              receiveShadow
+              material={material}
+            />
+            {renderText()}
+          </group>
+        );
+      case 'tetrahedron':
+        return (
+          <group rotation={[rotation[0], rotation[1], rotation[2]]}>
+            <Tetrahedron 
+              ref={meshRef} 
+              args={[size, 0]} 
+              position={position} 
+              castShadow 
+              receiveShadow
+              material={material}
+            />
+            {renderText()}
+          </group>
+        );
+      case 'icosahedron':
+        return (
+          <group rotation={[rotation[0], rotation[1], rotation[2]]}>
+            <Icosahedron 
+              ref={meshRef} 
+              args={[size, 1]} 
+              position={position} 
+              castShadow 
+              receiveShadow
+              material={material}
+            />
+            {renderText()}
+          </group>
+        );
+      case 'torus':
+        return (
+          <group rotation={[rotation[0], rotation[1], rotation[2]]}>
+            <Torus 
+              ref={meshRef} 
+              args={[size, size/3, 16, 32]} 
+              position={position} 
+              castShadow 
+              receiveShadow
+              material={material}
+            />
+            {renderText()}
+          </group>
+        );
+      case 'sphere':
+      default:
+        return (
+          <group rotation={[rotation[0], rotation[1], rotation[2]]}>
+            <Sphere 
+              ref={meshRef} 
+              args={[size, 32, 32]} 
+              position={position} 
+              castShadow 
+              receiveShadow
+              material={material}
+            />
+            {renderText()}
+          </group>
+        );
+    }
+  };
+
+  return renderShape();
 };
 
 export default FloatingShape;
