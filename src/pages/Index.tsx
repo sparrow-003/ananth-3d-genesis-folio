@@ -9,11 +9,10 @@ import Skills from "../components/Skills";
 import Projects from "../components/Projects";
 import Contact from "../components/Contact";
 
-// Lazy load Canvas3D component with improved error handling
+// Lazy load Canvas3D component with simplified fallback
 const Canvas3D = lazy(() => 
   import("../components/Canvas3D").catch(() => {
     console.error("Failed to load Canvas3D component");
-    // Return a simple fallback component
     return {
       default: () => <div className="w-full h-full bg-dark" />
     };
@@ -24,7 +23,7 @@ const Index = () => {
   // Preload the fonts and set up the page
   useEffect(() => {
     document.title = "Ananth N - Portfolio";
-    // Remove the default focus outline for mouse users, but keep it for keyboard users
+    // Event listeners for focus management
     const handleMouseDown = () => {
       document.body.classList.add('using-mouse');
     };
@@ -45,6 +44,7 @@ const Index = () => {
   return (
     <>
       <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1]">
+        {/* Only render Canvas3D if the browser supports WebGL */}
         <Suspense fallback={<div className="w-full h-full bg-dark" />}>
           <Canvas3D />
         </Suspense>

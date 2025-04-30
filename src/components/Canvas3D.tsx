@@ -8,16 +8,15 @@ const Canvas3D = () => {
   return (
     <div className="canvas-container h-full">
       <Canvas
-        shadows 
         camera={{ position: [0, 0, 10], fov: 75 }}
-        dpr={[1, 1.5]} // Optimized for performance
+        dpr={[1, 1.5]}
         gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           
-          {/* Fixed shape elements */}
+          {/* Simplified shape elements with basic props */}
           <FloatingShape position={[3, 1, -5]} size={1} color="#9b87f5" shape="sphere" speed={1} />
           <FloatingShape position={[-4, 2, -10]} size={1.5} color="#7E69AB" shape="sphere" speed={0.7} />
           <FloatingShape position={[0, -2, -8]} size={1.2} color="#D6BCFA" shape="sphere" speed={0.5} />
@@ -29,8 +28,6 @@ const Canvas3D = () => {
             enableRotate={true}
             autoRotate
             autoRotateSpeed={0.5}
-            maxPolarAngle={Math.PI / 2}
-            minPolarAngle={Math.PI / 2}
           />
         </Suspense>
       </Canvas>
