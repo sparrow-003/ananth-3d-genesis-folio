@@ -17,7 +17,7 @@ const Canvas3D = () => {
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           
-          {/* Simplified shapes setup */}
+          {/* Fixed shape elements */}
           <FloatingShape position={[3, 1, -5]} size={1} color="#9b87f5" shape="sphere" speed={1} />
           <FloatingShape position={[-4, 2, -10]} size={1.5} color="#7E69AB" shape="sphere" speed={0.7} />
           <FloatingShape position={[0, -2, -8]} size={1.2} color="#D6BCFA" shape="sphere" speed={0.5} />

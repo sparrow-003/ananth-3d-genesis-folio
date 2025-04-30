@@ -47,7 +47,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
         {children}
       </motion.div>
       
-      {/* Scroll indicator */}
+      {/* Simplified scroll indicator to reduce unnecessary complexity */}
       {mounted && (
         <motion.div 
           className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"

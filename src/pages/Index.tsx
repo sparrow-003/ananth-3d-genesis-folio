@@ -1,3 +1,4 @@
+
 import { useEffect, Suspense, lazy } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import ParticleBackground from "../components/ParticleBackground";
@@ -8,8 +9,16 @@ import Skills from "../components/Skills";
 import Projects from "../components/Projects";
 import Contact from "../components/Contact";
 
-// Lazy load Canvas3D component to improve initial loading time
-const Canvas3D = lazy(() => import("../components/Canvas3D"));
+// Lazy load Canvas3D component with improved error handling
+const Canvas3D = lazy(() => 
+  import("../components/Canvas3D").catch(() => {
+    console.error("Failed to load Canvas3D component");
+    // Return a simple fallback component
+    return {
+      default: () => <div className="w-full h-full bg-dark" />
+    };
+  })
+);
 
 const Index = () => {
   // Preload the fonts and set up the page
