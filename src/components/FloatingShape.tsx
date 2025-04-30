@@ -15,17 +15,6 @@ interface FloatingShapeProps {
 const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapeProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Define the material props instead of creating a JSX element
-  const materialProps = {
-    roughness: 0.2,
-    metalness: 0.8,
-    color: color,
-    emissive: color,
-    emissiveIntensity: 0.2,
-    transparent: true,
-    opacity: 0.8
-  };
-  
   useFrame((state) => {
     if (!meshRef.current) return;
     
@@ -37,19 +26,79 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.y += 0.003 * speed;
   });
 
-  // Simplified shape rendering with appropriate props
+  // Render the appropriate shape with inline material props
   switch (shape) {
     case 'octahedron':
-      return <Octahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
+      return (
+        <Octahedron ref={meshRef} args={[size, 0]} position={position}>
+          <meshStandardMaterial 
+            roughness={0.2} 
+            metalness={0.8} 
+            color={color} 
+            emissive={color} 
+            emissiveIntensity={0.2} 
+            transparent={true} 
+            opacity={0.8} 
+          />
+        </Octahedron>
+      );
     case 'tetrahedron':
-      return <Tetrahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
+      return (
+        <Tetrahedron ref={meshRef} args={[size, 0]} position={position}>
+          <meshStandardMaterial 
+            roughness={0.2} 
+            metalness={0.8} 
+            color={color} 
+            emissive={color} 
+            emissiveIntensity={0.2} 
+            transparent={true} 
+            opacity={0.8} 
+          />
+        </Tetrahedron>
+      );
     case 'icosahedron':
-      return <Icosahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
+      return (
+        <Icosahedron ref={meshRef} args={[size, 0]} position={position}>
+          <meshStandardMaterial 
+            roughness={0.2} 
+            metalness={0.8} 
+            color={color} 
+            emissive={color} 
+            emissiveIntensity={0.2} 
+            transparent={true} 
+            opacity={0.8} 
+          />
+        </Icosahedron>
+      );
     case 'torus':
-      return <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position} material={materialProps} />;
+      return (
+        <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position}>
+          <meshStandardMaterial 
+            roughness={0.2} 
+            metalness={0.8} 
+            color={color} 
+            emissive={color} 
+            emissiveIntensity={0.2} 
+            transparent={true} 
+            opacity={0.8} 
+          />
+        </Torus>
+      );
     case 'sphere':
     default:
-      return <Sphere ref={meshRef} args={[size, 16, 16]} position={position} material={materialProps} />;
+      return (
+        <Sphere ref={meshRef} args={[size, 16, 16]} position={position}>
+          <meshStandardMaterial 
+            roughness={0.2} 
+            metalness={0.8} 
+            color={color} 
+            emissive={color} 
+            emissiveIntensity={0.2} 
+            transparent={true} 
+            opacity={0.8} 
+          />
+        </Sphere>
+      );
   }
 };
 
