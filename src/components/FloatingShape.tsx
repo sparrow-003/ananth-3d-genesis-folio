@@ -28,82 +28,81 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.z += 0.001 * speed;
   });
 
+  const wireframe = Math.random() > 0.7;
+
+  // Material props shared across all shapes
+  const materialProps = {
+    roughness: 0.1,
+    metalness: 0.9,
+    color: color,
+    emissive: color,
+    emissiveIntensity: 0.4,
+    transparent: true,
+    opacity: 0.8,
+    wireframe: wireframe
+  };
+
   // Render the appropriate shape
   switch (shape) {
     case 'octahedron':
       return (
-        <Octahedron ref={meshRef} args={[size, 0]} position={position} castShadow receiveShadow>
-          <meshStandardMaterial
-            roughness={0.1}
-            metalness={0.9}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.4}
-            transparent
-            opacity={0.8}
-            wireframe={Math.random() > 0.7}
-          />
+        <Octahedron 
+          ref={meshRef} 
+          args={[size, 0]} 
+          position={position} 
+          castShadow 
+          receiveShadow
+        >
+          <meshStandardMaterial {...materialProps} />
         </Octahedron>
       );
     case 'tetrahedron':
       return (
-        <Tetrahedron ref={meshRef} args={[size, 0]} position={position} castShadow receiveShadow>
-          <meshStandardMaterial
-            roughness={0.1}
-            metalness={0.9}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.4}
-            transparent
-            opacity={0.8}
-            wireframe={Math.random() > 0.7}
-          />
+        <Tetrahedron 
+          ref={meshRef} 
+          args={[size, 0]} 
+          position={position} 
+          castShadow 
+          receiveShadow
+        >
+          <meshStandardMaterial {...materialProps} />
         </Tetrahedron>
       );
     case 'icosahedron':
       return (
-        <Icosahedron ref={meshRef} args={[size, 1]} position={position} castShadow receiveShadow>
-          <meshStandardMaterial
-            roughness={0.1}
-            metalness={0.9}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.4}
-            transparent
-            opacity={0.8}
-            wireframe={Math.random() > 0.7}
-          />
+        <Icosahedron 
+          ref={meshRef} 
+          args={[size, 1]} 
+          position={position} 
+          castShadow 
+          receiveShadow
+        >
+          <meshStandardMaterial {...materialProps} />
         </Icosahedron>
       );
     case 'torus':
       return (
-        <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position} castShadow receiveShadow>
-          <meshStandardMaterial
-            roughness={0.1}
-            metalness={0.9}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.4}
-            transparent
-            opacity={0.8}
-            wireframe={Math.random() > 0.7}
-          />
+        <Torus 
+          ref={meshRef} 
+          args={[size, size/3, 16, 32]} 
+          position={position} 
+          castShadow 
+          receiveShadow
+        >
+          <meshStandardMaterial {...materialProps} />
         </Torus>
       );
     case 'sphere':
     default:
       return (
-        <Sphere ref={meshRef} args={[size, 32, 32]} position={position} castShadow receiveShadow>
-          <meshStandardMaterial
-            roughness={0.1}
-            metalness={0.9}
-            color={color}
-            emissive={color}
-            emissiveIntensity={0.4}
-            transparent
-            opacity={0.8}
-            wireframe={Math.random() > 0.7}
-          />
+        <Sphere 
+          ref={meshRef} 
+          args={[size, 32, 32]} 
+          position={position} 
+          castShadow 
+          receiveShadow
+        >
+          <meshStandardMaterial {...materialProps} />
         </Sphere>
       );
   }

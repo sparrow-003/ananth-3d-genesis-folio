@@ -11,8 +11,46 @@ import Contact from "../components/Contact";
 
 // Simple fallback component for 3D canvas
 const Canvas3DFallback = () => (
-  <div className="w-full h-full bg-gradient-to-b from-dark to-purple/5" />
+  <div className="w-full h-full bg-gradient-to-b from-dark to-purple/5 flex items-center justify-center">
+    <div className="text-purple-light animate-pulse">Loading 3D environment...</div>
+  </div>
 );
+
+// Enhanced ErrorBoundary component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error("Error in component:", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || (
+        <div className="w-full h-full bg-dark flex items-center justify-center">
+          <div className="text-red-500 p-4 text-center">
+            <p className="text-xl">Something went wrong</p>
+            <button 
+              className="mt-4 px-4 py-2 bg-purple rounded-md text-white"
+              onClick={() => this.setState({ hasError: false })}
+            >
+              Try again
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 // Lazy load Canvas3D component with improved error handling
 const Canvas3D = lazy(() => 
@@ -33,15 +71,21 @@ const Index = () => {
     const handleMouseDown = () => {
       document.body.classList.add('using-mouse');
     };
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Tab') {
         document.body.classList.remove('using-mouse');
       }
     };
     
     // Handle errors in 3D rendering
-    const handleError = (event: ErrorEvent) => {
-      if (event.message.includes('THREE') || event.message.includes('WebGL')) {
+    const handleError = (event) => {
+      if (
+        event.message && (
+          event.message.includes('THREE') || 
+          event.message.includes('WebGL') ||
+          event.message.includes('lov')
+        )
+      ) {
         console.error('3D rendering error detected:', event.message);
         setIs3DEnabled(false);
       }
@@ -83,33 +127,6 @@ const Index = () => {
       </SmoothScroll>
     </>
   );
-};
-
-// Enhanced error boundary component
-const ErrorBoundary = ({ children, fallback = <div className="w-full h-full bg-dark" /> }: 
-  { children: React.ReactNode; fallback?: React.ReactNode }) => {
-  const [hasError, setHasError] = useState(false);
-  
-  useEffect(() => {
-    const errorHandler = (error: ErrorEvent) => {
-      console.error("Error in 3D rendering:", error);
-      setHasError(true);
-    };
-    
-    window.addEventListener('error', errorHandler);
-    return () => window.removeEventListener('error', errorHandler);
-  }, []);
-  
-  if (hasError) {
-    return <>{fallback}</>;
-  }
-  
-  try {
-    return <>{children}</>;
-  } catch (error) {
-    console.error("Error in 3D rendering component:", error);
-    return <>{fallback}</>;
-  }
 };
 
 export default Index;
