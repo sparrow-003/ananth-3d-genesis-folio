@@ -16,10 +16,10 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
   });
   
   useEffect(() => {
-    // Prevent mounting issues with 3D components by delaying initialization
+    // Use a more reasonable delay for initialization
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 800); // Further increased delay to ensure 3D components initialize properly
+    }, 300);
     
     // Smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -37,17 +37,15 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
         style={{ scaleX }}
       />
       
-      {/* Only render children when mounted to prevent Three.js initialization issues */}
-      {mounted && (
-        <motion.div 
-          className="flex flex-col"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-        >
-          {children}
-        </motion.div>
-      )}
+      {/* Render children immediately but with fade-in animation */}
+      <motion.div 
+        className="flex flex-col"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: mounted ? 1 : 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        {children}
+      </motion.div>
       
       {/* Scroll indicator that fades out as you scroll down */}
       <motion.div 
