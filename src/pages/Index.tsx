@@ -1,5 +1,6 @@
 
 import { useEffect, Suspense, lazy, useState } from "react";
+import React from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import ParticleBackground from "../components/ParticleBackground";
 import Navbar from "../components/Navbar";
@@ -16,22 +17,32 @@ const Canvas3DFallback = () => (
   </div>
 );
 
-// Enhanced ErrorBoundary component
-class ErrorBoundary extends React.Component {
-  constructor(props) {
+// Define proper interface for ErrorBoundary props and state
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+}
+
+// Enhanced ErrorBoundary component with proper TypeScript types
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true };
   }
 
-  componentDidCatch(error, errorInfo) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     console.error("Error in component:", error, errorInfo);
   }
 
-  render() {
+  render(): React.ReactNode {
     if (this.state.hasError) {
       return this.props.fallback || (
         <div className="w-full h-full bg-dark flex items-center justify-center">
@@ -71,14 +82,14 @@ const Index = () => {
     const handleMouseDown = () => {
       document.body.classList.add('using-mouse');
     };
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Tab') {
         document.body.classList.remove('using-mouse');
       }
     };
     
     // Handle errors in 3D rendering
-    const handleError = (event) => {
+    const handleError = (event: ErrorEvent) => {
       if (
         event.message && (
           event.message.includes('THREE') || 
