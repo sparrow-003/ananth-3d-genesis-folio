@@ -18,58 +18,92 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
   useFrame((state) => {
     if (!meshRef.current) return;
     
-    // Create floating animation
-    meshRef.current.position.y += Math.sin(state.clock.elapsedTime * speed) * 0.002;
+    // Create more dramatic floating animation
+    meshRef.current.position.y += Math.sin(state.clock.elapsedTime * speed) * 0.004;
+    meshRef.current.position.x += Math.cos(state.clock.elapsedTime * speed * 0.5) * 0.002;
     
-    // Slow rotation
-    meshRef.current.rotation.x += 0.002 * speed;
-    meshRef.current.rotation.y += 0.003 * speed;
+    // Enhanced rotation for more dramatic effect
+    meshRef.current.rotation.x += 0.003 * speed;
+    meshRef.current.rotation.y += 0.004 * speed;
+    meshRef.current.rotation.z += 0.001 * speed;
   });
-
-  // Create a material once to reuse
-  const material = (
-    <meshStandardMaterial
-      roughness={0.2}
-      metalness={0.8}
-      color={color}
-      emissive={color}
-      emissiveIntensity={0.2}
-      transparent
-      opacity={0.8}
-    />
-  );
 
   // Render the appropriate shape
   switch (shape) {
     case 'octahedron':
       return (
-        <Octahedron ref={meshRef} args={[size, 0]} position={position}>
-          {material}
+        <Octahedron ref={meshRef} args={[size, 0]} position={position} castShadow receiveShadow>
+          <meshStandardMaterial
+            roughness={0.1}
+            metalness={0.9}
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.8}
+            wireframe={Math.random() > 0.7}
+          />
         </Octahedron>
       );
     case 'tetrahedron':
       return (
-        <Tetrahedron ref={meshRef} args={[size, 0]} position={position}>
-          {material}
+        <Tetrahedron ref={meshRef} args={[size, 0]} position={position} castShadow receiveShadow>
+          <meshStandardMaterial
+            roughness={0.1}
+            metalness={0.9}
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.8}
+            wireframe={Math.random() > 0.7}
+          />
         </Tetrahedron>
       );
     case 'icosahedron':
       return (
-        <Icosahedron ref={meshRef} args={[size, 0]} position={position}>
-          {material}
+        <Icosahedron ref={meshRef} args={[size, 1]} position={position} castShadow receiveShadow>
+          <meshStandardMaterial
+            roughness={0.1}
+            metalness={0.9}
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.8}
+            wireframe={Math.random() > 0.7}
+          />
         </Icosahedron>
       );
     case 'torus':
       return (
-        <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position}>
-          {material}
+        <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position} castShadow receiveShadow>
+          <meshStandardMaterial
+            roughness={0.1}
+            metalness={0.9}
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.8}
+            wireframe={Math.random() > 0.7}
+          />
         </Torus>
       );
     case 'sphere':
     default:
       return (
-        <Sphere ref={meshRef} args={[size, 16, 16]} position={position}>
-          {material}
+        <Sphere ref={meshRef} args={[size, 32, 32]} position={position} castShadow receiveShadow>
+          <meshStandardMaterial
+            roughness={0.1}
+            metalness={0.9}
+            color={color}
+            emissive={color}
+            emissiveIntensity={0.4}
+            transparent
+            opacity={0.8}
+            wireframe={Math.random() > 0.7}
+          />
         </Sphere>
       );
   }
