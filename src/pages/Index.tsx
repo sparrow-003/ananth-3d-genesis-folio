@@ -1,4 +1,3 @@
-
 import { useEffect, Suspense, lazy } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import ParticleBackground from "../components/ParticleBackground";
@@ -44,11 +43,9 @@ const Index = () => {
       
       <ParticleBackground />
       
-      {/* Navigation & Smooth Scrolling Wrapper */}
       <Navbar />
       
       <SmoothScroll>
-        {/* Main Sections */}
         <Hero />
         <About />
         <Skills />

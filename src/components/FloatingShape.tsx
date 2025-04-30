@@ -26,53 +26,90 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.y += 0.003 * speed;
   });
 
-  // Create a standard material that will be reused
-  const material = {
-    color: color,
-    roughness: 0.2,
-    metalness: 0.8,
-    emissive: color,
-    emissiveIntensity: 0.2,
-    transparent: true,
-    opacity: 0.8
-  };
-
   // Render appropriate shape based on prop
   switch (shape) {
     case 'octahedron':
       return (
         <Octahedron args={[size, 0]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Octahedron>
       );
     case 'tetrahedron':
       return (
         <Tetrahedron args={[size, 0]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Tetrahedron>
       );
     case 'icosahedron':
       return (
         <Icosahedron args={[size, 0]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Icosahedron>
       );
     case 'sphere':
       return (
         <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Sphere>
       );
     case 'torus':
       return (
         <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Torus>
       );
     default:
       return (
         <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>
-          <meshStandardMaterial {...material} />
+          <meshStandardMaterial 
+            color={color} 
+            roughness={0.2} 
+            metalness={0.8} 
+            emissive={color} 
+            emissiveIntensity={0.2}
+            transparent={true}
+            opacity={0.8}
+          />
         </Sphere>
       );
   }
