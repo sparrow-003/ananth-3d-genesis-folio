@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 interface SmoothScrollProps {
@@ -7,6 +7,7 @@ interface SmoothScrollProps {
 }
 
 const SmoothScroll = ({ children }: SmoothScrollProps) => {
+  const [mounted, setMounted] = useState(false);
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
@@ -14,32 +15,74 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     restDelta: 0.001
   });
   
-  // Enhanced parallax effect on scroll
-  const opacity = useTransform(scrollYProgress, [0, 0.1], [0.6, 1]);
-  const scale = useTransform(scrollYProgress, [0, 0.1], [0.98, 1]);
+  // Enhanced parallax effect on scroll with improved values
+  const opacity = useTransform(scrollYProgress, [0, 0.05, 0.1], [0.8, 0.9, 1]);
+  const scale = useTransform(scrollYProgress, [0, 0.1], [0.985, 1]);
+  
+  // Additional transform effects for 3D feeling
+  const rotateX = useTransform(scrollYProgress, [0, 0.1], [1, 0]);
+  const translateY = useTransform(scrollYProgress, [0, 0.1], [3, 0]);
   
   useEffect(() => {
+    // Prevent mounting issues with 3D components by delaying initialization
+    const timer = setTimeout(() => {
+      setMounted(true);
+    }, 100);
+    
     // Smooth scrolling behavior
     const handleScroll = () => {
       document.documentElement.style.scrollBehavior = 'smooth';
     };
     
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      clearTimeout(timer);
+    };
   }, []);
 
+  // Enhanced 3D perspective for the entire content
   return (
     <>
+      {/* Progress bar with improved visuals */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1.5 bg-purple z-50 origin-left"
         style={{ scaleX }}
       />
+      
+      {/* Only render children when mounted to prevent Three.js initialization issues */}
+      {mounted && (
+        <motion.div 
+          className="flex flex-col perspective-container"
+          style={{ 
+            opacity, 
+            scale,
+            rotateX: rotateX, 
+            y: translateY,
+            perspective: "1000px"
+          }}
+          transition={{ type: "spring", stiffness: 60, damping: 20 }}
+        >
+          {children}
+        </motion.div>
+      )}
+      
+      {/* Scroll indicator that fades out as you scroll down */}
       <motion.div 
-        className="flex flex-col"
-        style={{ opacity, scale }}
-        transition={{ type: "spring", stiffness: 50 }}
+        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+        style={{ opacity: useTransform(scrollYProgress, [0, 0.1], [1, 0]) }}
       >
-        {children}
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, repeatType: "loop" }}
+          className="flex flex-col items-center"
+        >
+          <span className="text-sm text-gray-400 mb-1">Scroll</span>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-purple">
+            <path d="M7 13l5 5 5-5" />
+          </svg>
+        </motion.div>
       </motion.div>
     </>
   );
