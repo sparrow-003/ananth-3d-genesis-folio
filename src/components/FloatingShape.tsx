@@ -15,16 +15,16 @@ interface FloatingShapeProps {
 const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapeProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
-  // Define the material once to avoid issues
-  const material = <meshStandardMaterial 
-    roughness={0.2} 
-    metalness={0.8} 
-    color={color} 
-    emissive={color} 
-    emissiveIntensity={0.2} 
-    transparent={true} 
-    opacity={0.8} 
-  />;
+  // Define the material props instead of creating a JSX element
+  const materialProps = {
+    roughness: 0.2,
+    metalness: 0.8,
+    color: color,
+    emissive: color,
+    emissiveIntensity: 0.2,
+    transparent: true,
+    opacity: 0.8
+  };
   
   useFrame((state) => {
     if (!meshRef.current) return;
@@ -40,16 +40,16 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
   // Simplified shape rendering with appropriate props
   switch (shape) {
     case 'octahedron':
-      return <Octahedron ref={meshRef} args={[size, 0]} position={position}>{material}</Octahedron>;
+      return <Octahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
     case 'tetrahedron':
-      return <Tetrahedron ref={meshRef} args={[size, 0]} position={position}>{material}</Tetrahedron>;
+      return <Tetrahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
     case 'icosahedron':
-      return <Icosahedron ref={meshRef} args={[size, 0]} position={position}>{material}</Icosahedron>;
+      return <Icosahedron ref={meshRef} args={[size, 0]} position={position} material={materialProps} />;
     case 'torus':
-      return <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position}>{material}</Torus>;
+      return <Torus ref={meshRef} args={[size, size/3, 16, 32]} position={position} material={materialProps} />;
     case 'sphere':
     default:
-      return <Sphere ref={meshRef} args={[size, 16, 16]} position={position}>{material}</Sphere>;
+      return <Sphere ref={meshRef} args={[size, 16, 16]} position={position} material={materialProps} />;
   }
 };
 

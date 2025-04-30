@@ -9,7 +9,7 @@ import Skills from "../components/Skills";
 import Projects from "../components/Projects";
 import Contact from "../components/Contact";
 
-// Lazy load Canvas3D component with simplified fallback
+// Lazy load Canvas3D component with improved error handling
 const Canvas3D = lazy(() => 
   import("../components/Canvas3D").catch(() => {
     console.error("Failed to load Canvas3D component");
@@ -44,9 +44,10 @@ const Index = () => {
   return (
     <>
       <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1]">
-        {/* Only render Canvas3D if the browser supports WebGL */}
         <Suspense fallback={<div className="w-full h-full bg-dark" />}>
-          <Canvas3D />
+          <ErrorBoundary>
+            <Canvas3D />
+          </ErrorBoundary>
         </Suspense>
       </div>
       
@@ -63,6 +64,16 @@ const Index = () => {
       </SmoothScroll>
     </>
   );
+};
+
+// Simple error boundary component
+const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
+  try {
+    return <>{children}</>;
+  } catch (error) {
+    console.error("Error in 3D rendering:", error);
+    return <div className="w-full h-full bg-dark" />;
+  }
 };
 
 export default Index;
