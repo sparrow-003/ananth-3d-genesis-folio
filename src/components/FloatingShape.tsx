@@ -30,17 +30,17 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
 
   const wireframe = Math.random() > 0.7;
 
-  // Material props shared across all shapes
-  const materialProps = {
-    roughness: 0.1,
-    metalness: 0.9,
+  // Create a shared standard material
+  const material = new THREE.MeshStandardMaterial({
     color: color,
     emissive: color,
     emissiveIntensity: 0.4,
+    roughness: 0.1,
+    metalness: 0.9,
     transparent: true,
     opacity: 0.8,
     wireframe: wireframe
-  };
+  });
 
   // Render the appropriate shape
   switch (shape) {
@@ -52,9 +52,8 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
           position={position} 
           castShadow 
           receiveShadow
-        >
-          <meshStandardMaterial {...materialProps} />
-        </Octahedron>
+          material={material}
+        />
       );
     case 'tetrahedron':
       return (
@@ -64,9 +63,8 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
           position={position} 
           castShadow 
           receiveShadow
-        >
-          <meshStandardMaterial {...materialProps} />
-        </Tetrahedron>
+          material={material}
+        />
       );
     case 'icosahedron':
       return (
@@ -76,9 +74,8 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
           position={position} 
           castShadow 
           receiveShadow
-        >
-          <meshStandardMaterial {...materialProps} />
-        </Icosahedron>
+          material={material}
+        />
       );
     case 'torus':
       return (
@@ -88,9 +85,8 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
           position={position} 
           castShadow 
           receiveShadow
-        >
-          <meshStandardMaterial {...materialProps} />
-        </Torus>
+          material={material}
+        />
       );
     case 'sphere':
     default:
@@ -101,9 +97,8 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
           position={position} 
           castShadow 
           receiveShadow
-        >
-          <meshStandardMaterial {...materialProps} />
-        </Sphere>
+          material={material}
+        />
       );
   }
 };

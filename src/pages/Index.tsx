@@ -12,8 +12,8 @@ import Contact from "../components/Contact";
 
 // Simple fallback component for 3D canvas
 const Canvas3DFallback = () => (
-  <div className="w-full h-full bg-gradient-to-b from-dark to-purple/5 flex items-center justify-center">
-    <div className="text-purple-light animate-pulse">Loading 3D environment...</div>
+  <div className="w-full h-full bg-gradient-to-b from-dark to-violet-500/5 flex items-center justify-center">
+    <div className="text-violet-400 animate-pulse">Loading 3D environment...</div>
   </div>
 );
 
@@ -49,7 +49,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
           <div className="text-red-500 p-4 text-center">
             <p className="text-xl">Something went wrong</p>
             <button 
-              className="mt-4 px-4 py-2 bg-purple rounded-md text-white"
+              className="mt-4 px-4 py-2 bg-violet-600 rounded-md text-white"
               onClick={() => this.setState({ hasError: false })}
             >
               Try again
@@ -65,14 +65,15 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 // Lazy load Canvas3D component with improved error handling
 const Canvas3D = lazy(() => 
-  import("../components/Canvas3D").catch(() => {
-    console.error("Failed to load Canvas3D component");
+  import("../components/Canvas3D").catch((error) => {
+    console.error("Failed to load Canvas3D component:", error);
     return { default: Canvas3DFallback };
   })
 );
 
 const Index = () => {
   const [is3DEnabled, setIs3DEnabled] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Preload the fonts and set up the page
   useEffect(() => {
@@ -90,11 +91,13 @@ const Index = () => {
     
     // Handle errors in 3D rendering
     const handleError = (event: ErrorEvent) => {
+      // Check for specific 3D-related errors
       if (
         event.message && (
           event.message.includes('THREE') || 
           event.message.includes('WebGL') ||
-          event.message.includes('lov')
+          event.message.includes('lov') ||
+          event.message.includes('Cannot read properties of undefined')
         )
       ) {
         console.error('3D rendering error detected:', event.message);
@@ -106,12 +109,30 @@ const Index = () => {
     document.addEventListener('keydown', handleKeyDown);
     window.addEventListener('error', handleError);
     
+    // Simulate loading state
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
     return () => {
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('error', handleError);
+      clearTimeout(timer);
     };
   }, []);
+
+  // Loading screen
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-dark z-50">
+        <div className="flex flex-col items-center">
+          <div className="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-violet-300 animate-pulse text-lg">Loading Portfolio...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>

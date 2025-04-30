@@ -1,13 +1,13 @@
 
 import { Canvas } from '@react-three/fiber';
-import { Suspense, useState } from 'react';
-import { OrbitControls, Environment, Stars } from '@react-three/drei';
+import { Suspense, useState, useEffect } from 'react';
+import { OrbitControls, Environment, Stars, Float, Preload } from '@react-three/drei';
 import FloatingShape from './FloatingShape';
 
 // Simple fallback component for when the 3D canvas is loading
 const CanvasLoader = () => (
-  <div className="flex items-center justify-center h-full w-full bg-gradient-to-b from-dark to-purple/5">
-    <div className="text-purple text-xl">Loading 3D scene...</div>
+  <div className="flex items-center justify-center h-full w-full bg-gradient-to-b from-dark to-violet-500/5">
+    <div className="text-violet-400 text-xl animate-pulse">Loading 3D scene...</div>
   </div>
 );
 
@@ -17,7 +17,7 @@ const Canvas3DErrorBoundary = ({ children }: { children: React.ReactNode }) => {
   
   if (hasError) {
     return (
-      <div className="h-full w-full bg-gradient-to-b from-dark to-purple/5 flex items-center justify-center">
+      <div className="h-full w-full bg-gradient-to-b from-dark to-violet-500/5 flex items-center justify-center">
         <div className="text-red-500 text-center p-4">
           <p className="text-xl font-bold">3D rendering error</p>
           <p className="mt-2">Please try refreshing your browser.</p>
@@ -37,7 +37,7 @@ const Canvas3DErrorBoundary = ({ children }: { children: React.ReactNode }) => {
     console.error("Error in Canvas3D:", error);
     setHasError(true);
     return (
-      <div className="h-full w-full bg-gradient-to-b from-dark to-purple/5 flex items-center justify-center">
+      <div className="h-full w-full bg-gradient-to-b from-dark to-violet-500/5 flex items-center justify-center">
         <div className="text-red-500 text-center p-4">
           <p className="text-xl font-bold">3D rendering error</p>
           <p className="mt-2">Please try refreshing your browser.</p>
@@ -47,7 +47,48 @@ const Canvas3DErrorBoundary = ({ children }: { children: React.ReactNode }) => {
   }
 };
 
+// Custom shapes that represent different project categories
+const ProjectShapes = () => {
+  return (
+    <group>
+      {/* Financial Dashboard - Yellow */}
+      <Float speed={1.5} rotationIntensity={1} floatIntensity={2}>
+        <FloatingShape position={[5, 2, -8]} size={1.5} color="#EAB308" shape="octahedron" speed={0.8} />
+      </Float>
+      
+      {/* AI Business - Green */}
+      <Float speed={1.2} rotationIntensity={0.8} floatIntensity={1.5}>
+        <FloatingShape position={[-6, 3, -12]} size={2} color="#22C55E" shape="icosahedron" speed={0.5} />
+      </Float>
+      
+      {/* Chat Bot - Blue */}
+      <Float speed={1.8} rotationIntensity={1.2} floatIntensity={2.2}>
+        <FloatingShape position={[0, -3, -10]} size={1.7} color="#3B82F6" shape="tetrahedron" speed={0.6} />
+      </Float>
+      
+      {/* Dev Hub - Purple */}
+      <Float speed={1} rotationIntensity={0.5} floatIntensity={1.8}>
+        <FloatingShape position={[-4, -2, -6]} size={1.2} color="#8B5CF6" shape="sphere" speed={0.9} />
+      </Float>
+      
+      {/* Additional decorative elements */}
+      <Float speed={0.8} rotationIntensity={0.4} floatIntensity={1}>
+        <FloatingShape position={[6, -1, -14]} size={1.8} color="#EC4899" shape="torus" speed={0.7} />
+      </Float>
+    </group>
+  );
+};
+
 const Canvas3D = () => {
+  const [mounted, setMounted] = useState(false);
+  
+  // Only mount the canvas after the component has rendered on the client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return null;
+
   return (
     <Canvas3DErrorBoundary>
       <div className="canvas-container h-full">
@@ -64,19 +105,26 @@ const Canvas3D = () => {
           performance={{ min: 0.5 }} // Adjust for better performance
           style={{ background: 'transparent' }}
         >
-          <Suspense fallback={null}>
+          <Suspense fallback={<CanvasLoader />}>
             <ambientLight intensity={0.2} />
-            <directionalLight position={[10, 10, 5]} intensity={0.8} />
-            <pointLight position={[-10, -10, -5]} intensity={0.5} color="#ff0040" />
+            <directionalLight position={[10, 10, 5]} intensity={0.8} color="#8B5CF6" />
+            <pointLight position={[-10, -10, -5]} intensity={0.5} color="#22C55E" />
+            <pointLight position={[5, 5, -10]} intensity={0.3} color="#EAB308" />
             
-            <FloatingShape position={[5, 2, -8]} size={1.5} color="#ff0040" shape="octahedron" speed={0.8} />
-            <FloatingShape position={[-6, 3, -12]} size={2} color="#0040ff" shape="icosahedron" speed={0.5} />
-            <FloatingShape position={[0, -3, -10]} size={1.7} color="#00ff40" shape="tetrahedron" speed={0.6} />
-            <FloatingShape position={[-4, -2, -6]} size={1.2} color="#ffaa00" shape="sphere" speed={0.9} />
-            <FloatingShape position={[6, -1, -14]} size={1.8} color="#aa00ff" shape="torus" speed={0.7} />
+            <ProjectShapes />
             
-            <Stars radius={50} depth={50} count={500} factor={4} saturation={1} fade speed={1} />
+            <Stars 
+              radius={50} 
+              depth={50} 
+              count={1000} 
+              factor={4} 
+              saturation={1} 
+              fade 
+              speed={1}
+            />
+            
             <Environment preset="night" />
+            
             <OrbitControls 
               enableZoom={false}
               enablePan={false}
@@ -87,6 +135,8 @@ const Canvas3D = () => {
               minPolarAngle={Math.PI / 3}
               maxPolarAngle={Math.PI / 1.5}
             />
+            
+            <Preload all />
           </Suspense>
         </Canvas>
       </div>

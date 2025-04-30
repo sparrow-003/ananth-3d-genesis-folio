@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
-import { Mail, Phone, Send, User, MessageCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, User, MessageSquare, Download } from 'lucide-react';
 
 const Contact = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -26,10 +26,10 @@ const Contact = () => {
   };
 
   const handleHireMe = () => {
-    const subject = "Interested in Hiring You";
-    const body = `Hello Ananth,
+    const subject = "Project Inquiry - I'd Like to Hire You";
+    const body = `Hello,
 
-I came across your impressive portfolio website and I'm interested in discussing a potential collaboration opportunity with you.
+I came across your impressive portfolio website and I'm interested in discussing a potential project with you.
 
 Project Overview:
 [Brief description of your project/requirements]
@@ -50,24 +50,32 @@ Best regards,
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden bg-gradient-to-b from-dark/50 to-dark" ref={ref}>
+    <section id="contact" className="py-24 relative overflow-hidden bg-gradient-to-b from-dark/90 to-dark" ref={ref}>
+      {/* 3D Elements and Background */}
       <motion.div 
         className="absolute inset-0 -z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.15 }}
         transition={{ duration: 2 }}
       >
-        <div className="absolute inset-0 bg-gradient-radial from-purple/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-radial from-violet-500/10 to-transparent" />
+        
+        {/* Animated grid */}
         <div className="grid grid-cols-6 grid-rows-8 h-full w-full">
           {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-[0.5px] border-purple/10" />
+            <div key={i} className="border-[0.5px] border-violet-500/10" />
           ))}
         </div>
+        
+        {/* 3D floating elements */}
+        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-yellow-400/20 rounded-full animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-green-400/20 rounded-full animate-float-delay"></div>
+        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-violet-400/20 rounded-full animate-float-slow"></div>
       </motion.div>
 
-      <div className="section-container">
+      <div className="section-container relative z-10">
         <motion.h2 
-          className="section-title text-center"
+          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-500 to-yellow-400"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
@@ -92,10 +100,10 @@ Best regards,
         >
           <motion.button
             onClick={handleHireMe}
-            className="px-10 py-5 bg-gradient-to-r from-purple to-purple-vibrant rounded-full text-xl font-bold text-white shadow-lg shadow-purple/30 hover:shadow-xl hover:shadow-purple/50 transition-all"
+            className="px-10 py-5 bg-gradient-to-r from-violet-600 to-purple-700 rounded-full text-xl font-bold text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/50 transition-all relative overflow-hidden group"
             whileHover={{ 
               scale: 1.05, 
-              boxShadow: "0 0 25px rgba(155, 135, 245, 0.6)",
+              boxShadow: "0 0 25px rgba(124, 58, 237, 0.6)",
               textShadow: "0 0 8px rgba(255, 255, 255, 0.5)"
             }}
             whileTap={{ scale: 0.98 }}
@@ -105,6 +113,10 @@ Best regards,
               Hire Me Now
             </span>
             <span className="absolute inset-0 rounded-full bg-white/10 blur-sm" />
+            
+            {/* Animated gradient border */}
+            <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-violet-600 via-yellow-400 to-green-500 opacity-0 blur-sm group-hover:opacity-70 transition-opacity duration-500 animate-spin-slow"></span>
+            <span className="absolute inset-0.5 rounded-full bg-gradient-to-r from-violet-600 to-purple-700 group-hover:bg-gradient-to-r group-hover:from-violet-700 group-hover:to-purple-800 transition-colors duration-300"></span>
           </motion.button>
           <motion.p 
             className="text-gray-400 mt-4 italic"
@@ -119,11 +131,11 @@ Best regards,
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Contact Form with enhanced animations */}
           <motion.div 
-            className="glass-card p-8 lg:col-span-3 border border-purple/20"
+            className="glass-card p-8 lg:col-span-3 border border-violet-500/20 bg-gradient-to-br from-dark/80 to-dark/60"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            whileHover={{ boxShadow: "0 0 30px rgba(139, 92, 246, 0.15)" }}
+            whileHover={{ boxShadow: "0 0 30px rgba(124, 58, 237, 0.15)" }}
           >
             <h3 className="text-2xl font-bold mb-6 text-gradient">Send Me a Message</h3>
             <form className="space-y-6" onSubmit={handleSubmit}>
@@ -139,7 +151,7 @@ Best regards,
                       id="name"
                       name="name"
                       required
-                      className="w-full bg-white/5 border border-gray-700 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple/50 focus:border-purple text-light transition-all"
+                      className="w-full bg-dark/50 border border-violet-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 text-light transition-all"
                       placeholder="John Doe"
                     />
                   </div>
@@ -155,7 +167,7 @@ Best regards,
                       id="email"
                       name="email"
                       required
-                      className="w-full bg-white/5 border border-gray-700 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple/50 focus:border-purple text-light transition-all"
+                      className="w-full bg-dark/50 border border-violet-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 text-light transition-all"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -165,14 +177,14 @@ Best regards,
                 <label htmlFor="subject" className="text-light block">Subject</label>
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                    <MessageCircle size={18} />
+                    <MessageSquare size={18} />
                   </div>
                   <input
                     type="text"
                     id="subject"
                     name="subject"
                     required
-                    className="w-full bg-white/5 border border-gray-700 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple/50 focus:border-purple text-light transition-all"
+                    className="w-full bg-dark/50 border border-violet-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 text-light transition-all"
                     placeholder="Project Inquiry"
                   />
                 </div>
@@ -184,18 +196,18 @@ Best regards,
                   name="message"
                   rows={6}
                   required
-                  className="w-full bg-white/5 border border-gray-700 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple/50 focus:border-purple text-light resize-none transition-all"
+                  className="w-full bg-dark/50 border border-violet-500/20 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500 text-light resize-none transition-all"
                   placeholder="Tell me about your project..."
                 ></textarea>
               </div>
               <motion.button
                 type="submit"
-                className="px-8 py-3 bg-purple rounded-md font-medium text-white shadow-lg shadow-purple/30 hover:bg-purple-vibrant transition-all w-full md:w-auto"
-                whileHover={{ scale: 1.02, boxShadow: "0 0 15px rgba(139, 92, 246, 0.4)" }}
+                className="px-8 py-3 bg-gradient-to-r from-violet-600 to-purple-700 rounded-md font-medium text-white shadow-lg shadow-violet-500/30 hover:shadow-violet-500/50 transition-all w-full md:w-auto relative overflow-hidden group"
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={formStatus === 'submitting'}
               >
-                <span className="flex items-center justify-center gap-2">
+                <span className="relative z-10 flex items-center justify-center gap-2">
                   {formStatus === 'idle' && (
                     <>
                       <Send size={18} />
@@ -206,6 +218,7 @@ Best regards,
                   {formStatus === 'success' && 'Message Sent!'}
                   {formStatus === 'error' && 'Please Try Again'}
                 </span>
+                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-purple-700 to-violet-600 transition-opacity"></span>
               </motion.button>
               
               {formStatus === 'success' && (
@@ -232,11 +245,11 @@ Best regards,
           
           {/* Contact Info with enhanced animations */}
           <motion.div 
-            className="glass-card p-8 lg:col-span-2 border border-purple/20"
+            className="glass-card p-8 lg:col-span-2 border border-violet-500/20 bg-gradient-to-br from-dark/80 to-dark/60"
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            whileHover={{ boxShadow: "0 0 30px rgba(139, 92, 246, 0.15)" }}
+            whileHover={{ boxShadow: "0 0 30px rgba(124, 58, 237, 0.15)" }}
           >
             <h3 className="text-2xl font-bold mb-6 text-gradient">Contact Information</h3>
             <div className="space-y-6">
@@ -246,13 +259,13 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(139, 92, 246, 0.3)" }}
+                  className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(124, 58, 237, 0.3)" }}
                 >
-                  <Phone size={18} className="text-purple" />
+                  <Phone size={18} className="text-violet-400" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-purple-light">Phone</h4>
+                  <h4 className="font-semibold text-violet-300">Phone</h4>
                   <p className="text-gray-300">+91 6384227309</p>
                 </div>
               </motion.div>
@@ -263,13 +276,13 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(139, 92, 246, 0.3)" }}
+                  className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(124, 58, 237, 0.3)" }}
                 >
-                  <Mail size={18} className="text-purple" />
+                  <Mail size={18} className="text-violet-400" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-purple-light">Email</h4>
+                  <h4 className="font-semibold text-violet-300">Email</h4>
                   <p className="text-gray-300">thanan757@gmail.com</p>
                 </div>
               </motion.div>
@@ -280,17 +293,14 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(139, 92, 246, 0.3)" }}
+                  className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(124, 58, 237, 0.3)" }}
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple">
-                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                    <circle cx="12" cy="10" r="3"></circle>
-                  </svg>
+                  <MapPin size={18} className="text-violet-400" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-purple-light">Location</h4>
-                  <p className="text-gray-300">Bangalore, India</p>
+                  <h4 className="font-semibold text-violet-300">Location</h4>
+                  <p className="text-gray-300">Madurai, Tamil Nadu, India</p>
                 </div>
               </motion.div>
             </div>
@@ -302,8 +312,8 @@ Best regards,
                 href="https://linkedin.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center hover:bg-purple hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(139, 92, 246, 0.6)" }}
+                className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center hover:bg-violet-600 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(124, 58, 237, 0.6)" }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -317,8 +327,8 @@ Best regards,
                 href="https://github.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center hover:bg-purple hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(139, 92, 246, 0.6)" }}
+                className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center hover:bg-violet-600 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(124, 58, 237, 0.6)" }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -330,8 +340,8 @@ Best regards,
                 href="https://twitter.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center hover:bg-purple hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(139, 92, 246, 0.6)" }}
+                className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center hover:bg-violet-600 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(124, 58, 237, 0.6)" }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -341,8 +351,8 @@ Best regards,
               
               <motion.a 
                 href="#" 
-                className="w-10 h-10 bg-purple/20 rounded-full flex items-center justify-center hover:bg-purple hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(139, 92, 246, 0.6)" }}
+                className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center hover:bg-violet-600 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(124, 58, 237, 0.6)" }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -357,18 +367,14 @@ Best regards,
             <div className="mt-10">
               <motion.a 
                 href="#" 
-                className="inline-flex items-center gap-2 px-6 py-3 border border-purple rounded-md font-medium text-light hover:bg-purple/10 transition-all group relative overflow-hidden"
-                whileHover={{ scale: 1.05, borderColor: "#D6BCFA" }}
+                className="inline-flex items-center gap-2 px-6 py-3 border border-violet-500 rounded-md font-medium text-light hover:bg-violet-500/10 transition-all group relative overflow-hidden"
+                whileHover={{ scale: 1.05, borderColor: "#8B5CF6" }}
                 whileTap={{ scale: 0.95 }}
                 download
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
+                <Download size={18} />
                 <span className="relative z-10">Download Resume</span>
-                <span className="absolute inset-0 bg-purple/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+                <span className="absolute inset-0 bg-violet-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
               </motion.a>
             </div>
           </motion.div>
@@ -376,7 +382,7 @@ Best regards,
       </div>
       
       {/* Footer with cinematic animation */}
-      <footer className="mt-20 border-t border-gray-800 pt-8">
+      <footer className="mt-20 border-t border-violet-500/20 pt-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.p 
             className="text-gray-400"

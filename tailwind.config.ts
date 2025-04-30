@@ -72,6 +72,24 @@ export default {
                     dark: '#7E69AB',
                     vibrant: '#8B5CF6'
                 },
+                violet: {
+                    light: '#DDD6FE',
+                    DEFAULT: '#8B5CF6',
+                    dark: '#7C3AED',
+                    vibrant: '#6D28D9'
+                },
+                green: {
+                    light: '#A7F3D0',
+                    DEFAULT: '#10B981',
+                    dark: '#059669',
+                    vibrant: '#34D399'
+                },
+                yellow: {
+                    light: '#FDE68A',
+                    DEFAULT: '#FBBF24',
+                    dark: '#D97706',
+                    vibrant: '#F59E0B'
+                },
                 glass: {
                     light: 'rgba(255, 255, 255, 0.1)',
                     DEFAULT: 'rgba(255, 255, 255, 0.15)',
@@ -119,9 +137,49 @@ export default {
                         transform: 'translateY(-20px)'
                     }
                 },
+                'float-delay': {
+                    '0%, 100%': {
+                        transform: 'translateY(0px)'
+                    },
+                    '50%': {
+                        transform: 'translateY(-20px)'
+                    }
+                },
+                'float-slow': {
+                    '0%, 100%': {
+                        transform: 'translateY(0px)'
+                    },
+                    '50%': {
+                        transform: 'translateY(-15px)'
+                    }
+                },
                 'rotation': {
                     '0%': { transform: 'rotate(0deg)' },
                     '100%': { transform: 'rotate(360deg)' }
+                },
+                'reverse-rotation': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(-360deg)' }
+                },
+                'pulse-slow': {
+                    '0%, 100%': { 
+                        transform: 'scale(1)',
+                        opacity: '0.2'
+                    },
+                    '50%': { 
+                        transform: 'scale(1.05)',
+                        opacity: '0.3' 
+                    }
+                },
+                'reverse-pulse': {
+                    '0%, 100%': { 
+                        transform: 'scale(1)',
+                        opacity: '0.2'
+                    },
+                    '50%': { 
+                        transform: 'scale(0.95)',
+                        opacity: '0.3' 
+                    }
                 },
                 'pulse-glow': {
                     '0%, 100%': { 
@@ -132,6 +190,23 @@ export default {
                         opacity: '0.8',
                         filter: 'brightness(1.2)' 
                     }
+                },
+                'spin-slow': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' }
+                },
+                'reverse-spin': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(-360deg)' }
+                },
+                'flip': {
+                    '0%': { transform: 'rotateY(0deg)' },
+                    '100%': { transform: 'rotateY(360deg)' }
+                },
+                'pop': {
+                    '0%': { transform: 'scale(0.95)', opacity: '0.8' },
+                    '50%': { transform: 'scale(1.05)', opacity: '1' },
+                    '100%': { transform: 'scale(1)', opacity: '1' }
                 }
 			},
 			animation: {
@@ -139,8 +214,16 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
                 'fade-in': 'fade-in 0.5s ease-out',
                 'float': 'float 6s ease-in-out infinite',
+                'float-delay': 'float-delay 7s ease-in-out infinite 1s',
+                'float-slow': 'float-slow 8s ease-in-out infinite 2s',
                 'rotation': 'rotation 20s linear infinite',
-                'pulse-glow': 'pulse-glow 3s ease-in-out infinite'
+                'pulse-slow': 'pulse-slow 8s ease-in-out infinite',
+                'reverse-pulse': 'reverse-pulse 9s ease-in-out infinite 2s',
+                'pulse-glow': 'pulse-glow 3s ease-in-out infinite',
+                'spin-slow': 'spin-slow 25s linear infinite',
+                'reverse-spin': 'reverse-spin 30s linear infinite',
+                'flip': 'flip 2s ease-in-out',
+                'pop': 'pop 0.5s ease-in-out'
 			},
             fontFamily: {
                 display: ['Playfair Display', 'serif'],
