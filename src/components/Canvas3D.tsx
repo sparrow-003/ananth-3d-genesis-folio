@@ -10,14 +10,14 @@ const Canvas3D = () => {
       <Canvas
         shadows 
         camera={{ position: [0, 0, 10], fov: 75 }}
-        dpr={[1, 2]} // Optimize for different device pixel ratios
-        gl={{ antialias: true, alpha: true }} // Enable transparency and anti-aliasing
+        dpr={[1, 1.5]} // Optimized for performance
+        gl={{ antialias: true, alpha: true }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           
-          {/* Simple shapes with fixed props to avoid any issues */}
+          {/* Simplified shapes setup */}
           <FloatingShape position={[3, 1, -5]} size={1} color="#9b87f5" shape="sphere" speed={1} />
           <FloatingShape position={[-4, 2, -10]} size={1.5} color="#7E69AB" shape="sphere" speed={0.7} />
           <FloatingShape position={[0, -2, -8]} size={1.2} color="#D6BCFA" shape="sphere" speed={0.5} />

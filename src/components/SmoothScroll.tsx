@@ -16,10 +16,10 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
   });
   
   useEffect(() => {
-    // Use a more reasonable delay for initialization
+    // Use a shorter delay for initialization
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 600);
+    }, 300);
     
     // Smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -42,7 +42,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
         className="flex flex-col"
         initial={{ opacity: 0 }}
         animate={{ opacity: mounted ? 1 : 0 }}
-        transition={{ duration: 0.8 }}
+        transition={{ duration: 0.6 }}
       >
         {children}
       </motion.div>
