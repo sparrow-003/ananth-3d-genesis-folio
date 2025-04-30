@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,7 +62,21 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+                // Custom portfolio colors
+                dark: '#1A1F2C',
+                light: '#F1F1F1',
+                purple: {
+                    light: '#D6BCFA',
+                    DEFAULT: '#9b87f5',
+                    dark: '#7E69AB',
+                    vibrant: '#8B5CF6'
+                },
+                glass: {
+                    light: 'rgba(255, 255, 255, 0.1)',
+                    DEFAULT: 'rgba(255, 255, 255, 0.15)',
+                    dark: 'rgba(0, 0, 0, 0.15)'
+                }
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -84,12 +99,57 @@ export default {
 					to: {
 						height: '0'
 					}
-				}
+				},
+                // Custom animations
+                'fade-in': {
+                    '0%': {
+                        opacity: '0',
+                        transform: 'translateY(10px)'
+                    },
+                    '100%': {
+                        opacity: '1',
+                        transform: 'translateY(0)'
+                    }
+                },
+                'float': {
+                    '0%, 100%': {
+                        transform: 'translateY(0px)'
+                    },
+                    '50%': {
+                        transform: 'translateY(-20px)'
+                    }
+                },
+                'rotation': {
+                    '0%': { transform: 'rotate(0deg)' },
+                    '100%': { transform: 'rotate(360deg)' }
+                },
+                'pulse-glow': {
+                    '0%, 100%': { 
+                        opacity: '1',
+                        filter: 'brightness(1)' 
+                    },
+                    '50%': { 
+                        opacity: '0.8',
+                        filter: 'brightness(1.2)' 
+                    }
+                }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
-			}
+				'accordion-up': 'accordion-up 0.2s ease-out',
+                'fade-in': 'fade-in 0.5s ease-out',
+                'float': 'float 6s ease-in-out infinite',
+                'rotation': 'rotation 20s linear infinite',
+                'pulse-glow': 'pulse-glow 3s ease-in-out infinite'
+			},
+            fontFamily: {
+                display: ['Playfair Display', 'serif'],
+                body: ['Inter', 'sans-serif']
+            },
+            backgroundImage: {
+                'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+                'gradient-glass': 'linear-gradient(to right bottom, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.3))'
+            }
 		}
 	},
 	plugins: [require("tailwindcss-animate")],
