@@ -24,15 +24,23 @@ const AnimatedText = ({ texts, interval = 3000, className = '' }: AnimatedTextPr
     return () => clearInterval(intervalId);
   }, [texts, interval]);
 
+  // Enhanced animation variants
+  const variants = {
+    initial: { y: 20, opacity: 0, rotateX: 45 },
+    animate: { y: 0, opacity: 1, rotateX: 0 },
+    exit: { y: -20, opacity: 0, rotateX: -45 }
+  };
+
   return (
     <div className="relative inline-block">
       <AnimatePresence mode="wait">
         {isVisible && (
           <motion.span
             key={currentIndex}
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -20, opacity: 0 }}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            variants={variants}
             transition={{ duration: 0.5, ease: "easeInOut" }}
             className={`inline-block ${className}`}
           >
