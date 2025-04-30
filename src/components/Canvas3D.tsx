@@ -1,15 +1,14 @@
 
 import { Canvas } from '@react-three/fiber';
 import { Suspense } from 'react';
-import { OrbitControls, Environment, PerspectiveCamera } from '@react-three/drei';
+import { OrbitControls, Environment } from '@react-three/drei';
 import FloatingShape from './FloatingShape';
 
 const Canvas3D = () => {
   return (
     <div className="canvas-container">
-      <Canvas dpr={[1, 2]} shadows>
+      <Canvas shadows dpr={[1, 2]}>
         <Suspense fallback={null}>
-          <PerspectiveCamera makeDefault position={[0, 0, 10]} fov={75} />
           <ambientLight intensity={0.5} />
           <directionalLight position={[10, 10, 5]} intensity={1} />
           <spotLight position={[-10, 10, 10]} angle={0.15} penumbra={1} intensity={0.8} />

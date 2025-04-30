@@ -19,22 +19,16 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     // Prevent mounting issues with 3D components by delaying initialization
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 100);
+    }, 300); // Increased delay to ensure 3D components initialize properly
     
     // Smooth scrolling behavior
-    const handleScroll = () => {
-      document.documentElement.style.scrollBehavior = 'smooth';
-    };
-    
-    window.addEventListener('scroll', handleScroll);
+    document.documentElement.style.scrollBehavior = 'smooth';
     
     return () => {
-      window.removeEventListener('scroll', handleScroll);
       clearTimeout(timer);
     };
   }, []);
 
-  // Enhanced 3D perspective for the entire content
   return (
     <>
       {/* Progress bar with improved visuals */}
@@ -50,9 +44,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
           initial={{ opacity: 0.8, scale: 0.985 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: "spring", stiffness: 60, damping: 20 }}
-          style={{ 
-            perspective: "1000px"
-          }}
+          style={{ perspective: "1000px" }}
         >
           {children}
         </motion.div>

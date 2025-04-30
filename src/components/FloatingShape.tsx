@@ -26,38 +26,32 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.y += 0.003 * speed;
   });
 
-  const material = <meshStandardMaterial 
+  // Create material outside of the JSX to avoid prop issues
+  const sharedMaterial = <meshStandardMaterial 
     color={color} 
     roughness={0.2}
     metalness={0.8}
     emissive={color}
     emissiveIntensity={0.2}
-    opacity={0.8}
     transparent
+    opacity={0.8}
   />;
 
-  const renderShape = () => {
-    switch (shape) {
-      case 'octahedron':
-        return <Octahedron args={[size, 0]} ref={meshRef}>{material}</Octahedron>;
-      case 'tetrahedron':
-        return <Tetrahedron args={[size, 0]} ref={meshRef}>{material}</Tetrahedron>;
-      case 'icosahedron':
-        return <Icosahedron args={[size, 0]} ref={meshRef}>{material}</Icosahedron>;
-      case 'sphere':
-        return <Sphere args={[size, 16, 16]} ref={meshRef}>{material}</Sphere>;
-      case 'torus':
-        return <Torus args={[size, size/3, 16, 32]} ref={meshRef}>{material}</Torus>;
-      default:
-        return <Sphere args={[size, 16, 16]} ref={meshRef}>{material}</Sphere>;
-    }
-  };
-
-  return (
-    <group position={position}>
-      {renderShape()}
-    </group>
-  );
+  // Render appropriate shape based on prop
+  switch (shape) {
+    case 'octahedron':
+      return <Octahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Octahedron>;
+    case 'tetrahedron':
+      return <Tetrahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Tetrahedron>;
+    case 'icosahedron':
+      return <Icosahedron args={[size, 0]} position={position} ref={meshRef}>{sharedMaterial}</Icosahedron>;
+    case 'sphere':
+      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>{sharedMaterial}</Sphere>;
+    case 'torus':
+      return <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef}>{sharedMaterial}</Torus>;
+    default:
+      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>{sharedMaterial}</Sphere>;
+  }
 };
 
 export default FloatingShape;

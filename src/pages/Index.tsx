@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+
+import { useEffect, Suspense } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import Canvas3D from "../components/Canvas3D";
 import ParticleBackground from "../components/ParticleBackground";
@@ -33,8 +34,11 @@ const Index = () => {
 
   return (
     <>
-      {/* 3D Background & Particles */}
-      <Canvas3D />
+      {/* 3D Background wrapped in Suspense */}
+      <Suspense fallback={<div className="min-h-screen bg-dark" />}>
+        <Canvas3D />
+      </Suspense>
+      
       <ParticleBackground />
       
       {/* Navigation & Smooth Scrolling Wrapper */}
