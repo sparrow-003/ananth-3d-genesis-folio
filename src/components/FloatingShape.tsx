@@ -26,31 +26,55 @@ const FloatingShape = ({ position, size, color, shape, speed }: FloatingShapePro
     meshRef.current.rotation.y += 0.003 * speed;
   });
 
-  // Create material directly instead of as JSX to avoid Three.js prop issues
-  const materialProps = {
+  // Create material
+  const material = new THREE.MeshStandardMaterial({
     color,
     roughness: 0.2,
     metalness: 0.8,
-    emissive: color,
+    emissive: new THREE.Color(color),
     emissiveIntensity: 0.2,
     transparent: true,
     opacity: 0.8
-  };
+  });
 
   // Render appropriate shape based on prop
   switch (shape) {
     case 'octahedron':
-      return <Octahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Octahedron args={[size, 0]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Octahedron>
+      );
     case 'tetrahedron':
-      return <Tetrahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Tetrahedron args={[size, 0]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Tetrahedron>
+      );
     case 'icosahedron':
-      return <Icosahedron args={[size, 0]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Icosahedron args={[size, 0]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Icosahedron>
+      );
     case 'sphere':
-      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Sphere>
+      );
     case 'torus':
-      return <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Torus args={[size, size/3, 16, 32]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Torus>
+      );
     default:
-      return <Sphere args={[size, 16, 16]} position={position} ref={meshRef} material={new THREE.MeshStandardMaterial(materialProps)} />;
+      return (
+        <Sphere args={[size, 16, 16]} position={position} ref={meshRef}>
+          <primitive object={material} attach="material" />
+        </Sphere>
+      );
   }
 };
 

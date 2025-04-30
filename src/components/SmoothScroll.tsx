@@ -19,7 +19,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     // Prevent mounting issues with 3D components by delaying initialization
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 500); // Increased delay to ensure 3D components initialize properly
+    }, 800); // Further increased delay to ensure 3D components initialize properly
     
     // Smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
@@ -31,7 +31,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
 
   return (
     <>
-      {/* Progress bar with improved visuals */}
+      {/* Progress bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1.5 bg-purple z-50 origin-left"
         style={{ scaleX }}
@@ -41,9 +41,9 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       {mounted && (
         <motion.div 
           className="flex flex-col"
-          initial={{ opacity: 0.8 }}
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.8 }}
         >
           {children}
         </motion.div>

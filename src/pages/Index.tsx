@@ -1,7 +1,6 @@
 
-import { useEffect, Suspense } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import SmoothScroll from "../components/SmoothScroll";
-import Canvas3D from "../components/Canvas3D";
 import ParticleBackground from "../components/ParticleBackground";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
@@ -9,6 +8,9 @@ import About from "../components/About";
 import Skills from "../components/Skills";
 import Projects from "../components/Projects";
 import Contact from "../components/Contact";
+
+// Lazy load Canvas3D component to improve initial loading time
+const Canvas3D = lazy(() => import("../components/Canvas3D"));
 
 const Index = () => {
   // Preload the fonts and set up the page
