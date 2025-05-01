@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
@@ -27,7 +26,7 @@ const Contact = () => {
 
   const handleHireMe = () => {
     const subject = "Project Inquiry - I'd Like to Hire You";
-    const body = `Hello,
+    const body = `Hello Ananth,
 
 I came across your impressive portfolio website and I'm interested in discussing a potential project with you.
 
@@ -47,6 +46,16 @@ Best regards,
 
     const mailtoLink = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
+  };
+
+  const handleDownloadResume = () => {
+    // Create a link to the resume PDF and trigger download
+    const link = document.createElement('a');
+    link.href = '/resume.pdf';
+    link.download = 'Ananth_N_Resume.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -365,17 +374,16 @@ Best regards,
             
             {/* Resume Download with enhanced animation */}
             <div className="mt-10">
-              <motion.a 
-                href="#" 
+              <motion.button 
+                onClick={handleDownloadResume}
                 className="inline-flex items-center gap-2 px-6 py-3 border border-violet-500 rounded-md font-medium text-light hover:bg-violet-500/10 transition-all group relative overflow-hidden"
                 whileHover={{ scale: 1.05, borderColor: "#8B5CF6" }}
                 whileTap={{ scale: 0.95 }}
-                download
               >
                 <Download size={18} />
                 <span className="relative z-10">Download Resume</span>
                 <span className="absolute inset-0 bg-violet-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
-              </motion.a>
+              </motion.button>
             </div>
           </motion.div>
         </div>

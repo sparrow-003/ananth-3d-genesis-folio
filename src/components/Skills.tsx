@@ -1,4 +1,3 @@
-
 import { motion } from 'framer-motion';
 import { useRef } from 'react';
 import { useInView } from 'framer-motion';
@@ -16,8 +15,6 @@ const Skills = () => {
         { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
         { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
         { name: "TypeScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" },
-        { name: "Java", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg" },
-        { name: "C++", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cplusplus/cplusplus-original.svg" },
       ]
     },
     {
@@ -36,12 +33,12 @@ const Skills = () => {
       title: "AI & Machine Learning",
       icon: <BrainCircuit className="text-purple-400" size={28} />,
       skills: [
-        { name: "TensorFlow", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg" },
-        { name: "PyTorch", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/pytorch/pytorch-original.svg" },
-        { name: "Scikit-Learn", icon: "https://upload.wikimedia.org/wikipedia/commons/0/05/Scikit_learn_logo_small.svg" },
         { name: "Prompt Engineering", icon: "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-ai-industry-4-flaticons-flat-flat-icons.png" },
-        { name: "LLM Integration", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
-        { name: "NLP", icon: "https://img.icons8.com/external-smashingstocks-flat-smashing-stocks/66/external-Natural-Language-Processing-artificial-intelligence-smashingstocks-flat-smashing-stocks.png" },
+        { name: "LLM", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
+        { name: "LangChain", icon: "https://img.icons8.com/external-tal-revivo-color-tal-revivo/96/external-chainlink-is-a-blockchain-abstraction-layer-that-enables-universally-connected-smart-contracts-logo-color-tal-revivo.png" },
+        { name: "Neural Network", icon: "https://img.icons8.com/external-flaticons-lineal-color-flat-icons/64/external-neural-network-robotics-flaticons-lineal-color-flat-icons.png" },
+        { name: "Hugging Face", icon: "https://huggingface.co/front/assets/huggingface_logo-noborder.svg" },
+        { name: "API Integration", icon: "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-api-no-code-flaticons-flat-flat-icons.png" },
       ]
     },
     {
@@ -49,10 +46,8 @@ const Skills = () => {
       icon: <Database className="text-blue-400" size={28} />,
       skills: [
         { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
-        { name: "PostgreSQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" },
-        { name: "MySQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
-        { name: "Redis", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg" },
-        { name: "Firebase", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg" },
+        { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
+        { name: "Supabase", icon: "https://seeklogo.com/images/S/supabase-logo-DCC676FFE2-seeklogo.com.png" },
       ]
     },
     {
@@ -60,10 +55,7 @@ const Skills = () => {
       icon: <Layers className="text-orange-400" size={28} />,
       skills: [
         { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
-        { name: "Kubernetes", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg" },
-        { name: "AWS", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg" },
         { name: "GitHub Actions", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
-        { name: "Azure", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/azure/azure-original.svg" },
       ]
     },
     {
@@ -71,9 +63,6 @@ const Skills = () => {
       icon: <Cpu className="text-green-400" size={28} />,
       skills: [
         { name: "Express", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" },
-        { name: "Three.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/threejs/threejs-original.svg" },
-        { name: "Redux", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" },
-        { name: "GraphQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/graphql/graphql-plain.svg" },
         { name: "Django", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" },
         { name: "Flask", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flask/flask-original.svg" },
       ]
@@ -83,9 +72,6 @@ const Skills = () => {
       icon: <PencilRuler className="text-indigo-400" size={28} />,
       skills: [
         { name: "Figma", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
-        { name: "Adobe XD", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/xd/xd-plain.svg" },
-        { name: "Photoshop", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/photoshop/photoshop-plain.svg" },
-        { name: "Motion Design", icon: "https://img.icons8.com/color/48/animation--v1.png" },
         { name: "UI/UX Research", icon: "https://img.icons8.com/fluency/48/test-lab.png" },
       ]
     },
@@ -93,11 +79,10 @@ const Skills = () => {
       title: "Soft Skills",
       icon: <CheckCircle className="text-violet-400" size={28} />,
       skills: [
-        { name: "Project Management", icon: "https://img.icons8.com/color/48/project-management.png" },
-        { name: "Agile Methodology", icon: "https://img.icons8.com/color/48/agile.png" },
-        { name: "Team Leadership", icon: "https://img.icons8.com/color/48/conference-call--v1.png" },
         { name: "Problem Solving", icon: "https://img.icons8.com/color/48/solution.png" },
         { name: "Communication", icon: "https://img.icons8.com/color/48/communication--v1.png" },
+        { name: "Critical Thinking", icon: "https://img.icons8.com/color/48/brain--v1.png" },
+        { name: "Team Leadership", icon: "https://img.icons8.com/color/48/conference-call--v1.png" },
       ]
     }
   ];

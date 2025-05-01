@@ -3,7 +3,7 @@ import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useEffect, useState, useRef } from 'react';
-import { Mail, ArrowRight, Download } from 'lucide-react';
+import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
 
 const Hero = () => {
   const roles = [
@@ -51,6 +51,27 @@ Best regards,
     window.location.href = mailtoLink;
   };
 
+  // Catchy lines for HR professionals
+  const hrPickupLines = [
+    "Turning coffee into code since 2018",
+    "Where creativity meets technical excellence",
+    "Less talking, more coding - but I do both well",
+    "Bringing ideas to life, one pixel at a time",
+    "Not just a developer, a problem solver"
+  ];
+
+  const [currentPickupLine, setCurrentPickupLine] = useState(hrPickupLines[0]);
+
+  // Rotate through pickup lines
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const randomIndex = Math.floor(Math.random() * hrPickupLines.length);
+      setCurrentPickupLine(hrPickupLines[randomIndex]);
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     // Improved scroll handler with performance optimization
     const handleScroll = () => {
@@ -97,7 +118,7 @@ Best regards,
       </motion.div>
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-12 z-10">
-        {/* Avatar with enhanced 3D hover effect */}
+        {/* Avatar with enhanced 3D hover effects */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
           animate={{ opacity: 1, scale: 1, rotateY: 0 }}
@@ -113,10 +134,21 @@ Best regards,
               transition: { duration: 0.5 }
             }}
           >
-            <Avatar className="w-full h-full rounded-full image-3d">
-              <AvatarImage src="/lovable-uploads/8efe32d5-ce31-4351-a27d-8fbc089a153d.png" alt="Ananth N" className="object-cover" />
-              <AvatarFallback className="bg-purple text-4xl">AN</AvatarFallback>
-            </Avatar>
+            <div className="avatar-container group">
+              <Avatar className="w-full h-full rounded-full image-3d flip-card-inner">
+                <div className="flip-card-front">
+                  <AvatarImage src="/lovable-uploads/8efe32d5-ce31-4351-a27d-8fbc089a153d.png" alt="Ananth N" className="object-cover" />
+                  <AvatarFallback className="bg-purple text-4xl">AN</AvatarFallback>
+                </div>
+                <div className="flip-card-back bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                  <div className="text-center">
+                    <h3 className="text-xl font-bold">Ananth N</h3>
+                    <p className="text-sm">Full Stack Developer</p>
+                    <p className="text-xs mt-2">Interactive Resume</p>
+                  </div>
+                </div>
+              </Avatar>
+            </div>
             <div className="absolute inset-0 bg-gradient-to-tr from-purple/20 via-green-500/10 to-yellow-400/10 pointer-events-none" />
           </motion.div>
         </motion.div>
@@ -157,13 +189,25 @@ Best regards,
             I'm a <AnimatedText texts={roles} className="text-purple" interval={2500} />
           </motion.div>
           <motion.p 
-            className="text-lg md:text-xl max-w-2xl mx-auto lg:mx-0 mb-12 text-gray-300"
+            className="text-lg md:text-xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
             Crafting innovative solutions with code and AI expertise. A self-taught developer building the future one project at a time.
           </motion.p>
+
+          {/* Cinematic HR pickup line */}
+          <motion.div 
+            className="glass-card p-3 mb-12 border border-violet-500/20 relative overflow-hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9, duration: 0.8 }}
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-transparent to-green-500/5"></div>
+            <p className="text-gradient italic font-medium">"{currentPickupLine}"</p>
+          </motion.div>
+          
           <motion.div
             className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4"
             initial={{ opacity: 0 }}
@@ -206,40 +250,50 @@ Best regards,
             </motion.a>
           </motion.div>
           
-          {/* Skills showcase cards */}
+          {/* Information cards */}
           <motion.div
-            className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4"
+            className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.8 }}
           >
             <motion.div 
-              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
-              <p className="text-sm text-gradient-green font-semibold">UX/UI Design</p>
-              <p className="text-xs text-gray-400">Figma Expert</p>
+              <div className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-violet-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gradient font-semibold">Experience</p>
+                <p className="text-xs text-gray-400">Full Stack Developer</p>
+              </div>
             </motion.div>
+
             <motion.div 
-              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: -2 }}
             >
-              <p className="text-sm text-gradient font-semibold">AI/ML</p>
-              <p className="text-xs text-gray-400">Prompt Engineering</p>
+              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-green-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gradient-green font-semibold">Location</p>
+                <p className="text-xs text-gray-400">Madurai, Tamil Nadu</p>
+              </div>
             </motion.div>
+
             <motion.div 
-              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
+              className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
-              <p className="text-sm text-gradient-yellow font-semibold">Web Dev</p>
-              <p className="text-xs text-gray-400">React, NextJS</p>
-            </motion.div>
-            <motion.div 
-              className="cinematic-border bg-dark/40 backdrop-blur-sm p-3 rounded-xl"
-              whileHover={{ scale: 1.05, rotate: -2 }}
-            >
-              <p className="text-sm text-gradient-green font-semibold">Backend</p>
-              <p className="text-xs text-gray-400">Flask, MongoDB</p>
+              <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
+                <Code className="w-5 h-5 text-yellow-400" />
+              </div>
+              <div>
+                <p className="text-sm text-gradient-yellow font-semibold">Tech Stack</p>
+                <p className="text-xs text-gray-400">Python, JS, TS, React</p>
+              </div>
             </motion.div>
           </motion.div>
         </motion.div>
@@ -287,6 +341,47 @@ Best regards,
           </motion.svg>
         </div>
       </motion.div>
+
+      {/* Add CSS for avatar flip effect */}
+      <style jsx global>{`
+        .avatar-container {
+          perspective: 1000px;
+          width: 100%;
+          height: 100%;
+        }
+
+        .flip-card-inner {
+          position: relative;
+          width: 100%;
+          height: 100%;
+          transition: transform 0.8s;
+          transform-style: preserve-3d;
+        }
+
+        .avatar-container:hover .flip-card-inner {
+          transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          -webkit-backface-visibility: hidden;
+          backface-visibility: hidden;
+        }
+
+        .flip-card-front {
+          background-color: transparent;
+        }
+
+        .flip-card-back {
+          transform: rotateY(180deg);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+        }
+      `}</style>
     </section>
   );
 };
