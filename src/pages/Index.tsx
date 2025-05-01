@@ -1,4 +1,3 @@
-
 import React, { useEffect, Suspense, lazy, useState } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import ParticleBackground from "../components/ParticleBackground";
@@ -77,6 +76,12 @@ const Index = () => {
   // Preload the fonts and set up the page
   useEffect(() => {
     document.title = "Ananth N - Portfolio";
+    
+    // Load the avatar flip CSS file
+    const link = document.createElement('link');
+    link.rel = 'stylesheet';
+    link.href = '/styles/avatar-flip.css';
+    document.head.appendChild(link);
     
     // Event listeners for focus management
     const handleMouseDown = () => {

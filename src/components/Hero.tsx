@@ -1,3 +1,4 @@
+
 import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -29,6 +30,7 @@ const Hero = () => {
   // State for avatar animation
   const [avatarAnimation, setAvatarAnimation] = useState<string | null>(null);
   const [isAvatarHidden, setIsAvatarHidden] = useState(false);
+  const [lastAnimationIndex, setLastAnimationIndex] = useState<number>(-1);
   
   // Reset avatar after animation
   useEffect(() => {
@@ -41,18 +43,25 @@ const Hero = () => {
           setAvatarAnimation(null);
           setIsAvatarHidden(false);
         }, 500);
-      }, 1000);
+      }, 1500);
       
       return () => clearTimeout(timer);
     }
   }, [avatarAnimation]);
   
-  // Random animation effect on avatar click
+  // Random animation effect on avatar click, ensuring a different effect each time
   const animationEffects = ['avatar-floating', 'avatar-spinning', 'avatar-bouncing', 'avatar-shattering', 'avatar-defying-gravity'];
   
   const handleAvatarClick = () => {
     if (!avatarAnimation) {
-      const randomEffect = animationEffects[Math.floor(Math.random() * animationEffects.length)];
+      // Get a random effect that's different from the last one
+      let randomIndex;
+      do {
+        randomIndex = Math.floor(Math.random() * animationEffects.length);
+      } while (randomIndex === lastAnimationIndex && animationEffects.length > 1);
+      
+      const randomEffect = animationEffects[randomIndex];
+      setLastAnimationIndex(randomIndex);
       setAvatarAnimation(randomEffect);
       
       // Log the effect for debugging
@@ -154,7 +163,7 @@ Best regards,
         {/* Avatar with enhanced 3D hover effects and click animations */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
-          animate={{ opacity: isAvatarHidden ? 0 : 1, scale: isAvatarHidden ? 0.5 : 1, rotateY: 0 }}
+          animate={{ opacity: 1, scale: isAvatarHidden ? 0.5 : 1, rotateY: 0 }}
           transition={{ duration: 0.8, type: "spring" }}
           className="perspective"
           style={{ y: avatarY, rotateY: avatarRotate }}
@@ -376,8 +385,6 @@ Best regards,
           </motion.svg>
         </div>
       </motion.div>
-
-      {/* We'll remove the problematic style tag */}
     </section>
   );
 };
