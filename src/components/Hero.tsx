@@ -1,4 +1,3 @@
-
 import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -26,6 +25,40 @@ const Hero = () => {
   const avatarRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const contentOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
+  
+  // State for avatar animation
+  const [avatarAnimation, setAvatarAnimation] = useState<string | null>(null);
+  const [isAvatarHidden, setIsAvatarHidden] = useState(false);
+  
+  // Reset avatar after animation
+  useEffect(() => {
+    if (avatarAnimation) {
+      const timer = setTimeout(() => {
+        setIsAvatarHidden(true);
+        
+        // Add a small delay before making the avatar reappear
+        setTimeout(() => {
+          setAvatarAnimation(null);
+          setIsAvatarHidden(false);
+        }, 500);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [avatarAnimation]);
+  
+  // Random animation effect on avatar click
+  const animationEffects = ['avatar-floating', 'avatar-spinning', 'avatar-bouncing', 'avatar-shattering', 'avatar-defying-gravity'];
+  
+  const handleAvatarClick = () => {
+    if (!avatarAnimation) {
+      const randomEffect = animationEffects[Math.floor(Math.random() * animationEffects.length)];
+      setAvatarAnimation(randomEffect);
+      
+      // Log the effect for debugging
+      console.log(`Avatar animation: ${randomEffect}`);
+    }
+  };
   
   const handleHireMe = () => {
     const subject = "Project Inquiry - I'd Like to Hire You";
@@ -118,26 +151,27 @@ Best regards,
       </motion.div>
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-12 z-10">
-        {/* Avatar with enhanced 3D hover effects */}
+        {/* Avatar with enhanced 3D hover effects and click animations */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
-          animate={{ opacity: 1, scale: 1, rotateY: 0 }}
+          animate={{ opacity: isAvatarHidden ? 0 : 1, scale: isAvatarHidden ? 0.5 : 1, rotateY: 0 }}
           transition={{ duration: 0.8, type: "spring" }}
           className="perspective"
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
           <motion.div 
-            className="relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border"
+            className={`relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
             whileHover={{ 
               rotate: [0, -5, 5, -5, 0],
               scale: 1.05,
               transition: { duration: 0.5 }
             }}
+            onClick={handleAvatarClick}
           >
-            <div className="avatar-container group">
+            <div className="avatar-container group cursor-pointer">
               <Avatar className="w-full h-full rounded-full image-3d flip-card-inner">
                 <div className="flip-card-front">
-                  <AvatarImage src="/lovable-uploads/8efe32d5-ce31-4351-a27d-8fbc089a153d.png" alt="Ananth N" className="object-cover" />
+                  <AvatarImage src="/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png" alt="Ananth N" className="object-cover" />
                   <AvatarFallback className="bg-purple text-4xl">AN</AvatarFallback>
                 </div>
                 <div className="flip-card-back bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
@@ -151,6 +185,7 @@ Best regards,
             </div>
             <div className="absolute inset-0 bg-gradient-to-tr from-purple/20 via-green-500/10 to-yellow-400/10 pointer-events-none" />
           </motion.div>
+          <div className="mt-3 text-center text-xs text-violet-400 animate-pulse">Click for surprise effects!</div>
         </motion.div>
 
         {/* Text content with enhanced staggered animation */}
