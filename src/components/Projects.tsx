@@ -73,64 +73,74 @@ class PortfolioOptimizer {
     },
     {
       id: 2,
-      title: "Dell Match - Developer Collaboration Platform",
-      description: "Revolutionary team collaboration platform designed for developers, featuring real-time code sharing, integrated project management, and AI-powered productivity insights for distributed teams.",
+      title: "Dell Match - Developer Social Media",
+      description: "Revolutionary social platform for developers where they can connect, date, chat, post code snippets, collaborate on projects, and build meaningful professional and personal relationships in the tech community.",
       image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
       technologies: ["React", "Node.js", "Socket.io", "MongoDB", "Redis", "Docker", "AWS"],
       features: [
-        "Real-time collaborative coding environment",
-        "Integrated video conferencing and screen sharing",
-        "AI-powered code review and suggestions",
-        "Advanced project timeline and task management",
-        "Team productivity analytics and insights"
+        "Developer dating and matchmaking algorithms",
+        "Real-time chat and video calls for connections",
+        "Social feed for code snippets and tech discussions",
+        "Collaborative project spaces and team building",
+        "Tech event meetups and community building"
       ],
       icon: <Code className="stroke-blue-400" />,
-      codeSnippet: `// Real-time collaboration engine
-class DellMatchCollab {
-  constructor(socket, roomId) {
-    this.socket = socket;
-    this.roomId = roomId;
-    this.collaborators = new Map();
-    this.codeState = new OperationalTransform();
+      codeSnippet: `// Developer social media with matchmaking
+class DellMatchSocial {
+  constructor() {
+    this.matchmaker = new DevMatchmaker();
+    this.socialFeed = new SocialFeedEngine();
+    this.chatEngine = new RealTimeChatSystem();
+    this.eventManager = new TechEventOrganizer();
   }
 
-  async joinCollaboration(userId, userInfo) {
-    // Initialize user in collaboration room
-    this.collaborators.set(userId, {
-      ...userInfo,
-      cursor: { line: 0, column: 0 },
-      selections: [],
-      isActive: true
+  async findDevMatches(userId, preferences) {
+    // AI-powered developer matchmaking algorithm
+    const profile = await this.getDevProfile(userId);
+    const compatibility = await this.matchmaker.calculateCompatibility({
+      techStack: profile.skills,
+      interests: preferences.interests,
+      location: profile.location,
+      relationshipGoals: preferences.goals
     });
 
-    // Sync current code state
-    const currentState = await this.codeState.getCurrentState();
-    this.socket.emit('sync-state', {
-      roomId: this.roomId,
-      codeState: currentState,
-      collaborators: Array.from(this.collaborators.values())
+    // Find compatible developers for dating/collaboration
+    const matches = await this.matchmaker.findMatches({
+      userId,
+      compatibility,
+      filters: preferences.filters,
+      maxDistance: preferences.maxDistance
     });
 
-    // Listen for real-time changes
-    this.socket.on('code-change', (operation) => {
-      const transformed = this.codeState.transform(operation);
-      this.broadcastToRoom('apply-operation', transformed);
-    });
+    return {
+      potentialMatches: matches.slice(0, 10),
+      matchReasons: matches.map(m => m.compatibility.reasons),
+      suggestedIceBreakers: this.generateIceBreakers(matches),
+      upcomingEvents: await this.eventManager.getNearbyEvents(profile.location)
+    };
   }
 
-  broadcastToRoom(event, data) {
-    this.socket.to(this.roomId).emit(event, {
-      ...data,
-      timestamp: Date.now(),
-      roomId: this.roomId
+  async createSocialPost(userId, content, codeSnippet) {
+    // Create engaging social media post with code
+    const post = await this.socialFeed.createPost({
+      authorId: userId,
+      content: content,
+      codeSnippet: codeSnippet,
+      hashtags: this.extractTechHashtags(content),
+      timestamp: new Date()
     });
+
+    // Notify followers and potential matches
+    await this.notifyFollowers(userId, post.id);
+    
+    return post;
   }
 }`
     },
     {
       id: 3,
-      title: "Naan Mudhalvan AI/BI Education Platform",
-      description: "Comprehensive educational platform teaching AI and Business Intelligence to 150+ students under the Naan Mudhalvan scheme, featuring interactive learning modules and practical project-based curriculum.",
+      title: "Naan Mudhalvan Educational Programs",
+      description: "Comprehensive educational programs teaching AI and Business Intelligence to 150+ students under the Naan Mudhalvan scheme, featuring interactive learning modules and practical project-based curriculum.",
       image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",
       technologies: ["React", "Python", "Jupyter", "TensorFlow", "Pandas", "Plotly", "FastAPI"],
       features: [
@@ -262,59 +272,84 @@ class IntelligentChatBot {
   };
 
   return (
-    <section id="projects" className="py-24 relative overflow-hidden bg-gradient-to-b from-dark/90 to-dark" ref={ref}>
-      {/* 3D Elements Related to Projects */}
-      <div className="absolute inset-0 -z-10 opacity-20">
-        <div className="absolute top-1/4 left-1/4 w-64 h-64 border border-yellow-400/20 rounded-full animate-spin-slow"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border-2 border-green-400/20 rounded-full animate-reverse-spin"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-4 border-violet-400/20 rounded-full animate-pulse"></div>
+    <section id="projects" className="py-24 relative overflow-hidden bg-gradient-to-b from-slate-900/95 via-blue-950/90 to-slate-900/95" ref={ref}>
+      {/* Enhanced 3D Elements with Blue Theme */}
+      <div className="absolute inset-0 -z-10 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-64 h-64 border-2 border-blue-400/30 rounded-full animate-spin-slow shadow-lg shadow-blue-400/20"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 border-4 border-cyan-400/25 rounded-full animate-reverse-spin shadow-xl shadow-cyan-400/15"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-48 h-48 border-8 border-indigo-400/20 rounded-full animate-pulse shadow-2xl shadow-indigo-400/25"></div>
+        
+        {/* Additional Blue Floating Elements */}
+        <div className="absolute top-20 right-20 w-32 h-32 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 rounded-lg rotate-45 animate-float"></div>
+        <div className="absolute bottom-20 left-20 w-24 h-24 bg-gradient-to-r from-indigo-500/15 to-blue-500/15 rounded-full animate-bounce-slow"></div>
+        <div className="absolute top-1/3 right-1/3 w-16 h-16 bg-blue-400/20 rounded-md animate-pulse"></div>
       </div>
       
       <div className="section-container relative z-10">
         <motion.h2 
-          className="section-title text-center"
+          className="section-title text-center bg-gradient-to-r from-blue-300 via-cyan-300 to-indigo-300 bg-clip-text text-transparent"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
         >
-          My Projects
+          My Professional Projects
         </motion.h2>
         
         <motion.p 
-          className="section-subtitle"
+          className="section-subtitle text-blue-200/80"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Innovative solutions at the intersection of technology, design, and business value
+          Enterprise-grade solutions with cutting-edge technology and innovative design
         </motion.p>
         
-        {/* Project Selection Tabs with enhanced animation */}
+        {/* Enhanced Project Selection Tabs with Blue Theme */}
         <motion.div 
-          className="flex flex-wrap justify-center gap-3 mb-12"
+          className="flex flex-wrap justify-center gap-4 mb-12"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {projects.map((project) => (
+          {projects.map((project, index) => (
             <motion.button
               key={project.id}
-              className={`px-5 py-3 rounded-full transition-all flex items-center gap-2 ${
+              className={`px-6 py-4 rounded-xl transition-all duration-300 flex items-center gap-3 relative overflow-hidden ${
                 activeProject === project.id 
-                  ? 'bg-gradient-to-r from-violet-600 to-purple-700 text-white shadow-lg shadow-violet-500/30' 
-                  : 'bg-glass backdrop-blur-sm border border-gray-700/30 text-light hover:bg-purple/20'
+                  ? 'bg-gradient-to-r from-blue-600 via-cyan-600 to-indigo-600 text-white shadow-xl shadow-blue-500/40 scale-105' 
+                  : 'bg-slate-800/60 backdrop-blur-lg border-2 border-blue-500/20 text-blue-200 hover:bg-blue-900/30 hover:border-blue-400/40 hover:shadow-lg hover:shadow-blue-400/20'
               }`}
               whileHover={{ 
-                scale: 1.05, 
-                textShadow: "0 0 8px rgb(255,255,255)" 
+                scale: 1.08, 
+                textShadow: "0 0 12px rgba(59, 130, 246, 0.8)",
+                boxShadow: "0 0 25px rgba(59, 130, 246, 0.3)"
               }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setActiveProject(project.id)}
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 * index }}
             >
-              <span className="text-xl">
+              {/* Animated Background Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-cyan-600/20 to-indigo-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              
+              <motion.span 
+                className="text-2xl relative z-10"
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
                 {project.icon}
-              </span>
-              <span className="font-medium">{project.title}</span>
+              </motion.span>
+              <span className="font-semibold text-lg relative z-10">{project.title}</span>
+              
+              {/* Active Indicator */}
+              {activeProject === project.id && (
+                <motion.div
+                  className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 to-blue-400"
+                  layoutId="activeTab"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
             </motion.button>
           ))}
         </motion.div>
