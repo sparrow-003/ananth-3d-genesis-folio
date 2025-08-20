@@ -23,174 +23,226 @@ const Projects = () => {
   const projects: Project[] = [
     {
       id: 1,
-      title: "Financial Management Dashboard",
-      description: "An advanced financial analytics platform with AI-powered insights, real-time tracking, and predictive budget forecasting for optimal financial management.",
+      title: "AI-Powered Financial Dashboard",
+      description: "Professional-grade financial analytics platform with real-time data visualization, machine learning insights, and advanced portfolio management for enterprise-level financial operations.",
       image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
-      technologies: ["React", "TypeScript", "TensorFlow.js", "D3.js", "Financial APIs"],
+      technologies: ["React", "TypeScript", "Python", "TensorFlow", "D3.js", "FastAPI", "PostgreSQL"],
       features: [
-        "Real-time financial data visualization",
-        "ML-powered expense categorization",
-        "Predictive budget analysis",
-        "Investment portfolio optimization"
+        "Real-time market data integration with live charts",
+        "ML-powered risk assessment and prediction models",
+        "Advanced portfolio optimization algorithms",
+        "Automated financial reporting and analytics",
+        "Multi-currency support with live exchange rates"
       ],
       icon: <BarChart3 className="stroke-yellow-400" />,
-      codeSnippet: `// AI-powered investment strategy generator
-const generateInvestmentStrategy = async (profile) => {
-  const { riskTolerance, timeHorizon } = profile;
-  
-  // Initialize TensorFlow model
-  const model = await tf.loadLayersModel('/models/investment/model.json');
-  
-  // Create tensor from input parameters
-  const inputTensor = tf.tensor2d([[
-    riskTolerance, 
-    timeHorizon, 
-    market.volatility, 
-    economic.inflationRate
-  ]]);
-  
-  // Generate optimized allocation
-  const prediction = model.predict(inputTensor);
-  const allocation = await prediction.array();
-  
-  // Return structured portfolio recommendation
-  return {
-    stocks: allocation[0][0].toFixed(2),
-    bonds: allocation[0][1].toFixed(2),
-    alternatives: allocation[0][2].toFixed(2),
-    cash: allocation[0][3].toFixed(2)
-  };
-};`
+      codeSnippet: `// Advanced portfolio optimization with ML
+class PortfolioOptimizer {
+  constructor() {
+    this.model = tf.loadLayersModel('/models/portfolio-optimizer.json');
+    this.riskMetrics = new RiskAnalyzer();
+  }
+
+  async optimizePortfolio(assets, constraints) {
+    // Calculate expected returns using historical data
+    const returns = await this.calculateExpectedReturns(assets);
+    const covariance = await this.calculateCovarianceMatrix(assets);
+    
+    // ML-based risk prediction
+    const riskPrediction = await this.model.predict({
+      returns: tf.tensor2d(returns),
+      volatility: tf.tensor2d(covariance),
+      marketConditions: tf.tensor1d(this.getMarketIndicators())
+    });
+    
+    // Optimize allocation using modern portfolio theory
+    const allocation = this.efficientFrontier({
+      expectedReturns: returns,
+      riskMatrix: covariance,
+      constraints: constraints,
+      riskTolerance: await riskPrediction.data()
+    });
+    
+    return {
+      allocation,
+      expectedReturn: this.calculateExpectedReturn(allocation, returns),
+      riskLevel: this.calculatePortfolioRisk(allocation, covariance),
+      sharpeRatio: this.calculateSharpeRatio(allocation, returns, covariance)
+    };
+  }
+}`
     },
     {
       id: 2,
-      title: "AI Business Idea Generator",
-      description: "Revolutionary platform that leverages market data and AI algorithms to identify lucrative business opportunities and generate innovative startup concepts.",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
-      technologies: ["React", "GPT-4", "Market Analysis APIs", "Node.js", "MongoDB"],
+      title: "Dell Match - Developer Collaboration Platform",
+      description: "Revolutionary team collaboration platform designed for developers, featuring real-time code sharing, integrated project management, and AI-powered productivity insights for distributed teams.",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
+      technologies: ["React", "Node.js", "Socket.io", "MongoDB", "Redis", "Docker", "AWS"],
       features: [
-        "Industry gap analysis",
-        "Market viability assessment",
-        "Unique value proposition generation",
-        "Business model canvas creation"
+        "Real-time collaborative coding environment",
+        "Integrated video conferencing and screen sharing",
+        "AI-powered code review and suggestions",
+        "Advanced project timeline and task management",
+        "Team productivity analytics and insights"
       ],
-      icon: <BrainCircuit className="stroke-green-400" />,
-      codeSnippet: `// Business idea generation algorithm
-async function generateBusinessIdea(params) {
-  const { industry, investment, location, trends } = params;
-  
-  // Analyze market gaps using proprietary algorithm
-  const marketGaps = await MarketAnalyzer.findOpportunities({
-    industry,
-    location,
-    capitalRequired: investment
-  });
-  
-  // Generate ideas based on current trends and gaps
-  const ideas = await AIEngine.createConcepts({
-    marketGaps,
-    trendsData: trends,
-    viabilityThreshold: 0.75
-  });
-  
-  // Calculate success probability
-  return ideas.map(idea => ({
-    ...idea,
-    successProbability: calculateViability(idea, market.conditions)
-  })).sort((a, b) => b.successProbability - a.successProbability);
+      icon: <Code className="stroke-blue-400" />,
+      codeSnippet: `// Real-time collaboration engine
+class DellMatchCollab {
+  constructor(socket, roomId) {
+    this.socket = socket;
+    this.roomId = roomId;
+    this.collaborators = new Map();
+    this.codeState = new OperationalTransform();
+  }
+
+  async joinCollaboration(userId, userInfo) {
+    // Initialize user in collaboration room
+    this.collaborators.set(userId, {
+      ...userInfo,
+      cursor: { line: 0, column: 0 },
+      selections: [],
+      isActive: true
+    });
+
+    // Sync current code state
+    const currentState = await this.codeState.getCurrentState();
+    this.socket.emit('sync-state', {
+      roomId: this.roomId,
+      codeState: currentState,
+      collaborators: Array.from(this.collaborators.values())
+    });
+
+    // Listen for real-time changes
+    this.socket.on('code-change', (operation) => {
+      const transformed = this.codeState.transform(operation);
+      this.broadcastToRoom('apply-operation', transformed);
+    });
+  }
+
+  broadcastToRoom(event, data) {
+    this.socket.to(this.roomId).emit(event, {
+      ...data,
+      timestamp: Date.now(),
+      roomId: this.roomId
+    });
+  }
 }`
     },
     {
       id: 3,
-      title: "AI Chat Bot Framework",
-      description: "Sophisticated conversational AI platform that enables businesses to deploy intelligent chatbots with natural language processing and context-aware responses.",
-      image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&q=80&w=800",
-      technologies: ["React", "Natural Language Processing", "TensorFlow.js", "Socket.io", "Redis"],
+      title: "Naan Mudhalvan AI/BI Education Platform",
+      description: "Comprehensive educational platform teaching AI and Business Intelligence to 150+ students under the Naan Mudhalvan scheme, featuring interactive learning modules and practical project-based curriculum.",
+      image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800",
+      technologies: ["React", "Python", "Jupyter", "TensorFlow", "Pandas", "Plotly", "FastAPI"],
       features: [
-        "Context-aware conversation handling",
-        "Multi-language support",
-        "Sentiment analysis integration",
-        "Dynamic response generation"
+        "Interactive AI/ML tutorial modules with live coding",
+        "Real-time student progress tracking and analytics",
+        "Collaborative project workspace for 150+ students",
+        "Automated assignment grading with AI feedback",
+        "Industry-standard BI tools integration and training"
       ],
-      icon: <MessageSquare className="stroke-purple-400" />,
-      codeSnippet: `// Context-aware response generator
-class ConversationalEngine {
-  constructor(modelPath, options) {
-    this.contextWindow = [];
-    this.sentimentAnalyzer = new SentimentEngine();
-    this.loadModel(modelPath);
-    this.entityExtractor = new EntityRecognition();
+      icon: <BrainCircuit className="stroke-green-400" />,
+      codeSnippet: `// Student progress tracking with AI insights
+class NaanMudhalvanTracker {
+  constructor() {
+    this.studentDatabase = new StudentDB();
+    this.aiAnalyzer = new LearningAnalyzer();
+    this.progressModel = tf.loadLayersModel('/models/progress-predictor.json');
   }
 
-  async processMessage(message, userId) {
-    // Update context window
-    this.updateContext(userId, message);
-    
-    // Extract intent and entities
-    const intent = await this.modelInference({
-      message,
-      context: this.contextWindow
+  async trackStudentProgress(studentId, moduleId, performance) {
+    // Record student activity and performance
+    await this.studentDatabase.updateProgress(studentId, {
+      moduleId,
+      completionTime: performance.timeSpent,
+      accuracy: performance.score,
+      attempts: performance.attempts,
+      timestamp: new Date()
     });
-    
-    // Generate appropriate response
-    return this.responseGenerator.create({
-      intent,
-      entities: this.entityExtractor.find(message),
-      sentiment: this.sentimentAnalyzer.analyze(message),
-      context: this.getRecentContext(userId, 5)
+
+    // AI-powered learning path optimization
+    const learningPattern = await this.aiAnalyzer.analyzeLearningStyle(studentId);
+    const prediction = await this.progressModel.predict({
+      currentPerformance: tf.tensor1d([performance.score]),
+      learningStyle: tf.tensor1d(learningPattern.features),
+      moduleComplexity: tf.tensor1d([this.getModuleComplexity(moduleId)])
     });
+
+    // Generate personalized recommendations
+    const recommendations = await this.generateRecommendations({
+      studentId,
+      currentModule: moduleId,
+      predictedPerformance: await prediction.data(),
+      learningStyle: learningPattern.style
+    });
+
+    return {
+      progress: await this.calculateOverallProgress(studentId),
+      nextModules: recommendations.suggestedModules,
+      estimatedCompletionTime: recommendations.timeEstimate,
+      personalizedTips: recommendations.tips
+    };
   }
 }`
     },
     {
       id: 4,
-      title: "Dev Hub Collaboration Platform",
-      description: "Comprehensive development platform that enhances team collaboration through code analytics, productivity insights, and integrated project management.",
-      image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
-      technologies: ["React", "TypeScript", "GraphQL", "GitHub API", "PostgreSQL"],
+      title: "Intelligent AI ChatBot Framework",
+      description: "Advanced conversational AI system with natural language understanding, context awareness, and multi-domain knowledge integration, deployed for customer support and educational assistance.",
+      image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?auto=format&fit=crop&q=80&w=800",
+      technologies: ["Python", "Transformers", "FastAPI", "Redis", "PostgreSQL", "React", "WebSocket"],
       features: [
-        "Real-time code collaboration",
-        "Developer productivity analytics",
-        "Automated code review suggestions",
-        "Team sentiment analysis"
+        "Multi-language natural language processing",
+        "Context-aware conversation memory",
+        "Domain-specific knowledge integration",
+        "Real-time response generation with streaming",
+        "Advanced sentiment analysis and emotion detection"
       ],
-      icon: <Code className="stroke-violet-400" />,
-      codeSnippet: `// Code quality analyzer
-const analyzeCodeQuality = async (repository) => {
-  // Initialize analysis modules
-  const complexity = new ComplexityAnalyzer();
-  const security = new SecurityScanner();
-  const performance = new PerformanceMetrics();
-  
-  // Clone repository and analyze
-  const codebase = await GitService.clone(repository.url);
-  
-  // Run parallel analysis
-  const [complexityReport, securityIssues, perfMetrics] = await Promise.all([
-    complexity.analyze(codebase),
-    security.scanVulnerabilities(codebase),
-    performance.evaluate(codebase)
-  ]);
-  
-  // Generate comprehensive quality report
-  return {
-    qualityScore: calculateOverallScore({
-      complexity: complexityReport,
-      security: securityIssues,
-      performance: perfMetrics
-    }),
-    details: {
-      complexityReport,
-      securityIssues,
-      perfMetrics
-    },
-    recommendations: generateRecommendations({
-      complexityReport,
-      securityIssues,
-      perfMetrics
-    })
-  };
-};`
+      icon: <MessageSquare className="stroke-purple-400" />,
+      codeSnippet: `// Advanced chatbot with context awareness
+class IntelligentChatBot {
+  constructor() {
+    this.nlpModel = new TransformerModel('bert-base-multilingual');
+    this.contextManager = new ConversationContext();
+    this.knowledgeBase = new DomainKnowledge();
+    this.sentimentAnalyzer = new EmotionDetector();
+  }
+
+  async processMessage(message, userId, sessionId) {
+    // Analyze message sentiment and intent
+    const sentiment = await this.sentimentAnalyzer.analyze(message);
+    const intent = await this.nlpModel.classifyIntent(message);
+    
+    // Retrieve conversation context
+    const context = await this.contextManager.getContext(sessionId);
+    
+    // Generate contextual response
+    const response = await this.generateResponse({
+      message,
+      intent: intent.label,
+      confidence: intent.confidence,
+      sentiment: sentiment.emotion,
+      context: context.history,
+      userProfile: await this.getUserProfile(userId)
+    });
+
+    // Update conversation context
+    await this.contextManager.updateContext(sessionId, {
+      userMessage: message,
+      botResponse: response.text,
+      intent: intent.label,
+      sentiment: sentiment.emotion,
+      timestamp: new Date()
+    });
+
+    return {
+      response: response.text,
+      confidence: response.confidence,
+      suggestedActions: response.actions,
+      emotionalState: sentiment.emotion,
+      contextUpdated: true
+    };
+  }
+}`
     }
   ];
 

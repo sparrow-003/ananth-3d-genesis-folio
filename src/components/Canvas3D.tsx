@@ -122,21 +122,21 @@ const RunningMachine = () => {
       <Float speed={0.5} rotationIntensity={2} floatIntensity={0.2}>
         <mesh position={[0, 0, 0]}>
           <torusGeometry args={[2, 0.3, 16, 50]} />
-          <meshStandardMaterial color="#8B5CF6" metalness={0.9} roughness={0.1} />
+          <meshStandardMaterial args={[{ color: "#8B5CF6", metalness: 0.9, roughness: 0.1 }]} />
         </mesh>
       </Float>
       
       {/* Vertical Moving Piston */}
       <mesh position={[0, 2, 0]}>
         <boxGeometry args={[0.5, 3, 0.5]} />
-        <meshStandardMaterial color="#22C55E" metalness={0.8} roughness={0.2} />
+        <meshStandardMaterial args={[{ color: "#22C55E", metalness: 0.8, roughness: 0.2 }]} />
       </mesh>
       
       {/* Horizontal Moving Parts */}
       <Float speed={2} rotationIntensity={0.2} floatIntensity={1}>
         <mesh position={[3, 0, 0]}>
           <cylinderGeometry args={[0.3, 0.3, 4, 32]} />
-          <meshStandardMaterial color="#FBBF24" metalness={0.7} roughness={0.3} />
+          <meshStandardMaterial args={[{ color: "#FBBF24", metalness: 0.7, roughness: 0.3 }]} />
         </mesh>
       </Float>
       
@@ -144,7 +144,7 @@ const RunningMachine = () => {
       <Float speed={3} rotationIntensity={5} floatIntensity={0.1}>
         <mesh position={[-2, 1, 0]}>
           <octahedronGeometry args={[0.8, 0]} />
-          <meshStandardMaterial color="#3B82F6" wireframe={true} />
+          <meshStandardMaterial args={[{ color: "#3B82F6", wireframe: true }]} />
         </mesh>
       </Float>
       
@@ -152,7 +152,7 @@ const RunningMachine = () => {
       <Float speed={1.5} rotationIntensity={0.3} floatIntensity={1.5}>
         <mesh position={[0, 0, 2]}>
           <torusKnotGeometry args={[1, 0.2, 128, 32]} />
-          <meshStandardMaterial color="#EC4899" emissive="#EC4899" emissiveIntensity={0.5} />
+          <meshStandardMaterial args={[{ color: "#EC4899", emissive: "#EC4899", emissiveIntensity: 0.5 }]} />
         </mesh>
       </Float>
     </group>
@@ -173,11 +173,13 @@ const CinematicText = () => {
           >
             Code. Create. Innovate.
             <meshStandardMaterial 
-              color="#8B5CF6" 
-              emissive="#8B5CF6" 
-              emissiveIntensity={0.5} 
-              metalness={0.8}
-              roughness={0.1}
+              args={[{ 
+                color: "#8B5CF6", 
+                emissive: "#8B5CF6", 
+                emissiveIntensity: 0.5, 
+                metalness: 0.8,
+                roughness: 0.1
+              }]}
             />
           </Text3D>
         </Float>
