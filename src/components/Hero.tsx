@@ -7,8 +7,10 @@ import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-reac
 
 const Hero = () => {
   const roles = [
-    "Python Developer",
+    "Vibe Coder",
+    "Python Developer", 
     "JavaScript/TypeScript Developer",
+    "AI/BI Teaching Expert",
     "UI/UX Designer",
     "AI Prompt Engineer",
     "Full Stack Developer"
@@ -95,11 +97,11 @@ Best regards,
 
   // Catchy lines for HR professionals
   const hrPickupLines = [
-    "Turning coffee into code since 2018",
-    "Where creativity meets technical excellence",
-    "Less talking, more coding - but I do both well",
-    "Bringing ideas to life, one pixel at a time",
-    "Not just a developer, a problem solver"
+    "Vibe Coder: Where passion meets programming flow",
+    "Teaching 150+ students while building the future",
+    "Campus Ambassador vibes with enterprise solutions",
+    "Turning coffee into code with teaching expertise",
+    "AI & BI educator by day, full-stack innovator by night"
   ];
 
   const [currentPickupLine, setCurrentPickupLine] = useState(hrPickupLines[0]);
@@ -159,7 +161,7 @@ Best regards,
         ))}
       </motion.div>
       
-      <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-12 z-10">
+      <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8, rotateY: -15 }}
@@ -169,7 +171,7 @@ Best regards,
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
           <motion.div 
-            className={`relative w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
+            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
             whileHover={{ 
               rotate: [0, -5, 5, -5, 0],
               scale: 1.05,
@@ -217,28 +219,28 @@ Best regards,
             Hello, I'm
           </motion.h2>
           <motion.h1 
-            className="text-5xl md:text-7xl font-bold mb-4 cinematic-text"
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 cinematic-text"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <span className="text-gradient">Ananth N</span>
+            <span className="text-gradient animate-vibe-pulse">Ananth N</span>
           </motion.h1>
           <motion.div 
-            className="text-2xl md:text-3xl font-semibold mb-8 min-h-16"
+            className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            I'm a <AnimatedText texts={roles} className="text-purple" interval={2500} />
+            I'm a <AnimatedText texts={roles} className="text-purple animate-perspective-shift" interval={2500} />
           </motion.div>
           <motion.p 
-            className="text-lg md:text-xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            Crafting innovative solutions with code and AI expertise. A self-taught developer building the future one project at a time.
+            <span className="text-gradient font-semibold">Vibe Coder</span> teaching 150+ students AI & BI in Naan Mudhalvan program. Campus Ambassador at Averixis Solutions. Building the future with innovative tech solutions.
           </motion.p>
 
           {/* Cinematic HR pickup line */}
@@ -296,7 +298,7 @@ Best regards,
           
           {/* Information cards */}
           <motion.div
-            className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-4"
+            className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.8 }}
@@ -310,7 +312,7 @@ Best regards,
               </div>
               <div>
                 <p className="text-sm text-gradient font-semibold">Experience</p>
-                <p className="text-xs text-gray-400">Full Stack Developer</p>
+                <p className="text-xs text-gray-400">Teaching 150+ Students</p>
               </div>
             </motion.div>
 
@@ -335,8 +337,8 @@ Best regards,
                 <Code className="w-5 h-5 text-yellow-400" />
               </div>
               <div>
-                <p className="text-sm text-gradient-yellow font-semibold">Tech Stack</p>
-                <p className="text-xs text-gray-400">Python, JS, TS, React</p>
+                <p className="text-sm text-gradient-yellow font-semibold">Vibe Skills</p>
+                <p className="text-xs text-gray-400">AI/BI, Python, React, Teaching</p>
               </div>
             </motion.div>
           </motion.div>

@@ -56,9 +56,16 @@
     @apply font-display;
   }
 
-  /* Custom classes */
+  /* Enhanced glass effects with 3D */
   .glass-card {
     @apply bg-glass/10 backdrop-blur-md border border-gray-300/20 rounded-xl shadow-xl;
+    transform-style: preserve-3d;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .glass-card:hover {
+    transform: translateY(-8px) rotateX(5deg) rotateY(2deg);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 30px rgba(139, 92, 246, 0.1);
   }
 
   .glass-nav {
@@ -78,21 +85,34 @@
   }
 
   .section-container {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24;
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-24;
   }
 
   .section-title {
-    @apply text-4xl md:text-5xl font-bold mb-10 text-gradient;
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 sm:mb-8 lg:mb-10 text-gradient;
   }
 
   .section-subtitle {
-    @apply text-xl text-purple-light mb-16 max-w-2xl mx-auto text-center;
+    @apply text-lg sm:text-xl lg:text-2xl text-purple-light mb-8 sm:mb-12 lg:mb-16 max-w-2xl mx-auto text-center;
   }
   
   /* 3D perspective for entire page */
   #root {
-    perspective: 1000px;
+    perspective: 1200px;
     @apply overflow-x-hidden;
+  }
+  
+  /* Enhanced responsive breakpoints */
+  @media (max-width: 640px) {
+    .section-container {
+      @apply px-3 py-8;
+    }
+  }
+  
+  @media (min-width: 1920px) {
+    .section-container {
+      @apply max-w-8xl;
+    }
   }
 
   .canvas-container {
@@ -264,5 +284,78 @@
   
   .animate-gear {
     animation: spin-gear 8s linear infinite;
+  }
+  
+  /* Enhanced 3D animations */
+  @keyframes vibe-pulse {
+    0%, 100% {
+      transform: scale(1) rotateY(0deg);
+      box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7);
+    }
+    50% {
+      transform: scale(1.05) rotateY(10deg);
+      box-shadow: 0 0 0 20px rgba(139, 92, 246, 0);
+    }
+  }
+  
+  @keyframes float-3d {
+    0%, 100% {
+      transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+    }
+    33% {
+      transform: translateY(-10px) rotateX(5deg) rotateY(5deg);
+    }
+    66% {
+      transform: translateY(5px) rotateX(-2deg) rotateY(-3deg);
+    }
+  }
+  
+  @keyframes perspective-shift {
+    0%, 100% {
+      transform: perspective(1000px) rotateY(0deg) rotateX(0deg);
+    }
+    25% {
+      transform: perspective(1000px) rotateY(5deg) rotateX(2deg);
+    }
+    50% {
+      transform: perspective(1000px) rotateY(0deg) rotateX(5deg);
+    }
+    75% {
+      transform: perspective(1000px) rotateY(-5deg) rotateX(-2deg);
+    }
+  }
+  
+  .animate-vibe-pulse {
+    animation: vibe-pulse 2s ease-in-out infinite;
+  }
+  
+  .animate-float-3d {
+    animation: float-3d 6s ease-in-out infinite;
+  }
+  
+  .animate-perspective-shift {
+    animation: perspective-shift 12s ease-in-out infinite;
+  }
+  
+  /* Responsive 3D effects */
+  @media (max-width: 768px) {
+    .glass-card:hover {
+      transform: translateY(-4px) rotateX(2deg);
+    }
+    
+    #root {
+      perspective: 800px;
+    }
+  }
+  
+  /* Ultra-wide screen optimizations */
+  @media (min-width: 1920px) {
+    .glass-card {
+      transform-style: preserve-3d;
+    }
+    
+    .glass-card:hover {
+      transform: translateY(-12px) rotateX(8deg) rotateY(4deg);
+    }
   }
 }

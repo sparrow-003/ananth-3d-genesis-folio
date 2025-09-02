@@ -9,6 +9,16 @@ const Skills = () => {
   
   const skillCategories = [
     {
+      title: "Vibe Coding Skills",
+      icon: <BrainCircuit className="text-purple-400" size={28} />,
+      skills: [
+        { name: "Flow State Programming", icon: "https://img.icons8.com/color/48/meditation.png" },
+        { name: "Creative Problem Solving", icon: "https://img.icons8.com/color/48/creative-thinking.png" },
+        { name: "Intuitive Design", icon: "https://img.icons8.com/color/48/design.png" },
+        { name: "Rapid Prototyping", icon: "https://img.icons8.com/color/48/prototype.png" },
+      ]
+    },
+    {
       title: "Programming Languages",
       icon: <Code className="text-yellow-400" size={28} />,
       skills: [
@@ -76,13 +86,15 @@ const Skills = () => {
       ]
     },
     {
-      title: "Soft Skills",
+      title: "Teaching & Leadership",
       icon: <CheckCircle className="text-violet-400" size={28} />,
       skills: [
-        { name: "Problem Solving", icon: "https://img.icons8.com/color/48/solution.png" },
-        { name: "Communication", icon: "https://img.icons8.com/color/48/communication--v1.png" },
-        { name: "Critical Thinking", icon: "https://img.icons8.com/color/48/brain--v1.png" },
+        { name: "AI/BI Training", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
+        { name: "Campus Ambassador", icon: "https://img.icons8.com/color/48/ambassador.png" },
+        { name: "Student Mentoring", icon: "https://img.icons8.com/color/48/mentor.png" },
+        { name: "Technical Communication", icon: "https://img.icons8.com/color/48/communication--v1.png" },
         { name: "Team Leadership", icon: "https://img.icons8.com/color/48/conference-call--v1.png" },
+        { name: "Problem Solving", icon: "https://img.icons8.com/color/48/solution.png" },
       ]
     }
   ];
@@ -137,7 +149,7 @@ const Skills = () => {
         </motion.p>
         
         <motion.div 
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "show" : "hidden"}
@@ -161,7 +173,7 @@ const Skills = () => {
                 <h3 className="text-xl font-bold text-gradient">{category.title}</h3>
               </div>
               
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-3 lg:gap-4">
                 {category.skills.map((skill, index) => (
                   <motion.div 
                     key={skill.name}
@@ -171,21 +183,24 @@ const Skills = () => {
                     transition={{ delay: 0.5 + (0.05 * index) }}
                   >
                     <motion.div 
-                      className="w-16 h-16 bg-dark/50 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 group hover:bg-violet-500/20 transition-all border border-violet-500/10 hover:border-violet-500/30"
+                      className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/50 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 group hover:bg-violet-500/20 transition-all border border-violet-500/10 hover:border-violet-500/30"
                       whileHover={{ 
                         scale: 1.1, 
                         rotate: 5,
-                        boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.3)"
+                        boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.3)",
+                        rotateY: 15,
+                        z: 50
                       }}
                       whileTap={{ scale: 0.95 }}
+                      style={{ transformStyle: "preserve-3d" }}
                     >
                       <img 
                         src={skill.icon} 
                         alt={skill.name} 
-                        className="w-8 h-8 object-contain filter saturate-0 opacity-80 group-hover:saturate-100 group-hover:opacity-100 transition-all" 
+                        className="w-6 h-6 lg:w-8 lg:h-8 object-contain filter saturate-0 opacity-80 group-hover:saturate-100 group-hover:opacity-100 transition-all" 
                       />
                     </motion.div>
-                    <span className="text-center text-sm text-gray-300 group-hover:text-white">{skill.name}</span>
+                    <span className="text-center text-xs lg:text-sm text-gray-300 group-hover:text-white">{skill.name}</span>
                   </motion.div>
                 ))}
               </div>

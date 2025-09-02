@@ -30,18 +30,25 @@ const About = () => {
     },
     {
       year: "2023",
-      title: "Built Production-Ready Projects",
-      description: "Created multiple AI-powered applications with practical use cases"
+      title: "AI/BI Teaching & Campus Ambassador",
+      description: "Teaching 150+ students AI & BI in Naan Mudhalvan program, Campus Ambassador at Averixis Solutions"
+    },
+    {
+      year: "2024",
+      title: "Vibe Coder Era",
+      description: "Embracing the flow state of coding while building production-ready AI applications"
     }
   ];
   
   const skillsList = [
+    { name: "Vibe Coding", percentage: 98 },
+    { name: "Teaching AI/BI", percentage: 95 },
     { name: "Python", percentage: 90 },
     { name: "JavaScript", percentage: 85 },
     { name: "TypeScript", percentage: 80 },
     { name: "React", percentage: 85 },
     { name: "AI Integration", percentage: 95 },
-    { name: "Prompt Engineering", percentage: 90 }
+    { name: "Campus Leadership", percentage: 88 }
   ];
 
   return (
@@ -75,17 +82,16 @@ const About = () => {
           >
             <h3 className="text-2xl font-bold mb-6 text-purple">My Background</h3>
             <p className="mb-6 text-gray-300">
-              As a B.Com graduate, my journey into tech has been unconventional but driven by passion. I started learning 
-              programming from online resources, books, and practice projects, gradually building my skills from 
-              the ground up.
+              As a B.Com graduate turned <span className="text-gradient font-semibold">Vibe Coder</span>, my journey into tech has been driven by passion and flow. 
+              Currently teaching 150+ students AI & BI in the Naan Mudhalvan program while serving as Campus Ambassador at Averixis Solutions.
             </p>
             <p className="mb-6 text-gray-300">
-              Self-learning has given me a unique perspective on problem-solving and the ability to quickly adapt to new technologies.
-              What started as curiosity has evolved into expertise in Python, JavaScript, TypeScript, and cutting-edge AI technologies.
+              My teaching experience has given me a unique perspective on breaking down complex concepts and building practical solutions.
+              From self-learning programming to educating the next generation of AI developers, I've found my rhythm in the coding vibe.
             </p>
             <p className="text-gray-300">
-              Today, I focus on creating practical applications that leverage the power of AI and modern web technologies,
-              always looking to innovate and build solutions that make a difference.
+              Today, I blend education with innovation, creating AI-powered applications while inspiring students to embrace the 
+              beautiful chaos of coding. Every line of code is written with purpose, every lesson taught with passion.
             </p>
           </motion.div>
           
