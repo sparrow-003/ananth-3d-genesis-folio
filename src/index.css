@@ -111,7 +111,7 @@
   
   @media (min-width: 1920px) {
     .section-container {
-      @apply max-w-8xl;
+      @apply max-w-7xl;
     }
   }
 
