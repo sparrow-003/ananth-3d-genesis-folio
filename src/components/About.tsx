@@ -52,7 +52,7 @@ const About = () => {
   ];
 
   return (
-    <section id="about" className="py-16 sm:py-20 lg:py-32 relative overflow-hidden bg-gradient-to-b from-dark via-dark/95 to-violet-900/20" ref={ref}>
+    <section id="about" className="min-h-screen py-16 sm:py-20 lg:py-32 relative overflow-hidden bg-gradient-to-b from-background via-background/98 to-violet-500/10 z-10" ref={ref}>
       {/* Enhanced 3D Background Elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-20 left-10 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-violet-600/10 rounded-full blur-3xl animate-float"></div>
@@ -67,7 +67,7 @@ const About = () => {
         <div className="absolute bottom-1/4 left-1/4 w-24 h-24 border-2 border-green-400/20 rotate-45 animate-reverse-pulse"></div>
       </div>
       
-      <div className="section-container relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl relative z-20">
         {/* Enhanced Section Header */}
         <motion.div 
           className="text-center mb-16 sm:mb-20 lg:mb-24"
@@ -104,14 +104,14 @@ const About = () => {
             transition={{ duration: 0.8, delay: 0.6 }}
           >
             <div className="absolute -inset-4 bg-gradient-to-r from-violet-600/20 to-green-600/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-300"></div>
-            <div className="glass-card p-8 lg:p-10 relative z-10 border-violet-500/30 hover:border-violet-500/50 transition-all duration-300">
-              <h3 className="text-2xl lg:text-3xl font-bold mb-6 text-gradient flex items-center gap-3">
+            <div className="bg-card/80 backdrop-blur-md border border-border/50 rounded-2xl p-8 lg:p-10 relative z-10 hover:border-primary/50 transition-all duration-300 shadow-xl">
+              <h3 className="text-2xl lg:text-3xl font-bold mb-6 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent flex items-center gap-3">
                 <div className="w-8 h-8 bg-violet-500/20 rounded-full flex items-center justify-center">
                   <span className="text-violet-400">🚀</span>
                 </div>
                 Vibe Coder Background
               </h3>
-              <div className="space-y-6 text-gray-300 leading-relaxed">
+              <div className="space-y-6 text-muted-foreground leading-relaxed">
                 <p className="text-lg">
                   As a B.Com graduate turned <span className="text-gradient font-semibold">Vibe Coder</span>, my journey into tech has been driven by passion and flow. 
                   Currently teaching <span className="text-green-400 font-semibold">150+ students AI & BI</span> in the Naan Mudhalvan program while serving as <span className="text-violet-400 font-semibold">Campus Ambassador at Averixis Solutions</span>.
