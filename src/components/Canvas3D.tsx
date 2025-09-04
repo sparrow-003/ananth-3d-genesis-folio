@@ -4,48 +4,6 @@ import { Suspense, useState, useEffect } from 'react';
 import { OrbitControls, Environment, Stars, Float, Preload, Text3D, Center } from '@react-three/drei';
 import FloatingShape from './FloatingShape';
 
-// Simple fallback component for when the 3D canvas is loading
-const CanvasLoader = () => (
-  <div className="flex items-center justify-center h-full w-full bg-gradient-to-b from-dark to-violet-500/5">
-    <div className="text-violet-400 text-xl animate-pulse">Loading 3D scene...</div>
-  </div>
-);
-
-// Error boundary component for 3D rendering issues
-const Canvas3DErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-  const [hasError, setHasError] = useState(false);
-  
-  if (hasError) {
-    return (
-      <div className="h-full w-full bg-gradient-to-b from-dark to-violet-500/5 flex items-center justify-center">
-        <div className="text-red-500 text-center p-4">
-          <p className="text-xl font-bold">3D rendering error</p>
-          <p className="mt-2">Please try refreshing your browser.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Use a try-catch for the children to handle synchronous errors
-  try {
-    return (
-      <div className="h-full" onError={() => setHasError(true)}>
-        {children}
-      </div>
-    );
-  } catch (error) {
-    console.error("Error in Canvas3D:", error);
-    setHasError(true);
-    return (
-      <div className="h-full w-full bg-gradient-to-b from-dark to-violet-500/5 flex items-center justify-center">
-        <div className="text-red-500 text-center p-4">
-          <p className="text-xl font-bold">3D rendering error</p>
-          <p className="mt-2">Please try refreshing your browser.</p>
-        </div>
-      </div>
-    );
-  }
-};
 
 // Custom shapes that represent different project categories and technologies
 const ProjectShapes = () => {
@@ -122,21 +80,21 @@ const RunningMachine = () => {
       <Float speed={0.5} rotationIntensity={2} floatIntensity={0.2}>
         <mesh position={[0, 0, 0]}>
           <torusGeometry args={[2, 0.3, 16, 50]} />
-          <meshStandardMaterial args={[{ color: "#8B5CF6", metalness: 0.9, roughness: 0.1 }]} />
+          <meshStandardMaterial args={[{ color: "#3B82F6", metalness: 0.9, roughness: 0.1 }]} />
         </mesh>
       </Float>
       
       {/* Vertical Moving Piston */}
       <mesh position={[0, 2, 0]}>
         <boxGeometry args={[0.5, 3, 0.5]} />
-        <meshStandardMaterial args={[{ color: "#22C55E", metalness: 0.8, roughness: 0.2 }]} />
+        <meshStandardMaterial args={[{ color: "#1D4ED8", metalness: 0.8, roughness: 0.2 }]} />
       </mesh>
       
       {/* Horizontal Moving Parts */}
       <Float speed={2} rotationIntensity={0.2} floatIntensity={1}>
         <mesh position={[3, 0, 0]}>
           <cylinderGeometry args={[0.3, 0.3, 4, 32]} />
-          <meshStandardMaterial args={[{ color: "#FBBF24", metalness: 0.7, roughness: 0.3 }]} />
+          <meshStandardMaterial args={[{ color: "#60A5FA", metalness: 0.7, roughness: 0.3 }]} />
         </mesh>
       </Float>
       
@@ -144,7 +102,7 @@ const RunningMachine = () => {
       <Float speed={3} rotationIntensity={5} floatIntensity={0.1}>
         <mesh position={[-2, 1, 0]}>
           <octahedronGeometry args={[0.8, 0]} />
-          <meshStandardMaterial args={[{ color: "#3B82F6", wireframe: true }]} />
+          <meshStandardMaterial args={[{ color: "#2563EB", wireframe: true }]} />
         </mesh>
       </Float>
       
@@ -152,7 +110,7 @@ const RunningMachine = () => {
       <Float speed={1.5} rotationIntensity={0.3} floatIntensity={1.5}>
         <mesh position={[0, 0, 2]}>
           <torusKnotGeometry args={[1, 0.2, 128, 32]} />
-          <meshStandardMaterial args={[{ color: "#EC4899", emissive: "#EC4899", emissiveIntensity: 0.5 }]} />
+          <meshStandardMaterial args={[{ color: "#1E40AF", emissive: "#1E40AF", emissiveIntensity: 0.5 }]} />
         </mesh>
       </Float>
     </group>
@@ -174,8 +132,8 @@ const CinematicText = () => {
             Code. Create. Innovate.
             <meshStandardMaterial 
               args={[{ 
-                color: "#8B5CF6", 
-                emissive: "#8B5CF6", 
+                color: "#3B82F6", 
+                emissive: "#3B82F6", 
                 emissiveIntensity: 0.5, 
                 metalness: 0.8,
                 roughness: 0.1
@@ -191,84 +149,64 @@ const CinematicText = () => {
 const Canvas3D = () => {
   const [mounted, setMounted] = useState(false);
   
-  // Only mount the canvas after the component has rendered on the client
   useEffect(() => {
     setMounted(true);
-    
-    // Preload the font for Text3D
-    const preloadFont = async () => {
-      try {
-        // Font preloader logic would go here
-        console.log("Preloading fonts...");
-      } catch (error) {
-        console.error("Error preloading fonts:", error);
-      }
-    };
-    
-    preloadFont();
   }, []);
 
   if (!mounted) return null;
 
   return (
-    <Canvas3DErrorBoundary>
-      <div className="canvas-container h-full">
-        <Canvas
-          camera={{ position: [0, 0, 15], fov: 65 }}
-          gl={{ 
-            antialias: true, 
-            alpha: true,
-            powerPreference: 'high-performance',
-            failIfMajorPerformanceCaveat: false
-          }}
-          dpr={[1, 1.5]} // Reduced from [1, 2] for better performance
-          shadows={false} // Disable shadows for better performance
-          performance={{ min: 0.5 }} // Adjust for better performance
-          style={{ background: 'transparent' }}
-        >
-          <Suspense fallback={<CanvasLoader />}>
-            <ambientLight intensity={0.2} />
-            <directionalLight position={[10, 10, 5]} intensity={0.8} color="#8B5CF6" />
-            <pointLight position={[-10, -10, -5]} intensity={0.5} color="#22C55E" />
-            <pointLight position={[5, 5, -10]} intensity={0.3} color="#EAB308" />
-            
-            {/* Project and technology floating shapes */}
-            <ProjectShapes />
-            
-            {/* Machine-like 3D animation */}
-            <RunningMachine />
-            
-            {/* Cinematic text for HR impression */}
-            <CinematicText />
-            
-            <Stars 
-              radius={50} 
-              depth={50} 
-              count={1500} 
-              factor={4} 
-              saturation={1} 
-              fade 
-              speed={1}
-            />
-            
-            <Environment preset="night" />
-            
-            <OrbitControls 
-              enableZoom={false}
-              enablePan={false}
-              enableRotate={true}
-              autoRotate
-              autoRotateSpeed={0.5}
-              makeDefault
-              minPolarAngle={Math.PI / 3}
-              maxPolarAngle={Math.PI / 1.5}
-            />
-            
-            <Preload all />
-          </Suspense>
-        </Canvas>
-      </div>
-    </Canvas3DErrorBoundary>
+    <div className="canvas-container h-full">
+      <Canvas
+        camera={{ position: [0, 0, 15], fov: 65 }}
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: 'high-performance',
+          failIfMajorPerformanceCaveat: false
+        }}
+        dpr={[1, 1.5]}
+        shadows={false}
+        performance={{ min: 0.5 }}
+        style={{ background: 'transparent' }}
+      >
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.2} />
+          <directionalLight position={[10, 10, 5]} intensity={0.8} color="#3B82F6" />
+          <pointLight position={[-10, -10, -5]} intensity={0.5} color="#1D4ED8" />
+          <pointLight position={[5, 5, -10]} intensity={0.3} color="#60A5FA" />
+          
+          <ProjectShapes />
+          <RunningMachine />
+          <CinematicText />
+          
+          <Stars 
+            radius={50} 
+            depth={50} 
+            count={1500} 
+            factor={4} 
+            saturation={1} 
+            fade 
+            speed={1}
+          />
+          
+          <Environment preset="night" />
+          
+          <OrbitControls 
+            enableZoom={false}
+            enablePan={false}
+            enableRotate={true}
+            autoRotate
+            autoRotateSpeed={0.5}
+            makeDefault
+            minPolarAngle={Math.PI / 3}
+            maxPolarAngle={Math.PI / 1.5}
+          />
+          
+          <Preload all />
+        </Suspense>
+      </Canvas>
+    </div>
   );
 };
 
