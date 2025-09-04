@@ -144,22 +144,8 @@ Best regards,
         transition={{ duration: 1.2 }}
       />
       
-      {/* Dynamic 3D grid background */}
-      <motion.div
-        className="absolute inset-0 grid grid-cols-8 grid-rows-8 pointer-events-none"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.05 }}
-      >
-        {Array.from({ length: 64 }).map((_, i) => (
-          <motion.div
-            key={i}
-            className="border border-purple/5"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.2 }}
-            transition={{ delay: i * 0.01, duration: 1 }}
-          />
-        ))}
-      </motion.div>
+      {/* Simple grid background */}
+      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}
@@ -224,7 +210,7 @@ Best regards,
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <span className="text-gradient animate-vibe-pulse">Ananth N</span>
+            <span className="text-gradient">ananth.n</span>
           </motion.h1>
           <motion.div 
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16"
