@@ -1,128 +1,195 @@
+import { motion } from "framer-motion";
+import { useRef } from "react";
+import { useInView } from "framer-motion";
 
-import { motion } from 'framer-motion';
-import { useRef } from 'react';
-import { useInView } from 'framer-motion';
+const fadeInUp = (delay = 0) => ({
+  hidden: { opacity: 0, y: 60 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.9, delay, ease: "easeOut" },
+  },
+});
+
+const slideIn = (direction: "left" | "right" = "left", delay = 0) => ({
+  hidden: { opacity: 0, x: direction === "left" ? -80 : 80 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1, delay, ease: "easeOut" },
+  },
+});
+
+const scaleIn = (delay = 0) => ({
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 1, delay, ease: "easeOut" },
+  },
+});
 
 const About = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
+  const isInView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
-    <section 
-      id="about" 
-      className="min-h-screen py-16 bg-background relative"
+    <section
+      id="about"
+      className="min-h-screen py-20 bg-gradient-to-b from-background via-background/95 to-background relative overflow-hidden"
       ref={ref}
     >
-      <div className="container mx-auto px-4 max-w-4xl">
-        <motion.div 
-          className="text-center mb-12"
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8 }}
+      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,theme(colors.primary/30),transparent_70%)] animate-pulse"></div>
+
+      <div className="container mx-auto px-6 max-w-6xl relative z-10">
+        {/* Title */}
+        <motion.div
+          className="text-center mb-16"
+          variants={fadeInUp(0)}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
         >
-          <h2 className="text-4xl font-bold text-foreground mb-4">About Me</h2>
-          <p className="text-xl text-muted-foreground">
-            Passionate developer and educator creating innovative solutions
-          </p>
+          <h2 className="text-5xl font-extrabold tracking-tight text-foreground mb-6 drop-shadow-md">
+            About Me
+          </h2>
+          <motion.p
+            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
+            variants={fadeInUp(0.2)}
+          >
+            I’m Anand — a developer, educator, and innovator driven by curiosity
+            and a desire to make technology more human, accessible, and impactful.
+          </motion.p>
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Personal Story */}
+          {/* Journey */}
           <motion.div
-            initial={{ opacity: 0, x: -50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-6"
+            variants={slideIn("left", 0.2)}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-card rounded-lg p-6 border">
-              <h3 className="text-2xl font-semibold text-foreground mb-4">My Journey</h3>
-              <div className="space-y-4 text-muted-foreground">
+            <div className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition-shadow duration-500">
+              <h3 className="text-3xl font-semibold text-foreground mb-6">
+                My Journey
+              </h3>
+              <div className="space-y-5 text-muted-foreground">
                 <p>
-                  As a B.Com graduate turned passionate developer, I've found my calling in the 
-                  world of technology and education. My journey started with curiosity and 
-                  evolved into expertise.
+                  My path began as a <span className="font-semibold text-primary">B.Com graduate</span> with a deep interest in problem-solving. That interest grew into a passion for development and education.
                 </p>
-                <p>
-                  Currently, I'm teaching <span className="text-primary font-semibold">150+ students</span> 
-                  AI & BI in the Naan Mudhalvan program while serving as Campus Ambassador 
-                  at Averixis Solutions.
-                </p>
-                <p>
-                  I believe in learning by doing and teaching by sharing. Every project is 
-                  an opportunity to grow and every student interaction makes me better.
-                </p>
+                <motion.p variants={fadeInUp(0.4)}>
+                  I currently mentor <span className="text-primary font-bold">150+ students</span> in AI & BI through the Naan Mudhalvan program, while also serving as a Campus Ambassador at Averixis Solutions.
+                </motion.p>
+                <motion.p variants={fadeInUp(0.6)}>
+                  I thrive on <span className="font-semibold">building, sharing, and growing</span> — every challenge is an opportunity to innovate.
+                </motion.p>
               </div>
             </div>
           </motion.div>
 
-          {/* Skills & Experience */}
+          {/* Skills */}
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
             className="space-y-6"
+            variants={slideIn("right", 0.4)}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-card rounded-lg p-6 border">
-              <h3 className="text-2xl font-semibold text-foreground mb-4">What I Do</h3>
-              <div className="space-y-4">
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                  <div>
-                    <h4 className="font-semibold text-foreground">Full Stack Development</h4>
-                    <p className="text-muted-foreground">Building modern web applications with React, Python, and TypeScript</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                  <div>
-                    <h4 className="font-semibold text-foreground">AI/BI Education</h4>
-                    <p className="text-muted-foreground">Teaching AI and Business Intelligence to 150+ students</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                  <div>
-                    <h4 className="font-semibold text-foreground">Campus Leadership</h4>
-                    <p className="text-muted-foreground">Campus Ambassador at Averixis Solutions</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-3">
-                  <div className="w-2 h-2 bg-primary rounded-full mt-2"></div>
-                  <div>
-                    <h4 className="font-semibold text-foreground">AI Integration</h4>
-                    <p className="text-muted-foreground">Prompt engineering and AI-powered application development</p>
-                  </div>
-                </div>
+            <div className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition-shadow duration-500">
+              <h3 className="text-3xl font-semibold text-foreground mb-6">
+                What I Do
+              </h3>
+              <div className="space-y-5">
+                {[
+                 {
+"title": "Mastery in Full Stack Development",
+"desc": "Spearheading the end-to-end creation of high-performance, scalable web applications, leveraging a comprehensive stack that includes React, TypeScript, Python, and Node.js to deliver exceptional digital experiences."
+},
+{
+"title": "Cutting-Edge AI Integration & Prompt Engineering",
+"desc": "Architecting intelligent, scalable workflows by expertly integrating AI solutions and pioneering innovative prompt engineering techniques to maximize model performance and utility."
+},
+{
+"title": "Expertise in Large Language Model (LLM) Development",
+"desc": "Innovating at the forefront of AI by developing, training, and fine-tuning next-generation language models to create sophisticated, intelligent, and human-like conversational systems."
+},
+{
+"title": "Strategic Leadership & Mentorship",
+"desc": "Inspiring and leading a community of learners, serving as a Campus Ambassador to cultivate professional growth and foster a collaborative, knowledge-driven environment."
+},
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    className="flex items-start space-x-4"
+                    variants={fadeInUp(0.2 * index)}
+                  >
+                    <div className="w-3 h-3 bg-primary rounded-full mt-2 shadow-md"></div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-foreground">
+                        {item.title}
+                      </h4>
+                      <p className="text-muted-foreground">{item.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
               </div>
             </div>
           </motion.div>
         </div>
 
-        {/* Quick Stats */}
+        {/* Vision + Beyond */}
         <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-          transition={{ duration: 0.8, delay: 0.6 }}
-          className="mt-12"
+          className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8"
+          variants={fadeInUp(0.6)}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-card rounded-lg p-6 border text-center">
-              <div className="text-3xl font-bold text-primary mb-2">150+</div>
-              <div className="text-muted-foreground">Students Taught</div>
-            </div>
-            
-            <div className="bg-card rounded-lg p-6 border text-center">
-              <div className="text-3xl font-bold text-primary mb-2">5+</div>
-              <div className="text-muted-foreground">Years Learning</div>
-            </div>
-            
-            <div className="bg-card rounded-lg p-6 border text-center">
-              <div className="text-3xl font-bold text-primary mb-2">∞</div>
-              <div className="text-muted-foreground">Lines of Code</div>
-            </div>
+          <motion.div
+            className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition duration-500"
+            variants={scaleIn(0.2)}
+          >
+            <h3 className="text-2xl font-semibold mb-4">My Vision</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              I aim to create platforms that combine AI, creativity, and real-world problem-solving to empower people globally.
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition duration-500"
+            variants={scaleIn(0.4)}
+          >
+            <h3 className="text-2xl font-semibold mb-4">Beyond Tech</h3>
+            <p className="text-muted-foreground leading-relaxed">
+              Outside development, I explore storytelling, mentoring, and personal growth — bringing creativity into everything I do.
+            </p>
+          </motion.div>
+        </motion.div>
+
+        {/* Stats */}
+        <motion.div
+          className="mt-20"
+          variants={fadeInUp(0.8)}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { number: "150+", label: "Students Taught" },
+              { number: "5+", label: "Years of Learning" },
+              { number: "∞", label: "Lines of Code" },
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                className="bg-card rounded-2xl p-8 border text-center shadow-md hover:shadow-lg transition duration-500"
+                variants={scaleIn(0.2 * i)}
+              >
+                <div className="text-4xl font-bold text-primary mb-3 drop-shadow">
+                  {stat.number}
+                </div>
+                <div className="text-muted-foreground text-lg">
+                  {stat.label}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </motion.div>
       </div>
