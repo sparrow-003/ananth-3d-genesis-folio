@@ -68,36 +68,44 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
                 // Custom portfolio colors
-                dark: '#1A1F2C',
-                light: '#F1F1F1',
+                dark: '#1e293b',
+                light: '#f1f5f9',
+                blue: {
+                    50: '#eff6ff',
+                    100: '#dbeafe',
+                    200: '#bfdbfe',
+                    300: '#93c5fd',
+                    400: '#60a5fa',
+                    500: '#3b82f6',
+                    600: '#2563eb',
+                    700: '#1d4ed8',
+                    800: '#1e40af',
+                    900: '#1e3a8a',
+                    950: '#172554'
+                },
+                navy: {
+                    50: '#f0f4ff',
+                    100: '#e0e9ff',
+                    200: '#c7d7fe',
+                    300: '#a5bbfc',
+                    400: '#8194f8',
+                    500: '#6366f1',
+                    600: '#4f46e5',
+                    700: '#4338ca',
+                    800: '#3730a3',
+                    900: '#312e81',
+                    950: '#1e1b4b'
+                },
                 purple: {
-                    light: '#D6BCFA',
-                    DEFAULT: '#9b87f5',
-                    dark: '#7E69AB',
-                    vibrant: '#8B5CF6'
-                },
-                violet: {
-                    light: '#DDD6FE',
-                    DEFAULT: '#8B5CF6',
-                    dark: '#7C3AED',
-                    vibrant: '#6D28D9'
-                },
-                green: {
-                    light: '#A7F3D0',
-                    DEFAULT: '#10B981',
-                    dark: '#059669',
-                    vibrant: '#34D399'
-                },
-                yellow: {
-                    light: '#FDE68A',
-                    DEFAULT: '#FBBF24',
-                    dark: '#D97706',
-                    vibrant: '#F59E0B'
+                    light: '#d8b4fe',
+                    DEFAULT: '#a855f7',
+                    dark: '#7c3aed',
+                    vibrant: '#8b5cf6'
                 },
                 glass: {
-                    light: 'rgba(255, 255, 255, 0.1)',
-                    DEFAULT: 'rgba(255, 255, 255, 0.15)',
-                    dark: 'rgba(0, 0, 0, 0.15)'
+                    light: 'rgba(59, 130, 246, 0.1)',
+                    DEFAULT: 'rgba(37, 99, 235, 0.15)',
+                    dark: 'rgba(30, 64, 175, 0.2)'
                 }
 			},
 			borderRadius: {

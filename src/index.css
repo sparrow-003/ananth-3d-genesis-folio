@@ -7,33 +7,33 @@
 
 @layer base {
   :root {
-    --background: 240 10% 3.9%;
+    --background: 217 32% 17%;
     --foreground: 0 0% 98%;
 
-    --card: 240 10% 3.9%;
-    --card-foreground: 0 0% 98%;
+    --card: 216 30% 22%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 240 10% 3.9%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 216 30% 22%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 252 59% 48%;
+    --primary: 217 91% 60%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 240 4% 16%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 216 25% 35%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 240 4% 16%;
-    --muted-foreground: 240 5% 64.9%;
+    --muted: 216 25% 35%;
+    --muted-foreground: 217 10% 70%;
 
-    --accent: 12 6% 15.1%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 217 33% 25%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 240 4% 16%;
-    --input: 240 4% 16%;
-    --ring: 252 59% 48%;
+    --border: 216 25% 35%;
+    --input: 216 25% 35%;
+    --ring: 217 91% 60%;
 
     --radius: 0.5rem;
   }
@@ -48,7 +48,7 @@
   }
 
   body {
-    @apply bg-dark text-light font-body;
+    @apply bg-background text-foreground font-body;
     overflow-x: hidden;
   }
 
@@ -73,15 +73,15 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-500 to-yellow-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600;
   }
   
   .text-gradient-green {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-green-500 to-green-300;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500;
   }
   
   .text-gradient-yellow {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-yellow-400 via-amber-500 to-yellow-300;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-sky-400;
   }
 
   .section-container {
