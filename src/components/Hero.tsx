@@ -10,10 +10,10 @@ const Hero = () => {
     "Vibe Coder",
     "Python Developer", 
     "JavaScript/TypeScript Developer",
-    "AI/BI Teaching Expert",
+    "Teaching Expert",
     "UI/UX Designer",
     "AI Prompt Engineer",
-    "Full Stack Developer"
+    "Web Developer"
   ];
 
   const [scrollY, setScrollY] = useState(0);
@@ -96,13 +96,14 @@ Best regards,
   };
 
   // Catchy lines for HR professionals
-  const hrPickupLines = [
-    "Vibe Coder: Where passion meets programming flow",
-    "Teaching 150+ students while building the future",
-    "Campus Ambassador vibes with enterprise solutions",
-    "Turning coffee into code with teaching expertise",
-    "AI & BI educator by day, full-stack innovator by night"
-  ];
+  const hrPickupLines =[
+  "A dreamer who codes worlds beyond the ordinary",
+  "Crafting futures where AI and imagination collide",
+  "Guiding 150+ minds to awaken their hidden genius",
+  "A voice of leadership, turning sparks into fire",
+  "Join me on this journey — where vision becomes destiny"
+];
+
 
   const [currentPickupLine, setCurrentPickupLine] = useState(hrPickupLines[0]);
 
