@@ -174,8 +174,8 @@ const About = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               { number: "150+", label: "Students Taught" },
-              { number: "5+", label: "Years of Learning" },
-              { number: "∞", label: "Lines of Code" },
+              { number: "3+", label: "Years of Coding" },
+              { number: "∞", label: "Lines of Code & AI Agents" },
             ].map((stat, i) => (
               <motion.div
                 key={i}
