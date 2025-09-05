@@ -1,305 +1,342 @@
-import { motion, useMotionValue, useTransform, useScroll, useSpring, useInView } from "framer-motion";
-import { useRef, useState, MouseEvent } from "react";
-import { Code, BrainCircuit, Layers } from "lucide-react";
+import { motion, useInView } from "framer-motion";
+import { useRef, useState } from "react";
+import { Code2, Users, Bot, ExternalLink, Github, Play } from "lucide-react";
 
-// Project data, simplified for a focused 3-project showcase
 const projectsData = [
   {
     id: 1,
-    title: "AI-Powered Social Network",
-    description: "A developer-first social network with AI-driven collaboration tools, real-time communication, and code sharing features.",
-    technologies: ["React", "TypeScript", "Node.js", "MongoDB", "Framer Motion"],
-    features: ["AI matchmaking for dev collaboration", "Real-time chat & code snippets", "Team project management", "Interactive event boards"],
-    icon: <Code className="w-6 h-6 text-yellow-300" />,
-    image: "https://images.unsplash.com/photo-1605379399642-870262d3d051?q=80&w=2697&auto=format&fit=crop"
+    title: "DevMatch",
+    subtitle: "Developer Collaboration Platform",
+    description: "A sophisticated social network designed exclusively for developers, featuring AI-powered matching algorithms to connect like-minded programmers and facilitate seamless collaboration on innovative projects.",
+    technologies: ["React", "TypeScript", "Node.js", "MongoDB", "Socket.io", "AI/ML"],
+    features: [
+      "AI-powered developer matching algorithm",
+      "Real-time collaborative coding environment", 
+      "Project discovery and team formation",
+      "Integrated chat and video calls",
+      "Code review and sharing system"
+    ],
+    category: "Full-Stack Development",
+    type: "coding",
+    icon: <Code2 className="w-8 h-8" />,
+    gradient: "from-blue-500 via-purple-500 to-cyan-500",
+    bgPattern: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]",
+    liveUrl: "#",
+    githubUrl: "#"
   },
   {
     id: 2,
-    title: "Naan Mudhalvan - AI & BI Programs",
-    description: "An educational platform for over 150 students, featuring interactive labs, data analytics, and AI-powered learning feedback.",
-    technologies: ["Python", "Jupyter", "TensorFlow", "FastAPI", "Pandas", "Plotly"],
-    features: ["Live coding modules", "Student progress analytics", "AI-driven auto-grading", "Customizable dashboards"],
-    icon: <BrainCircuit className="w-6 h-6 text-purple-300" />,
-    image: "https://images.unsplash.com/photo-1549646467-3a1b37b6ed41?q=80&w=2752&auto=format&fit=crop"
+    title: "Naan Mudhalvan",
+    subtitle: "AI & BI Education Initiative",
+    description: "A comprehensive educational program where I personally mentor and teach 150+ students in Artificial Intelligence and Business Intelligence through hands-on workshops, practical sessions, and real-world project guidance.",
+    technologies: ["Python", "Jupyter Notebooks", "TensorFlow", "Power BI", "Tableau", "Data Analytics"],
+    features: [
+      "Live coding sessions with 150+ students",
+      "Hands-on AI/BI project workshops",
+      "Personalized mentorship programs",
+      "Real-world case study implementations",
+      "Student progress tracking and assessment"
+    ],
+    category: "Education & Mentorship",
+    type: "physical",
+    icon: <Users className="w-8 h-8" />,
+    gradient: "from-emerald-500 via-teal-500 to-green-500",
+    bgPattern: "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))]",
+    liveUrl: "#",
+    githubUrl: "#"
   },
   {
     id: 3,
-    title: "Intelligent AI ChatBot Framework",
-    description: "A context-aware, modular chatbot framework with multilingual NLU, streaming responses, and an emotion-aware engine.",
-    technologies: ["Python", "Transformers", "React", "WebSocket", "Redis", "FastAPI"],
-    features: ["Multilingual intent recognition", "Conversation memory graph", "Emotion-aware actions", "Pluggable domain knowledge"],
-    icon: <Layers className="w-6 h-6 text-cyan-300" />,
-    image: "https://images.unsplash.com/photo-1531746790731-6c087fecd65a?q=80&w=2697&auto=format&fit=crop"
+    title: "IntelliBot Framework",
+    subtitle: "Advanced AI Agent System",
+    description: "A cutting-edge conversational AI framework built from scratch, featuring context-aware responses, multi-language support, and emotion detection capabilities for creating next-generation chatbot experiences.",
+    technologies: ["Python", "Transformers", "React", "FastAPI", "WebSocket", "NLP"],
+    features: [
+      "Context-aware conversation management",
+      "Multi-language natural language understanding",
+      "Emotion detection and response adaptation",
+      "Modular plugin architecture",
+      "Real-time streaming responses"
+    ],
+    category: "AI/ML Development",
+    type: "coding",
+    icon: <Bot className="w-8 h-8" />,
+    gradient: "from-orange-500 via-red-500 to-pink-500",
+    bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
+    liveUrl: "#",
+    githubUrl: "#"
   }
 ];
 
-// 3D Parallax Tilt Card Component
-const ParallaxCard = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const rotateX = useTransform(y, [-100, 100], [20, -20]);
-  const rotateY = useTransform(x, [-100, 100], [-20, 20]);
-  const gradientTransform = useTransform(x, [-100, 100], ["-20%", "120%"]);
-
-  const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
-    const { offsetWidth, offsetHeight } = ref.current;
-    const { clientX, clientY } = event;
-    const { left, top } = ref.current.getBoundingClientRect();
-    const xVal = clientX - left - offsetWidth / 2;
-    const yVal = clientY - top - offsetHeight / 2;
-    x.set(xVal);
-    y.set(yVal);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
+const ProjectCard = ({ project, isActive, onClick }: any) => {
   return (
     <motion.div
-      ref={ref}
-      style={{
-        transformStyle: "preserve-3d",
-        rotateX,
-        rotateY,
-        cursor: "pointer"
-      }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className={`relative rounded-3xl p-1 will-change-transform ${className}`}
-      transition={{ type: "spring", stiffness: 150, damping: 15 }}
-      whileHover={{ scale: 1.02 }}
+      className={`relative cursor-pointer group transition-all duration-500 ${
+        isActive ? 'scale-105' : 'scale-100 hover:scale-102'
+      }`}
+      onClick={onClick}
+      whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.98 }}
     >
-      {/* Glare effect */}
-      <motion.div
-        className="absolute inset-0 rounded-3xl opacity-0 transition-opacity duration-300 pointer-events-none"
-        style={{
-          background: `radial-gradient(400px circle at var(--x) var(--y), rgba(255, 255, 255, 0.2), transparent 40%)`,
-          '--x': useTransform(x, (val) => `${val + 50}%`),
-          '--y': useTransform(y, (val) => `${val + 50}%`),
-          '--gx': useTransform(x, (val) => `${val}px`),
-          '--gy': useTransform(y, (val) => `${val}px`),
-        }}
-        whileHover={{ opacity: 1 }}
-      />
-      {children}
+      <div className={`
+        relative overflow-hidden rounded-3xl border border-white/10 backdrop-blur-xl
+        ${isActive 
+          ? `bg-gradient-to-br ${project.gradient} p-1` 
+          : 'bg-gradient-to-br from-white/5 to-white/10 hover:from-white/10 hover:to-white/15'
+        }
+        shadow-2xl transition-all duration-500
+      `}>
+        <div className="relative bg-black/80 rounded-3xl p-6 h-full backdrop-blur-sm">
+          {/* Type indicator */}
+          <div className="absolute top-4 right-4">
+            <span className={`
+              px-3 py-1 rounded-full text-xs font-medium
+              ${project.type === 'coding' 
+                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' 
+                : 'bg-green-500/20 text-green-300 border border-green-500/30'
+              }
+            `}>
+              {project.type === 'coding' ? 'Coding Project' : 'Physical Teaching'}
+            </span>
+          </div>
+
+          {/* Icon */}
+          <div className={`
+            inline-flex p-3 rounded-2xl mb-4
+            bg-gradient-to-br ${project.gradient} text-white shadow-lg
+          `}>
+            {project.icon}
+          </div>
+
+          {/* Content */}
+          <h3 className="text-2xl font-bold text-white mb-2">{project.title}</h3>
+          <p className="text-sm font-medium text-gray-300 mb-3">{project.subtitle}</p>
+          <p className="text-gray-400 text-sm leading-relaxed mb-4 line-clamp-3">
+            {project.description}
+          </p>
+
+          {/* Category */}
+          <div className="text-xs text-gray-500 font-medium mb-4">
+            {project.category}
+          </div>
+
+          {/* Tech stack preview */}
+          <div className="flex flex-wrap gap-1 mb-4">
+            {project.technologies.slice(0, 3).map((tech: string, i: number) => (
+              <span key={i} className="text-xs px-2 py-1 bg-white/10 rounded-full text-gray-300">
+                {tech}
+              </span>
+            ))}
+            {project.technologies.length > 3 && (
+              <span className="text-xs px-2 py-1 bg-white/5 rounded-full text-gray-500">
+                +{project.technologies.length - 3} more
+              </span>
+            )}
+          </div>
+
+          {/* Hover overlay */}
+          <div className={`
+            absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-300
+            bg-gradient-to-br ${project.gradient} mix-blend-overlay
+          `} />
+        </div>
+      </div>
     </motion.div>
   );
 };
 
-// Main Projects component
-const ProjectsShowcase = () => {
+const ProjectDetails = ({ project }: any) => {
+  return (
+    <motion.div
+      key={project.id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.5 }}
+      className="relative"
+    >
+      <div className={`
+        relative overflow-hidden rounded-3xl 
+        bg-gradient-to-br ${project.gradient} p-1
+        shadow-2xl
+      `}>
+        <div className="relative bg-black/90 rounded-3xl backdrop-blur-xl">
+          {/* Background pattern */}
+          <div className={`absolute inset-0 ${project.bgPattern} ${project.gradient} opacity-10 rounded-3xl`} />
+          
+          <div className="relative grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
+            {/* Left side - Visual */}
+            <div className="relative p-8 lg:p-12 flex flex-col justify-center">
+              <div className={`
+                inline-flex p-4 rounded-3xl mb-6
+                bg-gradient-to-br ${project.gradient} text-white shadow-2xl
+              `}>
+                {project.icon}
+              </div>
+              
+              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+                {project.title}
+              </h2>
+              <p className="text-xl text-gray-300 mb-6 font-medium">
+                {project.subtitle}
+              </p>
+              <p className="text-gray-400 leading-relaxed text-lg mb-8">
+                {project.description}
+              </p>
+
+              {/* Action buttons */}
+              <div className="flex flex-wrap gap-4">
+                <motion.a
+                  href={project.liveUrl}
+                  className={`
+                    inline-flex items-center gap-3 px-6 py-3 rounded-2xl font-semibold
+                    bg-gradient-to-r ${project.gradient} text-white shadow-lg
+                    transition-all duration-300
+                  `}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Play className="w-5 h-5" />
+                  {project.type === 'coding' ? 'Live Demo' : 'Learn More'}
+                </motion.a>
+                
+                {project.type === 'coding' && (
+                  <motion.a
+                    href={project.githubUrl}
+                    className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl font-semibold bg-white/10 text-white border border-white/20 hover:bg-white/20 transition-all duration-300"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Github className="w-5 h-5" />
+                    Source Code
+                  </motion.a>
+                )}
+              </div>
+            </div>
+
+            {/* Right side - Details */}
+            <div className="p-8 lg:p-12 border-l border-white/10">
+              {/* Technologies */}
+              <div className="mb-8">
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400" />
+                  Technologies Used
+                </h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {project.technologies.map((tech: string, i: number) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="px-4 py-2 bg-white/10 rounded-xl text-gray-300 text-sm font-medium text-center backdrop-blur-sm border border-white/5"
+                    >
+                      {tech}
+                    </motion.span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Key features */}
+              <div>
+                <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-green-400 to-emerald-400" />
+                  Key Features
+                </h3>
+                <div className="space-y-3">
+                  {project.features.map((feature: string, i: number) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + i * 0.1 }}
+                      className="flex items-start gap-3 group"
+                    >
+                      <div className={`
+                        w-2 h-2 rounded-full mt-2 flex-shrink-0
+                        bg-gradient-to-r ${project.gradient}
+                        group-hover:scale-125 transition-transform duration-300
+                      `} />
+                      <span className="text-gray-300 leading-relaxed">{feature}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+const Projects = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeProject, setActiveProject] = useState(projectsData[0]);
-  
-  // Parallax scroll for background elements
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-
-  const springYProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-  const bgTranslateY = useTransform(springYProgress, [0, 1], ["-10%", "10%"]);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0 }
-  };
 
   return (
-    <section id="projects" ref={ref} className="relative py-24 bg-[#0A0A0A] text-gray-100 overflow-hidden">
-      
-      {/* Background - Rich and Classic Feel */}
-      <div className="absolute inset-0 -z-10 overflow-hidden">
-        {/* Top left gold glow */}
-        <motion.div
-          className="absolute -top-[10%] -left-[10%] w-96 h-96 rounded-full blur-[120px] bg-gradient-to-br from-[#9b8359] to-transparent opacity-30"
-          style={{ translateY: bgTranslateY }}
-        />
-        {/* Bottom right dark purple glow */}
-        <motion.div
-          className="absolute -bottom-[10%] -right-[10%] w-96 h-96 rounded-full blur-[120px] bg-gradient-to-br from-purple-900 to-transparent opacity-20"
-          style={{ translateY: useTransform(springYProgress, [0, 1], ["10%", "-10%"]) }}
-        />
-        {/* Elegant grid pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#333_1px,transparent_1px),linear-gradient(to_bottom,#333_1px,transparent_1px)] bg-[size:40px_40px] opacity-[0.05]" />
+    <section id="projects" ref={ref} className="relative py-24 bg-black overflow-hidden">
+      {/* Background elements */}
+      <div className="absolute inset-0">
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-radial from-white/[0.02] to-transparent rounded-full" />
       </div>
 
-      <div className="relative z-10 container max-w-7xl mx-auto px-6">
-        {/* Heading */}
+      <div className="relative container max-w-7xl mx-auto px-6">
+        {/* Header */}
         <motion.div
           className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <h2 className="text-5xl md:text-6xl font-serif font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-stone-200 to-amber-300">
-            Showcase of Work
-          </h2>
-          <motion.p
-            className="mt-4 text-xl font-light italic text-gray-300 max-w-2xl mx-auto"
-            initial={{ opacity: 0, y: 10 }}
-            animate={isInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
+          <motion.div
+            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 mb-6"
+            whileHover={{ scale: 1.05 }}
           >
-            A collection of my most significant projects, crafted with a passion for classic design and modern technology.
-          </motion.p>
+            <Code2 className="w-5 h-5 text-blue-400" />
+            <span className="text-white font-medium">Featured Projects</span>
+          </motion.div>
+          
+          <h2 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-6">
+            My Portfolio
+          </h2>
+          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+            Showcasing my journey in development, education, and innovation. Each project represents 
+            a unique challenge solved through creativity and technical expertise.
+          </p>
         </motion.div>
 
-        {/* Tabs for project selection */}
+        {/* Project navigation */}
         <motion.div
-          className="flex flex-wrap justify-center gap-4 mb-12"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "show" : "hidden"}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {projectsData.map((project, index) => (
-            <motion.button
+          {projectsData.map((project) => (
+            <ProjectCard
               key={project.id}
-              variants={itemVariants}
+              project={project}
+              isActive={activeProject.id === project.id}
               onClick={() => setActiveProject(project)}
-              className={`relative py-2 px-6 rounded-full transition-all duration-300 font-medium ${
-                activeProject.id === project.id
-                  ? "bg-gradient-to-r from-amber-600 to-yellow-500 text-stone-900 shadow-md shadow-amber-500/30"
-                  : "bg-transparent text-gray-400 border border-gray-600/50 hover:border-gray-400/50 hover:text-white"
-              }`}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {project.title}
-              {activeProject.id === project.id && (
-                <motion.span
-                  layoutId="bubble"
-                  className="absolute inset-0 rounded-full -z-10 bg-gradient-to-r from-amber-500 to-yellow-400"
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                />
-              )}
-            </motion.button>
+            />
           ))}
         </motion.div>
 
-        {/* Active project card */}
-        {activeProject && (
-          <ParallaxCard className="bg-gradient-to-br from-[#121212]/90 to-[#0A0A0A]/90 border border-amber-600/20 shadow-xl shadow-black/50">
-            <motion.div
-              key={activeProject.id}
-              initial={{ opacity: 0, y: 30, rotateX: -10 }}
-              animate={{ opacity: 1, y: 0, rotateX: 0 }}
-              exit={{ opacity: 0, y: 30, rotateX: 10 }}
-              transition={{ duration: 0.6 }}
-              className="relative overflow-hidden rounded-3xl"
-              style={{ transformStyle: "preserve-3d" }}
-            >
-              <div className="grid grid-cols-1 lg:grid-cols-2">
-                {/* Image Section */}
-                <div className="relative min-h-[300px] lg:min-h-[500px]">
-                  <motion.img
-                    src={activeProject.image}
-                    alt={activeProject.title}
-                    className="absolute inset-0 w-full h-full object-cover"
-                    initial={{ scale: 1.1, rotate: -2 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    transition={{ duration: 1.5, ease: "easeOut" }}
-                  />
-                  {/* Overlay Gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-transparent to-transparent opacity-90" />
-                </div>
-                
-                {/* Content Section */}
-                <div className="p-8 md:p-12 lg:p-16 relative">
-                  <motion.div style={{ transform: "translateZ(30px)" }}>
-                    <div className="flex items-center gap-4 mb-4">
-                      {activeProject.icon}
-                      <h3 className="text-3xl md:text-4xl font-serif font-bold text-stone-200">
-                        {activeProject.title}
-                      </h3>
-                    </div>
-                    <p className="text-gray-400 leading-relaxed text-lg mb-6 font-light">{activeProject.description}</p>
-
-                    <div className="space-y-6">
-                      {/* Technologies Section */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-amber-400 mb-2">TECHNOLOGIES</h4>
-                        <div className="flex flex-wrap gap-2">
-                          {activeProject.technologies.map((tech, i) => (
-                            <motion.span
-                              key={i}
-                              initial={{ opacity: 0, y: 10 }}
-                              animate={{ opacity: 1, y: 0 }}
-                              transition={{ delay: 0.3 + i * 0.05 }}
-                              className="rounded-full bg-stone-800/50 border border-stone-700/50 px-4 py-1 text-sm text-gray-300"
-                            >
-                              {tech}
-                            </motion.span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Features Section */}
-                      <div>
-                        <h4 className="text-sm font-semibold text-amber-400 mb-2">KEY FEATURES</h4>
-                        <ul className="space-y-3">
-                          {activeProject.features.map((feature, i) => (
-                            <motion.li
-                              key={i}
-                              initial={{ opacity: 0, x: -10 }}
-                              animate={{ opacity: 1, x: 0 }}
-                              transition={{ delay: 0.4 + i * 0.05 }}
-                              className="flex items-center gap-3 text-gray-300"
-                            >
-                              <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
-                              {feature}
-                            </motion.li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="mt-8 flex flex-wrap gap-4">
-                      <motion.a
-                        href="#"
-                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-amber-600 to-yellow-500 px-6 py-3 text-stone-950 font-semibold shadow-lg shadow-amber-500/30 transition-all"
-                        whileHover={{ scale: 1.05, boxShadow: "0 8px 25px rgba(251, 191, 36, 0.4)" }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                        View Project
-                      </motion.a>
-                      <motion.a
-                        href="#"
-                        className="inline-flex items-center gap-2 rounded-full border border-gray-600 px-6 py-3 text-gray-300 font-semibold hover:border-gray-400 hover:text-white transition-colors"
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                      >
-                        <svg className="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 2S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 2 5.09 2A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                        Source Code
-                      </motion.a>
-                    </div>
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          </ParallaxCard>
-        )}
+        {/* Active project details */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <ProjectDetails project={activeProject} />
+        </motion.div>
       </div>
     </section>
   );
 };
 
-export default ProjectsShowcase;
+export default Projects;
