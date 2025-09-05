@@ -211,7 +211,7 @@ Best regards,
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4, duration: 0.8 }}
           >
-            <span className="text-gradient">ananth.n</span>
+            <span className="text-gradient">ANANTH.N</span>
           </motion.h1>
           <motion.div 
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16"
