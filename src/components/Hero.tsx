@@ -227,7 +227,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
           >
-            <span className="text-gradient font-semibold">Vibe Coder</span> teaching 150+ students AI & BI in Naan Mudhalvan program. Campus Ambassador at Averixis Solutions. Building the future with innovative tech solutions.
+            A dreamer who codes worlds beyond the ordinary, crafting futures where AI and imagination collide. Guiding 150+ minds to awaken their hidden genius, a voice of leadership turning sparks into fire. Join me on this journey — where vision becomes destiny.
           </motion.p>
 
           {/* Cinematic HR pickup line */}
