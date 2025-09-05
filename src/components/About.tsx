@@ -173,7 +173,7 @@ const About = () => {
         >
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { number: "150+", label: "Students Taught" },
+              { number: "2+", label: "Years of AI Agents" },
               { number: "3+", label: "Years of Coding" },
               { number: "∞", label: "Lines of Code & AI Agents" },
             ].map((stat, i) => (
