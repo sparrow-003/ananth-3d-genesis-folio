@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Suspense, useState, useEffect } from 'react';
 import { OrbitControls, Environment, Stars, Float, Preload, Text3D, Center } from '@react-three/drei';
 import FloatingShape from './FloatingShape';
+import FallingStars from './FallingStars';
 
 
 // Custom shapes that represent different project categories and technologies
@@ -168,7 +169,7 @@ const Canvas3D = () => {
         dpr={[1, 1.5]}
         shadows={false}
         performance={{ min: 0.5 }}
-        style={{ background: 'transparent' }}
+        style={{ background: '#000100' }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.2} />
@@ -179,6 +180,7 @@ const Canvas3D = () => {
           <ProjectShapes />
           <RunningMachine />
           <CinematicText />
+          <FallingStars />
           
           <Stars 
             radius={50} 
