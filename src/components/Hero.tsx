@@ -133,7 +133,7 @@ Best regards,
   }, [scrollY]);
 
   return (
-    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20">
       {/* Enhanced parallax background effect */}
       <motion.div 
         className="absolute inset-0 -z-10"

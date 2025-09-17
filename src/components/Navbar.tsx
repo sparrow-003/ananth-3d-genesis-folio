@@ -37,14 +37,15 @@ const Navbar = () => {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
-        className={`fixed top-0 w-full z-50 px-6 transition-all duration-300 ${
-          isScrolled ? 'glass-nav py-2' : 'py-6'
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-300 ${
+          isScrolled ? 'glass-nav py-2' : 'py-4 sm:py-6'
         }`}
+        style={{ position: 'fixed' }}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <motion.a 
             href="#home"
-            className="text-2xl font-display font-bold text-gradient"
+            className="text-lg sm:text-xl md:text-2xl font-display font-bold text-gradient"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={(e) => {
@@ -56,12 +57,12 @@ const Navbar = () => {
           </motion.a>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
             {navItems.map((item, index) => (
               <motion.a
                 key={item.name}
                 href={item.href}
-                className="text-light opacity-80 hover:opacity-100 hover:text-purple transition-all"
+                className="text-sm lg:text-base text-light opacity-80 hover:opacity-100 hover:text-purple transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
@@ -120,7 +121,7 @@ const Navbar = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-16 left-0 right-0 z-40 glass-nav py-4 md:hidden"
+            className="fixed top-14 sm:top-16 left-0 right-0 z-40 glass-nav py-4 md:hidden"
           >
             <div className="flex flex-col items-center space-y-4 px-6">
               {navItems.map((item) => (

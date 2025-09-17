@@ -149,12 +149,18 @@ const CinematicText = () => {
 
 const Canvas3D = () => {
   const [mounted, setMounted] = useState(false);
+  const [error, setError] = useState(false);
   
   useEffect(() => {
-    setMounted(true);
+    try {
+      setMounted(true);
+    } catch (err) {
+      console.error('Canvas3D mount error:', err);
+      setError(true);
+    }
   }, []);
 
-  if (!mounted) return null;
+  if (error || !mounted) return null;
 
   return (
     <div className="canvas-container h-full">
@@ -164,12 +170,17 @@ const Canvas3D = () => {
           antialias: true, 
           alpha: true,
           powerPreference: 'high-performance',
-          failIfMajorPerformanceCaveat: false
+          failIfMajorPerformanceCaveat: false,
+          preserveDrawingBuffer: false
         }}
         dpr={[1, 1.5]}
         shadows={false}
         performance={{ min: 0.5 }}
         style={{ background: '#000000' }}
+        onError={(error) => {
+          console.error('Canvas error:', error);
+          setError(true);
+        }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.2} />

@@ -94,17 +94,19 @@ const Index = () => {
     };
     
     // Handle errors in 3D rendering
-    const handleError = (event: ErrorEvent) => {
+    const handleError = (event: ErrorEvent | Event) => {
       // Check for specific 3D-related errors
+      const message = 'message' in event ? event.message : '';
       if (
-        event.message && (
-          event.message.includes('THREE') || 
-          event.message.includes('WebGL') ||
-          event.message.includes('lov') ||
-          event.message.includes('Cannot read properties of undefined')
+        message && (
+          message.includes('THREE') || 
+          message.includes('WebGL') ||
+          message.includes('lov') ||
+          message.includes('Cannot read properties of undefined') ||
+          message.includes('Context Lost')
         )
       ) {
-        console.error('3D rendering error detected:', event.message);
+        console.error('3D rendering error detected:', message);
         setIs3DEnabled(false);
       }
     };
