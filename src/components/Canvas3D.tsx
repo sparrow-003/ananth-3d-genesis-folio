@@ -169,7 +169,7 @@ const Canvas3D = () => {
         dpr={[1, 1.5]}
         shadows={false}
         performance={{ min: 0.5 }}
-        style={{ background: '#000100' }}
+        style={{ background: '#000000' }}
       >
         <Suspense fallback={null}>
           <ambientLight intensity={0.2} />
