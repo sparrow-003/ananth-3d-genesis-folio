@@ -34,13 +34,17 @@ const Navbar = () => {
   return (
     <>
       <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-300 ${
-          isScrolled ? 'glass-nav py-2' : 'py-4 sm:py-6'
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ 
+          duration: 0.8,
+          type: "spring",
+          stiffness: 100,
+          damping: 15
+        }}
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${
+          isScrolled ? 'glass-nav py-2 backdrop-blur-xl' : 'py-3 sm:py-4'
         }`}
-        style={{ position: 'fixed' }}
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <motion.a 

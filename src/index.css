@@ -64,13 +64,8 @@
     background-attachment: fixed;
     overflow-x: hidden;
     min-height: 100vh;
-    padding-top: 60px; /* Account for fixed navbar */
-  }
-  
-  @media (min-width: 640px) {
-    body {
-      padding-top: 80px; /* Larger padding for bigger screens */
-    }
+    margin: 0;
+    padding: 0;
   }
 
   h1, h2, h3, h4, h5, h6 {

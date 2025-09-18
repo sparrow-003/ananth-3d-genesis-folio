@@ -190,7 +190,6 @@ const Canvas3D = () => {
           
           <ProjectShapes />
           <RunningMachine />
-          <CinematicText />
           <FallingStars />
           
           <Stars 

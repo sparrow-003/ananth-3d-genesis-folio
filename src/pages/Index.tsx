@@ -7,6 +7,7 @@ import About from "../components/About";
 import Skills from "../components/Skills";
 import Projects from "../components/Projects";
 import Contact from "../components/Contact";
+import Footer from "../components/Footer";
 
 // Simple fallback component for 3D canvas
 const Canvas3DFallback = () => (
@@ -159,13 +160,17 @@ const Index = () => {
       
       <Navbar />
       
-      <SmoothScroll>
-        <Hero />
-        <About />
-        <Skills />
-        <Projects />
-        <Contact />
-      </SmoothScroll>
+      <main className="pt-16 sm:pt-20">
+        <SmoothScroll>
+          <Hero />
+          <About />
+          <Skills />
+          <Projects />
+          <Contact />
+        </SmoothScroll>
+      </main>
+      
+      <Footer />
     </>
   );
 };
