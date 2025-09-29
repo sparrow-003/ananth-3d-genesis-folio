@@ -1,4 +1,3 @@
-````markdown
 # 🚀 My Project Portfolio  
 
 Welcome to my personal project showcase!  
