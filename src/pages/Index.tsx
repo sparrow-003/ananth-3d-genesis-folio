@@ -145,7 +145,7 @@ const Index = () => {
   }
 
   return (
-    <>
+    <div className="overflow-x-hidden w-full max-w-[100vw]">
       {is3DEnabled && (
         <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1]">
           <Suspense fallback={<Canvas3DFallback />}>
@@ -160,7 +160,7 @@ const Index = () => {
       
       <Navbar />
       
-      <main className="relative bg-black">
+      <main className="relative bg-black overflow-x-hidden">
         <SmoothScroll>
           <Hero />
           <About />
@@ -171,7 +171,7 @@ const Index = () => {
       </main>
       
       <Footer />
-    </>
+    </div>
   );
 };
 
