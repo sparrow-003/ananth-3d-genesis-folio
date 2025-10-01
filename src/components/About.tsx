@@ -36,7 +36,7 @@ const About = () => {
   return (
     <section
       id="about"
-      className="min-h-screen py-20 bg-gradient-to-b from-background via-background/95 to-background relative overflow-hidden"
+      className="min-h-screen py-20 bg-black relative overflow-hidden"
       ref={ref}
     >
       <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,theme(colors.primary/30),transparent_70%)] animate-pulse"></div>

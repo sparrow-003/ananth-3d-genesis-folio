@@ -59,7 +59,7 @@ Best regards,
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden" ref={ref}>
+    <section id="contact" className="py-24 relative overflow-hidden bg-black" ref={ref}>
       {/* 3D Elements and Background */}
       <motion.div 
         className="absolute inset-0 -z-10"

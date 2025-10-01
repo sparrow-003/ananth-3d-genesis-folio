@@ -160,7 +160,7 @@ const Index = () => {
       
       <Navbar />
       
-      <main className="pt-16 sm:pt-20">
+      <main className="relative bg-black">
         <SmoothScroll>
           <Hero />
           <About />

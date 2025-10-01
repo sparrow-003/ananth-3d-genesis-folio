@@ -115,7 +115,7 @@ const Skills = () => {
   };
 
   return (
-    <section id="skills" className="py-24 relative overflow-hidden" ref={ref}>
+    <section id="skills" className="py-24 relative overflow-hidden bg-black" ref={ref}>
       {/* 3D Background Elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-yellow-600/5 rounded-full blur-2xl"></div>

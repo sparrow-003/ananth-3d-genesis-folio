@@ -15,7 +15,10 @@ const ParticleBackground = () => {
     canvas.height = window.innerHeight;
     
     const particles: Particle[] = [];
+    const shootingStars: ShootingStar[] = [];
+    const stars: Star[] = [];
     const particleCount = Math.min(100, window.innerWidth / 15);
+    const starCount = Math.min(200, window.innerWidth / 5);
     
     // Create particles
     for (let i = 0; i < particleCount; i++) {
@@ -29,14 +32,109 @@ const ParticleBackground = () => {
       });
     }
     
+    // Create background stars
+    for (let i = 0; i < starCount; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 0.5,
+        opacity: Math.random() * 0.5 + 0.3,
+        twinkleSpeed: Math.random() * 0.02 + 0.01,
+      });
+    }
+    
+    // Function to create shooting stars
+    function createShootingStar() {
+      shootingStars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height * 0.5,
+        length: Math.random() * 80 + 50,
+        speed: Math.random() * 8 + 6,
+        opacity: 1,
+        angle: Math.PI / 4,
+      });
+    }
+    
+    // Create initial shooting stars
+    setInterval(() => {
+      if (Math.random() > 0.7) {
+        createShootingStar();
+      }
+    }, 2000);
+    
     function animate() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
       
+      drawStars();
       updateParticles();
       drawParticles();
       connectParticles();
+      updateShootingStars();
+      drawShootingStars();
       
       requestAnimationFrame(animate);
+    }
+    
+    function drawStars() {
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
+        star.opacity += star.twinkleSpeed;
+        if (star.opacity > 1 || star.opacity < 0.3) {
+          star.twinkleSpeed *= -1;
+        }
+        
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+    
+    function updateShootingStars() {
+      for (let i = shootingStars.length - 1; i >= 0; i--) {
+        const star = shootingStars[i];
+        star.x += Math.cos(star.angle) * star.speed;
+        star.y += Math.sin(star.angle) * star.speed;
+        star.opacity -= 0.01;
+        
+        if (star.opacity <= 0 || star.x > canvas.width || star.y > canvas.height) {
+          shootingStars.splice(i, 1);
+        }
+      }
+    }
+    
+    function drawShootingStars() {
+      for (let i = 0; i < shootingStars.length; i++) {
+        const star = shootingStars[i];
+        
+        // Draw trail
+        const gradient = ctx.createLinearGradient(
+          star.x,
+          star.y,
+          star.x - Math.cos(star.angle) * star.length,
+          star.y - Math.sin(star.angle) * star.length
+        );
+        gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity})`);
+        gradient.addColorStop(0.5, `rgba(155, 135, 245, ${star.opacity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.strokeStyle = gradient;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(star.x, star.y);
+        ctx.lineTo(
+          star.x - Math.cos(star.angle) * star.length,
+          star.y - Math.sin(star.angle) * star.length
+        );
+        ctx.stroke();
+        
+        // Draw bright head
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
     }
     
     function updateParticles() {
@@ -115,6 +213,23 @@ interface Particle {
   speedX: number;
   speedY: number;
   color: string;
+}
+
+interface Star {
+  x: number;
+  y: number;
+  size: number;
+  opacity: number;
+  twinkleSpeed: number;
+}
+
+interface ShootingStar {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  opacity: number;
+  angle: number;
 }
 
 export default ParticleBackground;
