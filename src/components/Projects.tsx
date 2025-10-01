@@ -276,7 +276,8 @@ const Projects = () => {
   const [activeProject, setActiveProject] = useState(projectsData[0]);
 
   return (
-    <section id="projects" ref={ref} className="section-container bg-black">
+    <section id="projects" ref={ref} className="section-container relative">
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black -z-10" />
       <div className="projects-section">
         {/* Enhanced background elements */}
         <div className="absolute inset-0 pointer-events-none">

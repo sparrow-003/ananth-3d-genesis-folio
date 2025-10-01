@@ -59,7 +59,8 @@ Best regards,
   };
 
   return (
-    <section id="contact" className="py-24 relative overflow-hidden bg-black" ref={ref}>
+    <section id="contact" className="py-24 relative overflow-hidden" ref={ref}>
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/20 via-black to-pink-950/20 -z-10" />
       {/* 3D Elements and Background */}
       <motion.div 
         className="absolute inset-0 -z-10"

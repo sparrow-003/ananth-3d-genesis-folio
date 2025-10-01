@@ -133,7 +133,9 @@ Best regards,
   }, [scrollY]);
 
   return (
-    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24 bg-black">
+    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24">
+      {/* Enhanced gradient background with purple theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-black to-fuchsia-950/20 -z-10" />
       {/* Enhanced parallax background effect */}
       <motion.div 
         className="absolute inset-0 -z-10"

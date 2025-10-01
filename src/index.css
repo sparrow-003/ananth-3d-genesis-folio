@@ -10,43 +10,43 @@
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 0%;
+    --card: 0 0% 3%;
     --card-foreground: 0 0% 95%;
 
     --popover: 0 0% 0%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 217 91% 60%;
+    --primary: 262 83% 58%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 0 0% 0%;
+    --secondary: 280 100% 70%;
     --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 0%;
+    --muted: 0 0% 5%;
     --muted-foreground: 217 10% 70%;
 
-    --accent: 0 0% 0%;
+    --accent: 291 91% 73%;
     --accent-foreground: 0 0% 95%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 0%;
-    --input: 0 0% 0%;
-    --ring: 217 91% 60%;
+    --border: 262 40% 15%;
+    --input: 262 40% 15%;
+    --ring: 262 83% 58%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    /* Enhanced gradient backgrounds - Pure black base */
-    --bg-main: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 0%) 25%, hsl(0, 0%, 0%) 50%, hsl(0, 0%, 0%) 100%);
-    --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 0%) 100%);
-    --bg-projects: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(0, 0%, 0%) 30%, hsl(0, 0%, 0%) 70%, hsl(0, 0%, 0%) 100%);
-    --bg-glass: hsla(0, 0%, 0%, 0.4);
+    /* Enhanced gradient backgrounds with vibrant colors */
+    --bg-main: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(262, 50%, 5%) 50%, hsl(280, 60%, 8%) 100%);
+    --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 0%) 0%, hsl(262, 40%, 5%) 100%);
+    --bg-projects: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(262, 45%, 6%) 30%, hsl(280, 55%, 7%) 70%, hsl(291, 60%, 10%) 100%);
+    --bg-glass: hsla(262, 50%, 10%, 0.4);
     
-    /* Enhanced glow effects */
-    --glow-primary: 0 0 40px hsla(217, 91%, 60%, 0.3);
-    --glow-secondary: 0 0 60px hsla(260, 70%, 50%, 0.2);
-    --glow-accent: 0 0 80px hsla(180, 100%, 50%, 0.15);
+    /* Enhanced glow effects with purple/pink theme */
+    --glow-primary: 0 0 60px hsla(262, 83%, 58%, 0.4);
+    --glow-secondary: 0 0 80px hsla(280, 100%, 70%, 0.3);
+    --glow-accent: 0 0 100px hsla(291, 91%, 73%, 0.25);
   }
 
   * {
@@ -62,7 +62,8 @@
 
   body {
     @apply text-foreground font-body;
-    background: #000000;
+    background: radial-gradient(ellipse at top, hsl(262, 50%, 5%) 0%, hsl(0, 0%, 0%) 50%),
+                radial-gradient(ellipse at bottom, hsl(280, 60%, 8%) 0%, hsl(0, 0%, 0%) 50%);
     background-attachment: fixed;
     overflow-x: hidden;
     min-height: 100vh;
@@ -80,21 +81,22 @@
     @apply font-display;
   }
 
-  /* Enhanced glass effects with 3D */
+  /* Enhanced glass effects with 3D and vibrant colors */
   .glass-card {
     background: var(--bg-glass);
-    backdrop-filter: blur(20px);
-    border: 1px solid hsla(217, 91%, 60%, 0.2);
-    border-radius: 16px;
-    box-shadow: var(--glow-primary), 0 8px 32px hsla(0, 0%, 0%, 0.3);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid hsla(262, 83%, 58%, 0.2);
+    border-radius: 20px;
+    box-shadow: var(--glow-primary), 0 8px 32px hsla(262, 83%, 58%, 0.1);
     transform-style: preserve-3d;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   
   .glass-card:hover {
-    transform: translateY(-12px) rotateX(8deg) rotateY(4deg);
-    box-shadow: var(--glow-secondary), 0 25px 50px hsla(0, 0%, 0%, 0.4);
-    border-color: hsla(217, 91%, 60%, 0.4);
+    transform: translateY(-16px) rotateX(5deg);
+    box-shadow: var(--glow-secondary), 0 30px 60px hsla(280, 100%, 70%, 0.2);
+    border-color: hsla(262, 83%, 58%, 0.5);
+    background: hsla(262, 50%, 10%, 0.6);
   }
 
   .glass-nav {
@@ -102,15 +104,23 @@
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-600;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400;
+    animation: gradient-shift 3s ease infinite;
   }
   
   .text-gradient-green {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-indigo-500;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400;
+    animation: gradient-shift 3s ease infinite;
   }
   
   .text-gradient-yellow {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-cyan-300 to-sky-400;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-400 via-yellow-400 to-orange-400;
+    animation: gradient-shift 3s ease infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(30deg); }
   }
 
   .section-container {

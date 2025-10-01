@@ -28,7 +28,7 @@ const ParticleBackground = () => {
         size: Math.random() * 2 + 0.5,
         speedX: Math.random() * 0.5 - 0.25,
         speedY: Math.random() * 0.5 - 0.25,
-        color: `rgba(155, 135, 245, ${Math.random() * 0.5 + 0.2})`,
+        color: `rgba(${139 + Math.random() * 40}, ${92 + Math.random() * 40}, 246, ${Math.random() * 0.5 + 0.3})`,
       });
     }
     
@@ -173,7 +173,7 @@ const ParticleBackground = () => {
           
           if (distance < maxDistance) {
             const opacity = 1 - distance / maxDistance;
-            ctx.strokeStyle = `rgba(155, 135, 245, ${opacity * 0.2})`;
+            ctx.strokeStyle = `rgba(139, 92, 246, ${opacity * 0.3})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -200,7 +200,7 @@ const ParticleBackground = () => {
   return (
     <canvas
       ref={canvasRef}
-      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-60"
+      className="fixed top-0 left-0 w-full h-full pointer-events-none z-0 opacity-70"
     />
   );
 };
