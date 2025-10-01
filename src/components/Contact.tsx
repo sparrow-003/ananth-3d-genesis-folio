@@ -49,10 +49,10 @@ Best regards,
   };
 
   const handleDownloadResume = () => {
-    // Create a link to the resume PDF and trigger download
+    // Create a link to the resume and trigger download
     const link = document.createElement('a');
-    link.href = '/resume.pdf';
-    link.download = 'Ananth_N_Resume.pdf';
+    link.href = '/AnanthN_Resume.docx';
+    link.download = 'AnanthN_Resume.docx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
