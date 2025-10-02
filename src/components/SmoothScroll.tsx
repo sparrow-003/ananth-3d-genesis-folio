@@ -110,7 +110,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
       {/* Render children with enhanced animations */}
       <motion.div 
         ref={scrollRef}
-        className="flex flex-col"
+        className="flex flex-col w-full overflow-x-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: mounted ? 1 : 0 }}
         transition={{ duration: 0.8 }}

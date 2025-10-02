@@ -11,7 +11,7 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <div className="overflow-x-hidden w-full max-w-[100vw]">
+      <div className="overflow-x-hidden overflow-y-auto w-full max-w-[100vw] relative">
         <Toaster />
         <Sonner />
         <BrowserRouter>
