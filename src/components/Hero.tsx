@@ -134,8 +134,8 @@ Best regards,
 
   return (
     <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full">
-      {/* Enhanced gradient background with purple theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-black to-fuchsia-950/20" />
+      {/* Enhanced gradient background with emerald theme */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-black to-teal-950/20" />
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}
@@ -147,7 +147,7 @@ Best regards,
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
           <motion.div 
-            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-purple/30 shadow-xl shadow-purple/20 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
+            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-emerald-500/30 shadow-xl shadow-emerald-500/20 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
             whileHover={{ 
               rotate: [0, -5, 5, -5, 0],
               scale: 1.05,
@@ -159,9 +159,9 @@ Best regards,
               <Avatar className="w-full h-full rounded-full image-3d flip-card-inner">
                 <div className="flip-card-front">
                   <AvatarImage src="/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png" alt="Ananth N" className="object-cover" />
-                  <AvatarFallback className="bg-purple text-4xl">AN</AvatarFallback>
+                  <AvatarFallback className="bg-emerald-600 text-4xl">AN</AvatarFallback>
                 </div>
-                <div className="flip-card-back bg-gradient-to-br from-violet-600 to-purple-700 flex items-center justify-center">
+                <div className="flip-card-back bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center">
                   <div className="text-center">
                     <h3 className="text-xl font-bold">Ananth N</h3>
                     <p className="text-sm">Full Stack Developer</p>
@@ -170,9 +170,9 @@ Best regards,
                 </div>
               </Avatar>
             </div>
-            <div className="absolute inset-0 bg-gradient-to-tr from-purple/20 via-green-500/10 to-yellow-400/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-cyan-400/10 pointer-events-none" />
           </motion.div>
-          <div className="mt-3 text-center text-xs text-violet-400 animate-pulse">Click for surprise effects!</div>
+          <div className="mt-3 text-center text-xs text-emerald-400 animate-pulse">Click for surprise effects!</div>
         </motion.div>
 
         {/* Text content with enhanced staggered animation */}
@@ -208,7 +208,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            I'm a <AnimatedText texts={roles} className="text-purple animate-perspective-shift" interval={2500} />
+            I'm a <AnimatedText texts={roles} className="text-emerald-500 animate-perspective-shift" interval={2500} />
           </motion.div>
           <motion.p 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300 leading-relaxed"
@@ -221,12 +221,12 @@ Best regards,
 
           {/* Cinematic HR pickup line */}
           <motion.div 
-            className="glass-card p-3 mb-12 border border-violet-500/20 relative overflow-hidden"
+            className="glass-card p-3 mb-12 border border-emerald-500/20 relative overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-transparent to-green-500/5"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5"></div>
             <p className="text-gradient italic font-medium">"{currentPickupLine}"</p>
           </motion.div>
           
@@ -238,10 +238,10 @@ Best regards,
           >
             {/* Enhanced buttons with 3D effect */}
             <motion.button
-              className="px-8 py-3 bg-gradient-to-r from-violet-600 via-violet-500 to-purple-700 rounded-full font-medium text-white shadow-lg shadow-violet-500/30 hover:shadow-xl hover:shadow-violet-500/50 transition-all relative overflow-hidden group"
+              className="px-8 py-3 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-700 rounded-full font-medium text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 transition-all relative overflow-hidden group"
               whileHover={{ 
                 scale: 1.05, 
-                boxShadow: "0 0 25px rgba(124, 58, 237, 0.6)",
+                boxShadow: "0 0 25px rgba(16, 185, 129, 0.6)",
                 textShadow: "0 0 8px rgba(255, 255, 255, 0.5)"
               }}
               whileTap={{ scale: 0.98 }}
@@ -252,12 +252,12 @@ Best regards,
                 Hire Me Now
                 <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
               </span>
-              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-green-600 via-green-500 to-green-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-teal-600 via-teal-500 to-cyan-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </motion.button>
 
             <motion.a
               href="#projects"
-              className="px-8 py-3 border border-green-500 rounded-full font-medium text-light hover:bg-green-500/10 transition-all relative overflow-hidden group"
+              className="px-8 py-3 border border-emerald-500 rounded-full font-medium text-light hover:bg-emerald-500/10 transition-all relative overflow-hidden group"
               whileHover={{ scale: 1.05, translateY: -2 }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -283,8 +283,8 @@ Best regards,
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
-              <div className="w-10 h-10 bg-violet-500/20 rounded-full flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-violet-400" />
+              <div className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
                 <p className="text-sm text-gradient font-semibold">Experience</p>
@@ -296,8 +296,8 @@ Best regards,
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: -2 }}
             >
-              <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-green-400" />
+              <div className="w-10 h-10 bg-teal-500/20 rounded-full flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-teal-400" />
               </div>
               <div>
                 <p className="text-sm text-gradient-green font-semibold">Location</p>
@@ -309,8 +309,8 @@ Best regards,
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
-              <div className="w-10 h-10 bg-yellow-500/20 rounded-full flex items-center justify-center">
-                <Code className="w-5 h-5 text-yellow-400" />
+              <div className="w-10 h-10 bg-cyan-500/20 rounded-full flex items-center justify-center">
+                <Code className="w-5 h-5 text-cyan-400" />
               </div>
               <div>
                 <p className="text-sm text-gradient-yellow font-semibold">Vibe Skills</p>
@@ -347,8 +347,8 @@ Best regards,
             fill="none" 
             stroke="currentColor" 
             strokeWidth="2" 
-            className="text-purple"
-            animate={{ 
+            className="text-emerald-500"
+            animate={{
               y: [0, 8, 0],
               rotateX: [0, 20, 0]
             }}

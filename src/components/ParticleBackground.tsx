@@ -28,7 +28,7 @@ const ParticleBackground = () => {
         size: Math.random() * 2 + 0.5,
         speedX: Math.random() * 0.5 - 0.25,
         speedY: Math.random() * 0.5 - 0.25,
-        color: `rgba(${139 + Math.random() * 40}, ${92 + Math.random() * 40}, 246, ${Math.random() * 0.5 + 0.3})`,
+        color: `rgba(${16 + Math.random() * 40}, ${185 + Math.random() * 40}, 129, ${Math.random() * 0.5 + 0.3})`,
       });
     }
     
@@ -116,7 +116,7 @@ const ParticleBackground = () => {
           star.y - Math.sin(star.angle) * star.length
         );
         gradient.addColorStop(0, `rgba(255, 255, 255, ${star.opacity})`);
-        gradient.addColorStop(0.5, `rgba(155, 135, 245, ${star.opacity * 0.6})`);
+        gradient.addColorStop(0.5, `rgba(16, 185, 129, ${star.opacity * 0.6})`);
         gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
         
         ctx.strokeStyle = gradient;
@@ -173,7 +173,7 @@ const ParticleBackground = () => {
           
           if (distance < maxDistance) {
             const opacity = 1 - distance / maxDistance;
-            ctx.strokeStyle = `rgba(139, 92, 246, ${opacity * 0.3})`;
+            ctx.strokeStyle = `rgba(16, 185, 129, ${opacity * 0.3})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);

@@ -39,7 +39,7 @@ const About = () => {
       className="min-h-screen py-20 relative w-full"
       ref={ref}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-violet-950/20 to-black" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black" />
 
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
         {/* Title */}

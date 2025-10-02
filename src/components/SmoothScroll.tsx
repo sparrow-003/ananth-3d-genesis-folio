@@ -61,7 +61,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
     <>
       {/* AI-Enhanced Progress bar with gradient */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 via-pink-500 to-fuchsia-500 z-[100] origin-left shadow-lg shadow-violet-500/50"
+        className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 via-cyan-500 to-green-500 z-[100] origin-left shadow-lg shadow-emerald-500/50"
         style={{ scaleX }}
       />
       
@@ -86,12 +86,12 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
             }}
           >
             <motion.div
-              className="w-3 h-3 rounded-full bg-violet-500/30 border border-violet-400/50 group-hover:bg-violet-500 transition-all"
+              className="w-3 h-3 rounded-full bg-emerald-500/30 border border-emerald-400/50 group-hover:bg-emerald-500 transition-all"
               style={{
                 backgroundColor: useTransform(
                   scrollYProgress,
                   [i * 0.2, (i + 1) * 0.2],
-                  ['rgba(139, 92, 246, 0.3)', 'rgba(139, 92, 246, 1)']
+                  ['rgba(16, 185, 129, 0.3)', 'rgba(16, 185, 129, 1)']
                 ).get(),
                 scale: useTransform(
                   scrollYProgress,
@@ -100,7 +100,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
                 ).get(),
               }}
             />
-            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-violet-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-violet-900/80 px-2 py-1 rounded backdrop-blur-sm">
+            <span className="absolute right-6 top-1/2 -translate-y-1/2 text-xs text-emerald-300 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap bg-emerald-900/80 px-2 py-1 rounded backdrop-blur-sm">
               {section.charAt(0).toUpperCase() + section.slice(1)}
             </span>
           </motion.a>
@@ -139,7 +139,7 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
             }}
             className="flex flex-col items-center"
           >
-            <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-400 mb-2">
+            <span className="text-sm font-medium text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400 mb-2">
               Scroll Down
             </span>
             <div className="relative">
@@ -150,13 +150,13 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
                 fill="none" 
                 stroke="currentColor" 
                 strokeWidth="2" 
-                className="text-violet-400"
+                className="text-emerald-400"
               >
                 <path d="M7 13l5 5 5-5" />
                 <path d="M7 7l5 5 5-5" />
               </svg>
               <motion.div
-                className="absolute inset-0 rounded-full bg-violet-500/30 blur-xl"
+                className="absolute inset-0 rounded-full bg-emerald-500/30 blur-xl"
                 animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0.2, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />

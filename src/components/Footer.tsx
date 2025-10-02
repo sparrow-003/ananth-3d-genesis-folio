@@ -9,7 +9,7 @@ const Footer = () => {
       icon: Github, 
       href: '#', 
       label: 'GitHub',
-      color: 'hover:text-purple-400'
+      color: 'hover:text-emerald-400'
     },
     { 
       icon: Linkedin, 
@@ -70,7 +70,7 @@ const Footer = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, margin: "-100px" }}
-      className="relative overflow-hidden bg-black/90 backdrop-blur-xl border-t border-purple-500/20"
+      className="relative overflow-hidden bg-black/90 backdrop-blur-xl border-t border-emerald-500/20"
     >
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden">
@@ -84,7 +84,7 @@ const Footer = () => {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-r from-purple-500/5 via-blue-500/5 to-cyan-500/5 rounded-full"
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-full"
         />
         <motion.div
           animate={{
@@ -96,7 +96,7 @@ const Footer = () => {
             repeat: Infinity,
             ease: "linear"
           }}
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-l from-cyan-500/5 via-purple-500/5 to-blue-500/5 rounded-full"
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-l from-cyan-500/5 via-emerald-500/5 to-teal-500/5 rounded-full"
         />
       </div>
 
@@ -135,7 +135,7 @@ const Footer = () => {
                 variants={iconVariants}
                 whileHover="hover"
                 whileTap={{ scale: 0.9 }}
-                className={`p-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm transition-all duration-300 ${social.color} hover:border-purple-500/50 hover:shadow-lg hover:shadow-purple-500/20`}
+                className={`p-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm transition-all duration-300 ${social.color} hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/20`}
                 aria-label={social.label}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ 
@@ -170,7 +170,7 @@ const Footer = () => {
           variants={itemVariants}
         >
           <motion.div
-            className="h-1 bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-500 rounded-full mx-auto"
+            className="h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full mx-auto"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
