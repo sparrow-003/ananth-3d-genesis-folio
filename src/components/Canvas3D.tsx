@@ -1,7 +1,7 @@
 
 import { Canvas } from '@react-three/fiber';
 import { Suspense, useState, useEffect } from 'react';
-import { OrbitControls, Environment, Stars, Float, Preload, Text3D, Center } from '@react-three/drei';
+import { OrbitControls, Environment, Stars, Float, Preload } from '@react-three/drei';
 import FloatingShape from './FloatingShape';
 import FallingStars from './FallingStars';
 
@@ -118,34 +118,6 @@ const RunningMachine = () => {
   );
 };
 
-// Cinematic text display
-const CinematicText = () => {
-  return (
-    <group position={[0, 10, -25]}>
-      <Center>
-        <Float speed={0.5} rotationIntensity={0.2} floatIntensity={0.3}>
-          <Text3D 
-            font="/fonts/inter_bold.json"
-            size={3}
-            height={0.5}
-            curveSegments={12}
-          >
-            Code. Create. Innovate.
-            <meshStandardMaterial 
-              args={[{ 
-                color: "#3B82F6", 
-                emissive: "#3B82F6", 
-                emissiveIntensity: 0.5, 
-                metalness: 0.8,
-                roughness: 0.1
-              }]}
-            />
-          </Text3D>
-        </Float>
-      </Center>
-    </group>
-  );
-};
 
 const Canvas3D = () => {
   const [mounted, setMounted] = useState(false);
