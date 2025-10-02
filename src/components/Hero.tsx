@@ -133,22 +133,9 @@ Best regards,
   }, [scrollY]);
 
   return (
-    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 sm:pt-24">
+    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full">
       {/* Enhanced gradient background with purple theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-black to-fuchsia-950/20 -z-10" />
-      {/* Enhanced parallax background effect */}
-      <motion.div 
-        className="absolute inset-0 -z-10"
-        style={{ 
-          y: scrollY * 0.2
-        }}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.3 }}
-        transition={{ duration: 1.2 }}
-      />
-      
-      {/* Simple grid background */}
-      <div className="absolute inset-0 bg-grid-pattern opacity-5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-violet-950/30 via-black to-fuchsia-950/20" />
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}

@@ -71,7 +71,7 @@ const Canvas3D = lazy(() =>
 );
 
 const Index = () => {
-  const [is3DEnabled, setIs3DEnabled] = useState(true);
+  const [is3DEnabled, setIs3DEnabled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Preload the fonts and set up the page
@@ -145,22 +145,12 @@ const Index = () => {
   }
 
   return (
-    <div className="overflow-x-hidden overflow-y-auto w-full max-w-[100vw] relative">
-      {is3DEnabled && (
-        <div className="fixed inset-0 w-full h-full pointer-events-none z-[-1] overflow-hidden">
-          <Suspense fallback={<Canvas3DFallback />}>
-            <ErrorBoundary fallback={<Canvas3DFallback />}>
-              <Canvas3D />
-            </ErrorBoundary>
-          </Suspense>
-        </div>
-      )}
-      
+    <div className="w-full min-h-screen">
       <ParticleBackground />
       
       <Navbar />
       
-      <main className="relative bg-black overflow-x-hidden w-full">
+      <main className="relative w-full">
         <SmoothScroll>
           <Hero />
           <About />

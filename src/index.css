@@ -55,11 +55,8 @@
 
   html {
     scroll-behavior: smooth;
-    overflow-x: hidden !important;
-    overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
-    max-width: 100vw;
-    position: relative;
   }
 
   body {
@@ -67,18 +64,14 @@
     background: radial-gradient(ellipse at top, hsl(262, 50%, 5%) 0%, hsl(0, 0%, 0%) 50%),
                 radial-gradient(ellipse at bottom, hsl(280, 60%, 8%) 0%, hsl(0, 0%, 0%) 50%);
     background-attachment: fixed;
-    overflow-x: hidden !important;
-    overflow-y: auto;
+    overflow-x: hidden;
     min-height: 100vh;
     margin: 0;
     padding: 0;
     width: 100%;
-    max-width: 100vw;
-    position: relative;
   }
   
   * {
-    max-width: 100%;
     box-sizing: border-box;
   }
 
@@ -173,12 +166,8 @@
   
   /* 3D perspective for entire page */
   #root {
-    perspective: 1200px;
-    overflow-x: hidden !important;
-    overflow-y: auto;
     width: 100%;
-    max-width: 100vw;
-    position: relative;
+    overflow-x: hidden;
   }
   
   /* Enhanced responsive breakpoints */
