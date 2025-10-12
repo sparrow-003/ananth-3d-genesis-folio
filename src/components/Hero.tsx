@@ -147,7 +147,7 @@ Best regards,
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
           <motion.div 
-            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-4 border-emerald-500/30 shadow-xl shadow-emerald-500/20 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
+            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-8 border-emerald-500/70 shadow-2xl shadow-emerald-500/50 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
             whileHover={{ 
               rotate: [0, -5, 5, -5, 0],
               scale: 1.05,

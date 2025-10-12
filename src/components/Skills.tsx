@@ -162,9 +162,8 @@ const Skills = () => {
               variants={itemVariants}
               transition={{ duration: 0.5, delay: 0.3 + (categoryIndex * 0.1) }}
               whileHover={{ 
-                y: -5, 
-                boxShadow: "0 15px 30px rgba(124, 58, 237, 0.1)",
-                borderColor: "rgba(124, 58, 237, 0.5)"
+                y: -5,
+                borderColor: "rgba(16, 185, 129, 0.5)"
               }}
             >
               <div className="flex items-center gap-3 mb-4">
@@ -184,11 +183,10 @@ const Skills = () => {
                     transition={{ delay: 0.5 + (0.05 * index) }}
                   >
                     <motion.div 
-                      className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/50 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 group hover:bg-violet-500/20 transition-all border border-violet-500/10 hover:border-violet-500/30"
+                      className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/50 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 group hover:bg-emerald-500/20 transition-all border border-emerald-500/10 hover:border-emerald-500/30"
                       whileHover={{ 
                         scale: 1.1, 
                         rotate: 5,
-                        boxShadow: "0 10px 25px -5px rgba(124, 58, 237, 0.3)",
                         rotateY: 15,
                         z: 50
                       }}
@@ -214,9 +212,6 @@ const Skills = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.5, delay: 0.8 }}
-          whileHover={{ 
-            boxShadow: "0 20px 40px rgba(124, 58, 237, 0.2)"
-          }}
         >
           {/* Background gradient */}
           <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-transparent to-green-500/5 z-0"></div>
