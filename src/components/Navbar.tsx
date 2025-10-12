@@ -20,10 +20,16 @@ const Navbar = () => {
     { name: 'About', href: '#about' },
     { name: 'Skills', href: '#skills' },
     { name: 'Projects', href: '#projects' },
+    { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
     { name: 'Contact', href: '#contact' }
   ];
 
-  const scrollToSection = (id: string) => {
+  const scrollToSection = (id: string, isExternal?: boolean) => {
+    if (isExternal) {
+      window.open(id, '_blank');
+      setMobileMenuOpen(false);
+      return;
+    }
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -79,9 +85,13 @@ const Navbar = () => {
                   transition: { delay: 0.1 * index, duration: 0.5 } 
                 }}
                 onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection(item.href);
+                  if (!item.external) {
+                    e.preventDefault();
+                    scrollToSection(item.href);
+                  }
                 }}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
               >
                 {item.name}
               </motion.a>
@@ -137,9 +147,13 @@ const Navbar = () => {
                   href={item.href}
                   className="text-light text-lg py-2"
                   onClick={(e) => {
-                    e.preventDefault();
-                    scrollToSection(item.href);
+                    if (!item.external) {
+                      e.preventDefault();
+                      scrollToSection(item.href);
+                    }
                   }}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
                 >
                   {item.name}
                 </a>

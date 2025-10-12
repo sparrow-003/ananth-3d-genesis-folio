@@ -121,6 +121,16 @@ const Footer = () => {
             >
               Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> and <Code className="w-4 h-4 text-blue-400" />
             </motion.p>
+            <motion.a
+              href="https://ananthdev.blogspot.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-2 text-emerald-400 hover:text-emerald-300 transition-colors"
+              whileHover={{ scale: 1.05, x: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              Read My Articles →
+            </motion.a>
           </motion.div>
 
           {/* Center: Social Links */}
