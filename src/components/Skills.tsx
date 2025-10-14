@@ -158,19 +158,19 @@ const Skills = () => {
           {skillCategories.map((category, categoryIndex) => (
             <motion.div 
               key={category.title}
-              className="glass-card p-6 border border-violet-500/20 hover:border-violet-500/40 transition-all h-full"
+              className="bg-dark/40 backdrop-blur-sm p-6 border border-white/10 hover:border-white/20 transition-all h-full rounded-xl"
               variants={itemVariants}
               transition={{ duration: 0.5, delay: 0.3 + (categoryIndex * 0.1) }}
               whileHover={{ 
                 y: -5,
-                borderColor: "rgba(16, 185, 129, 0.5)"
+                borderColor: "rgba(255, 255, 255, 0.25)"
               }}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-dark/50 rounded-lg border border-violet-500/20">
+                <div className="p-2 bg-dark/80 rounded-lg border border-white/10">
                   {category.icon}
                 </div>
-                <h3 className="text-xl font-bold text-gradient">{category.title}</h3>
+                <h3 className="text-xl font-bold text-white">{category.title}</h3>
               </div>
               
               <div className="grid grid-cols-2 gap-3 lg:gap-4">
@@ -183,15 +183,12 @@ const Skills = () => {
                     transition={{ delay: 0.5 + (0.05 * index) }}
                   >
                     <motion.div 
-                      className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/50 backdrop-blur-sm rounded-lg flex items-center justify-center mb-2 group hover:bg-emerald-500/20 transition-all border border-emerald-500/10 hover:border-emerald-500/30"
+                      className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/60 rounded-lg flex items-center justify-center mb-2 group hover:bg-white/5 transition-all border border-white/10 hover:border-white/20"
                       whileHover={{ 
-                        scale: 1.1, 
-                        rotate: 5,
-                        rotateY: 15,
-                        z: 50
+                        scale: 1.05, 
+                        rotate: 2
                       }}
                       whileTap={{ scale: 0.95 }}
-                      style={{ transformStyle: "preserve-3d" }}
                     >
                       <img 
                         src={skill.icon} 
@@ -208,16 +205,16 @@ const Skills = () => {
         </motion.div>
         
         <motion.div 
-          className="mt-16 glass-card p-8 text-center relative overflow-hidden border border-violet-500/20"
+          className="mt-16 bg-dark/40 backdrop-blur-sm rounded-xl p-8 text-center relative overflow-hidden border border-white/10"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-violet-500/5 via-transparent to-green-500/5 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-transparent to-white/5 z-0"></div>
           
           <div className="relative z-10">
-            <h3 className="text-2xl font-bold mb-4 text-gradient">Always Learning & Growing</h3>
+            <h3 className="text-2xl font-bold mb-4 text-white">Always Learning & Growing</h3>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
               As a passionate technologist, I'm constantly expanding my skillset through continuous learning,
               hands-on projects, and collaboration with industry experts. I believe in staying ahead of emerging
@@ -231,8 +228,8 @@ const Skills = () => {
               transition={{ delay: 1 }}
             >
               <motion.div 
-                className="flex items-center gap-2 px-4 py-2 bg-dark/50 rounded-full border border-violet-500/20"
-                whileHover={{ scale: 1.05, backgroundColor: "rgba(124, 58, 237, 0.2)" }}
+                className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-400">
                   <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
@@ -241,8 +238,8 @@ const Skills = () => {
               </motion.div>
               
               <motion.div 
-                className="flex items-center gap-2 px-4 py-2 bg-dark/50 rounded-full border border-green-500/20"
-                whileHover={{ scale: 1.05, backgroundColor: "rgba(74, 222, 128, 0.2)" }}
+                className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-400">
                   <path d="M18 8h1a4 4 0 1 1 0 8h-1"></path>
@@ -255,8 +252,8 @@ const Skills = () => {
               </motion.div>
               
               <motion.div 
-                className="flex items-center gap-2 px-4 py-2 bg-dark/50 rounded-full border border-violet-500/20"
-                whileHover={{ scale: 1.05, backgroundColor: "rgba(124, 58, 237, 0.2)" }}
+                className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-400">
                   <path d="M12 2v4"></path>
@@ -272,8 +269,8 @@ const Skills = () => {
               </motion.div>
               
               <motion.div 
-                className="flex items-center gap-2 px-4 py-2 bg-dark/50 rounded-full border border-blue-500/20"
-                whileHover={{ scale: 1.05, backgroundColor: "rgba(96, 165, 250, 0.2)" }}
+                className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-400">
                   <rect x="3" y="3" width="7" height="7"></rect>
