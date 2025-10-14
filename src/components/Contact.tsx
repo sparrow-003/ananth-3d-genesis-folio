@@ -51,8 +51,8 @@ Best regards,
   const handleDownloadResume = () => {
     // Create a link to the resume and trigger download
     const link = document.createElement('a');
-    link.href = '/AnanthN_Resume.docx';
-    link.download = 'AnanthN_Resume.docx';
+    link.href = '/Ananth_Resume.docx';
+    link.download = 'Ananth_Resume.docx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -60,7 +60,7 @@ Best regards,
 
   return (
     <section id="contact" className="py-24 relative overflow-hidden" ref={ref}>
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-black to-white/5 -z-10" />
       {/* 3D Elements and Background */}
       <motion.div 
         className="absolute inset-0 -z-10"
@@ -68,24 +68,24 @@ Best regards,
         animate={{ opacity: 0.15 }}
         transition={{ duration: 2 }}
       >
-        <div className="absolute inset-0 bg-gradient-radial from-emerald-500/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-radial from-white/5 to-transparent" />
         
         {/* Animated grid */}
         <div className="grid grid-cols-6 grid-rows-8 h-full w-full">
           {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-[0.5px] border-emerald-500/10" />
+            <div key={i} className="border-[0.5px] border-white/5" />
           ))}
         </div>
         
         {/* 3D floating elements */}
-        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-cyan-400/20 rounded-full animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-teal-400/20 rounded-full animate-float-delay"></div>
-        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-emerald-400/20 rounded-full animate-float-slow"></div>
+        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-white/10 rounded-full animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-white/10 rounded-full animate-float-delay"></div>
+        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-white/10 rounded-full animate-float-slow"></div>
       </motion.div>
 
       <div className="section-container relative z-10">
         <motion.h2 
-          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-400"
+          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-white"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
@@ -110,11 +110,10 @@ Best regards,
         >
           <motion.button
             onClick={handleHireMe}
-            className="px-10 py-5 bg-gradient-to-r from-emerald-600 to-teal-700 rounded-full text-xl font-bold text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 transition-all relative overflow-hidden group"
+            className="px-10 py-5 bg-gradient-to-r from-white/10 to-white/5 rounded-full text-xl font-bold text-white border border-white/20 hover:bg-white/20 transition-all relative overflow-hidden group"
             whileHover={{ 
-              scale: 1.05, 
-              boxShadow: "0 0 25px rgba(16, 185, 129, 0.6)",
-              textShadow: "0 0 8px rgba(255, 255, 255, 0.5)"
+              scale: 1.05,
+              borderColor: "rgba(255, 255, 255, 0.4)"
             }}
             whileTap={{ scale: 0.98 }}
           >
@@ -122,11 +121,8 @@ Best regards,
               <Send className="h-5 w-5" />
               Hire Me Now
             </span>
-            <span className="absolute inset-0 rounded-full bg-white/10 blur-sm" />
-            
-            {/* Animated gradient border */}
-            <span className="absolute -inset-1 rounded-full bg-gradient-to-r from-emerald-600 via-cyan-400 to-teal-500 opacity-0 blur-sm group-hover:opacity-70 transition-opacity duration-500 animate-spin-slow"></span>
-            <span className="absolute inset-0.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-700 group-hover:bg-gradient-to-r group-hover:from-emerald-700 group-hover:to-teal-800 transition-colors duration-300"></span>
+            <span className="absolute inset-0 rounded-full bg-white/5 blur-sm" />
+            <span className="absolute inset-0.5 rounded-full bg-dark/50"></span>
           </motion.button>
           <motion.p 
             className="text-gray-400 mt-4 italic"
@@ -141,13 +137,12 @@ Best regards,
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Contact Form with enhanced animations */}
           <motion.div 
-            className="glass-card p-8 lg:col-span-3 border border-emerald-500/20"
+            className="bg-dark/40 backdrop-blur-sm rounded-xl p-8 lg:col-span-3 border border-white/10"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            whileHover={{ boxShadow: "0 0 30px rgba(16, 185, 129, 0.15)" }}
           >
-            <h3 className="text-2xl font-bold mb-6 text-gradient">Send Me a Message</h3>
+            <h3 className="text-2xl font-bold mb-6 text-white">Send Me a Message</h3>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
@@ -161,7 +156,7 @@ Best regards,
                       id="name"
                       name="name"
                       required
-                      className="w-full bg-dark/50 border border-emerald-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-light transition-all"
+                      className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
                       placeholder="John Doe"
                     />
                   </div>
@@ -177,7 +172,7 @@ Best regards,
                       id="email"
                       name="email"
                       required
-                      className="w-full bg-dark/50 border border-emerald-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-light transition-all"
+                      className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -194,7 +189,7 @@ Best regards,
                     id="subject"
                     name="subject"
                     required
-                    className="w-full bg-dark/50 border border-emerald-500/20 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-light transition-all"
+                    className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
                     placeholder="Project Inquiry"
                   />
                 </div>
@@ -206,13 +201,13 @@ Best regards,
                   name="message"
                   rows={6}
                   required
-                  className="w-full bg-dark/50 border border-emerald-500/20 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 text-light resize-none transition-all"
+                  className="w-full bg-dark/50 border border-white/10 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light resize-none transition-all"
                   placeholder="Tell me about your project..."
                 ></textarea>
               </div>
               <motion.button
                 type="submit"
-                className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 rounded-md font-medium text-white shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all w-full md:w-auto relative overflow-hidden group"
+                className="px-8 py-3 bg-white/10 rounded-md font-medium text-white border border-white/20 hover:bg-white/20 transition-all w-full md:w-auto relative overflow-hidden group"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={formStatus === 'submitting'}
@@ -228,7 +223,7 @@ Best regards,
                   {formStatus === 'success' && 'Message Sent!'}
                   {formStatus === 'error' && 'Please Try Again'}
                 </span>
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-teal-700 to-emerald-600 transition-opacity"></span>
+                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/10 transition-opacity"></span>
               </motion.button>
               
               {formStatus === 'success' && (
@@ -255,13 +250,12 @@ Best regards,
           
           {/* Contact Info with enhanced animations */}
           <motion.div 
-            className="glass-card p-8 lg:col-span-2 border border-emerald-500/20"
+            className="bg-dark/40 backdrop-blur-sm rounded-xl p-8 lg:col-span-2 border border-white/10"
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
             transition={{ duration: 0.5, delay: 0.4 }}
-            whileHover={{ boxShadow: "0 0 30px rgba(16, 185, 129, 0.15)" }}
           >
-            <h3 className="text-2xl font-bold mb-6 text-gradient">Contact Information</h3>
+            <h3 className="text-2xl font-bold mb-6 text-white">Contact Information</h3>
             <div className="space-y-6">
               <motion.div 
                 className="flex items-start gap-4"
@@ -269,13 +263,13 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(16, 185, 129, 0.3)" }}
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
-                  <Phone size={18} className="text-emerald-400" />
+                  <Phone size={18} className="text-white" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-emerald-300">Phone</h4>
+                  <h4 className="font-semibold text-white">Phone</h4>
                   <p className="text-gray-300">+91 6384227309</p>
                 </div>
               </motion.div>
@@ -286,13 +280,13 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(16, 185, 129, 0.3)" }}
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
-                  <Mail size={18} className="text-emerald-400" />
+                  <Mail size={18} className="text-white" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-emerald-300">Email</h4>
+                  <h4 className="font-semibold text-white">Email</h4>
                   <p className="text-gray-300">thanan757@gmail.com</p>
                 </div>
               </motion.div>
@@ -303,27 +297,27 @@ Best regards,
                 transition={{ type: "spring", stiffness: 400, damping: 10 }}
               >
                 <motion.div 
-                  className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center flex-shrink-0"
-                  whileHover={{ scale: 1.1, backgroundColor: "rgba(16, 185, 129, 0.3)" }}
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
                 >
-                  <MapPin size={18} className="text-emerald-400" />
+                  <MapPin size={18} className="text-white" />
                 </motion.div>
                 <div>
-                  <h4 className="font-semibold text-emerald-300">Location</h4>
+                  <h4 className="font-semibold text-white">Location</h4>
                   <p className="text-gray-300">Madurai, Tamil Nadu, India</p>
                 </div>
               </motion.div>
             </div>
             
             {/* Social Links with enhanced animations */}
-            <h3 className="text-xl font-bold mt-10 mb-6 text-gradient">Connect With Me</h3>
+            <h3 className="text-xl font-bold mt-10 mb-6 text-white">Connect With Me</h3>
             <div className="flex gap-4">
               <motion.a 
                 href="https://linkedin.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -337,8 +331,8 @@ Best regards,
                 href="https://github.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -350,8 +344,8 @@ Best regards,
                 href="https://twitter.com" 
                 target="_blank"
                 rel="noreferrer"
-                className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: 10, boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -361,8 +355,8 @@ Best regards,
               
               <motion.a 
                 href="#" 
-                className="w-10 h-10 bg-emerald-500/20 rounded-full flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-all"
-                whileHover={{ scale: 1.2, rotate: -10, boxShadow: "0 0 15px rgba(16, 185, 129, 0.6)" }}
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10 }}
                 whileTap={{ scale: 0.9 }}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
