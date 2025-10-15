@@ -21,8 +21,8 @@ const projectsData = [
     icon: <Code2 className="w-8 h-8" />,
     gradient: "from-blue-500 via-purple-500 to-cyan-500",
     bgPattern: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]",
-    liveUrl: "#",
-    githubUrl: "#"
+    liveUrl: "https://dev-matchs.vercel.app",
+    githubUrl: "https://github.com/sparrow-003/debug-your-heart.git"
   },
   {
     id: 2,
@@ -47,24 +47,24 @@ const projectsData = [
   },
   {
     id: 3,
-    title: "IntelliBot Framework",
-    subtitle: "Advanced AI Agent System",
-    description: "A cutting-edge conversational AI framework built from scratch, featuring context-aware responses, multi-language support, and emotion detection capabilities for creating next-generation chatbot experiences.",
-    technologies: ["Python", "Transformers", "React", "FastAPI", "WebSocket", "NLP"],
+    title: "RAG Chat Bot",
+    subtitle: "Smart Document Summarizer",
+    description: "An intelligent RAG (Retrieval-Augmented Generation) chatbot that analyzes and summarizes documents with advanced AI capabilities, providing context-aware responses and efficient information extraction.",
+    technologies: ["Python", "Transformers", "React", "FastAPI", "RAG", "NLP"],
     features: [
+      "Document analysis and summarization",
       "Context-aware conversation management",
-      "Multi-language natural language understanding",
-      "Emotion detection and response adaptation",
-      "Modular plugin architecture",
-      "Real-time streaming responses"
+      "Multi-format document support",
+      "Intelligent information retrieval",
+      "Real-time AI-powered responses"
     ],
     category: "AI/ML Development",
     type: "coding",
     icon: <Bot className="w-8 h-8" />,
     gradient: "from-orange-500 via-red-500 to-pink-500",
     bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
-    liveUrl: "#",
-    githubUrl: "#"
+    liveUrl: "https://v0-smart-document-summarizer.vercel.app",
+    githubUrl: "https://github.com/sparrow-003/DOC-.git"
   }
 ];
 
