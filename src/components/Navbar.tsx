@@ -21,8 +21,17 @@ const Navbar = () => {
     { name: 'Skills', href: '#skills' },
     { name: 'Projects', href: '#projects' },
     { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
-    { name: 'Contact', href: '#contact' }
+    { name: 'Hire Me', href: 'mailto', isHireMe: true }
   ];
+
+  const handleHireMe = () => {
+    const subject = encodeURIComponent("Hiring Inquiry - Let's Work Together!");
+    const body = encodeURIComponent(
+      `Hi Ananth,\n\nI came across your portfolio and I'm impressed with your work!\n\nI would like to discuss a potential opportunity/project with you.\n\nProject Details:\n- \n\nLooking forward to hearing from you.\n\nBest regards,`
+    );
+    window.location.href = `mailto:ananthnatarajan999@gmail.com?subject=${subject}&body=${body}`;
+    setMobileMenuOpen(false);
+  };
 
   const scrollToSection = (id: string, isExternal?: boolean) => {
     if (isExternal) {
@@ -85,13 +94,17 @@ const Navbar = () => {
                   transition: { delay: 0.1 * index, duration: 0.5 } 
                 }}
                 onClick={(e) => {
-                  if (!item.external) {
-                    e.preventDefault();
+                  e.preventDefault();
+                  if ((item as any).isHireMe) {
+                    handleHireMe();
+                  } else if (!item.external) {
                     scrollToSection(item.href);
+                  } else {
+                    window.open(item.href, '_blank');
                   }
                 }}
-                target={item.external ? '_blank' : undefined}
-                rel={item.external ? 'noopener noreferrer' : undefined}
+                target={item.external && !(item as any).isHireMe ? '_blank' : undefined}
+                rel={item.external && !(item as any).isHireMe ? 'noopener noreferrer' : undefined}
               >
                 {item.name}
               </motion.a>
@@ -147,13 +160,17 @@ const Navbar = () => {
                   href={item.href}
                   className="text-light text-lg py-2"
                   onClick={(e) => {
-                    if (!item.external) {
-                      e.preventDefault();
+                    e.preventDefault();
+                    if ((item as any).isHireMe) {
+                      handleHireMe();
+                    } else if (!item.external) {
                       scrollToSection(item.href);
+                    } else {
+                      window.open(item.href, '_blank');
                     }
                   }}
-                  target={item.external ? '_blank' : undefined}
-                  rel={item.external ? 'noopener noreferrer' : undefined}
+                  target={item.external && !(item as any).isHireMe ? '_blank' : undefined}
+                  rel={item.external && !(item as any).isHireMe ? 'noopener noreferrer' : undefined}
                 >
                   {item.name}
                 </a>
