@@ -101,12 +101,12 @@ const Footer = () => {
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+        <div className="flex flex-col items-center justify-center text-center gap-6">
           
-          {/* Left: Brand */}
+          {/* Brand & Copyright Combined */}
           <motion.div 
             variants={itemVariants}
-            className="text-center md:text-left"
+            className="text-center"
           >
             <motion.h3 
               className="text-2xl font-bold text-gradient mb-2"
@@ -116,56 +116,13 @@ const Footer = () => {
               Ananth N
             </motion.h3>
             <motion.p 
-              className="text-gray-400 flex items-center justify-center md:justify-start gap-2"
+              className="text-gray-400 flex items-center justify-center gap-2 mb-2"
               variants={itemVariants}
             >
               Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> and <Code className="w-4 h-4 text-blue-400" />
             </motion.p>
-            <motion.a
-              href="https://ananthdev.blogspot.com/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 text-emerald-400 hover:text-emerald-300 transition-colors"
-              whileHover={{ scale: 1.05, x: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              Read My Articles →
-            </motion.a>
-          </motion.div>
-
-          {/* Center: Social Links */}
-          <motion.div 
-            variants={itemVariants}
-            className="flex justify-center space-x-6"
-          >
-            {socialLinks.map((social, index) => (
-              <motion.a
-                key={social.label}
-                href={social.href}
-                variants={iconVariants}
-                whileHover="hover"
-                whileTap={{ scale: 0.9 }}
-                className={`p-3 rounded-full bg-gray-800/50 border border-gray-700/50 backdrop-blur-sm transition-all duration-300 ${social.color} hover:border-emerald-500/50 hover:shadow-lg hover:shadow-emerald-500/20`}
-                aria-label={social.label}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  transition: { delay: 0.2 * index }
-                }}
-              >
-                <social.icon className="w-5 h-5" />
-              </motion.a>
-            ))}
-          </motion.div>
-
-          {/* Right: Copyright */}
-          <motion.div 
-            variants={itemVariants}
-            className="text-center md:text-right"
-          >
             <motion.p 
-              className="text-gray-500 flex items-center justify-center md:justify-end gap-2"
+              className="text-gray-500 flex items-center justify-center gap-2"
               whileHover={{ scale: 1.02 }}
             >
               <Zap className="w-4 h-4 text-yellow-400" />

@@ -29,7 +29,7 @@ const Navbar = () => {
     const body = encodeURIComponent(
       `Hi Ananth,\n\nI came across your portfolio and I'm impressed with your work!\n\nI would like to discuss a potential opportunity/project with you.\n\nProject Details:\n- \n\nLooking forward to hearing from you.\n\nBest regards,`
     );
-    window.location.href = `mailto:ananthnatarajan999@gmail.com?subject=${subject}&body=${body}`;
+    window.location.href = `mailto:thanan757@gmail.com?subject=${subject}&body=${body}`;
     setMobileMenuOpen(false);
   };
 
@@ -64,20 +64,7 @@ const Navbar = () => {
           borderBottom: isScrolled ? '1px solid rgba(155, 135, 245, 0.1)' : '1px solid transparent',
         }}
       >
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <motion.a 
-            href="#home"
-            className="text-lg sm:text-xl md:text-2xl font-display font-bold text-gradient"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.preventDefault();
-              scrollToSection('#home');
-            }}
-          >
-            Ananth N
-          </motion.a>
-
+        <div className="max-w-7xl mx-auto flex justify-center items-center">
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
             {navItems.map((item, index) => (

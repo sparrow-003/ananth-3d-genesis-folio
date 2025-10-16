@@ -69,22 +69,30 @@ const projectsData = [
 ];
 
 const ProjectCard = ({ project, isActive, onClick }: any) => {
+  const handleClick = () => {
+    if (project.type === 'coding' && project.liveUrl && project.liveUrl !== '#') {
+      window.open(project.liveUrl, '_blank');
+    } else {
+      onClick();
+    }
+  };
+
   return (
     <motion.div
       className={`relative cursor-pointer group transition-all duration-500 ${
-        isActive ? 'scale-105' : 'scale-100 hover:scale-102'
+        isActive ? 'scale-105' : 'scale-100 hover:scale-105'
       }`}
-      onClick={onClick}
-      whileHover={{ y: -5 }}
-      whileTap={{ scale: 0.98 }}
+      onClick={handleClick}
+      whileHover={{ y: -8, scale: 1.02 }}
+      whileTap={{ scale: 0.96 }}
     >
       <div className={`
-        relative overflow-hidden rounded-3xl border border-white/10 backdrop-blur-xl
+        relative overflow-hidden rounded-3xl border backdrop-blur-xl
         ${isActive 
-          ? `bg-gradient-to-br ${project.gradient} p-1` 
-          : 'bg-gradient-to-br from-white/5 to-white/10 hover:from-white/10 hover:to-white/15'
+          ? `bg-gradient-to-br ${project.gradient} p-1 border-white/30 shadow-2xl shadow-purple/50` 
+          : 'bg-gradient-to-br from-purple/10 to-blue/10 border-purple/30 hover:from-purple/20 hover:to-blue/20 hover:border-purple/50'
         }
-        shadow-2xl transition-all duration-500
+        transition-all duration-700
       `}>
         <div className="relative bg-black/80 rounded-3xl p-6 h-full backdrop-blur-sm">
           {/* Type indicator */}
@@ -136,8 +144,12 @@ const ProjectCard = ({ project, isActive, onClick }: any) => {
 
           {/* Hover overlay */}
           <div className={`
-            absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-300
+            absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-30 transition-all duration-500
             bg-gradient-to-br ${project.gradient} mix-blend-overlay
+          `} />
+          <div className={`
+            absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700
+            bg-gradient-to-t from-purple/20 via-transparent to-transparent
           `} />
         </div>
       </div>
