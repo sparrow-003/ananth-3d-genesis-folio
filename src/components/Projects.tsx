@@ -61,7 +61,7 @@ const projectsData = [
     category: "AI/ML Development",
     type: "coding",
     icon: <Bot className="w-8 h-8" />,
-    gradient: "from-orange-500 via-red-500 to-pink-500",
+    gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
     bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
     liveUrl: "https://v0-smart-document-summarizer.vercel.app",
     githubUrl: "https://github.com/sparrow-003/DOC-.git"
@@ -69,20 +69,12 @@ const projectsData = [
 ];
 
 const ProjectCard = ({ project, isActive, onClick }: any) => {
-  const handleClick = () => {
-    if (project.type === 'coding' && project.liveUrl && project.liveUrl !== '#') {
-      window.open(project.liveUrl, '_blank');
-    } else {
-      onClick();
-    }
-  };
-
   return (
     <motion.div
       className={`relative cursor-pointer group transition-all duration-500 ${
         isActive ? 'scale-105' : 'scale-100 hover:scale-105'
       }`}
-      onClick={handleClick}
+      onClick={onClick}
       whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.96 }}
     >
