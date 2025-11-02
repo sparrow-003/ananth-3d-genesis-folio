@@ -110,10 +110,10 @@ Best regards,
         >
           <motion.button
             onClick={handleHireMe}
-            className="px-10 py-5 bg-gradient-to-r from-white/10 to-white/5 rounded-full text-xl font-bold text-white border border-white/20 hover:bg-white/20 transition-all relative overflow-hidden group"
+            className="px-10 py-5 bg-gradient-to-r from-white/10 to-white/5 rounded-3xl text-xl font-bold text-white border-2 border-white/30 hover:border-white/60 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_50px_rgba(255,255,255,0.35)]"
             whileHover={{ 
               scale: 1.05,
-              borderColor: "rgba(255, 255, 255, 0.4)"
+              boxShadow: "0 0 60px rgba(255, 255, 255, 0.4), 0 0 100px rgba(255, 255, 255, 0.2)"
             }}
             whileTap={{ scale: 0.98 }}
           >
@@ -121,8 +121,9 @@ Best regards,
               <Send className="h-5 w-5" />
               Hire Me Now
             </span>
-            <span className="absolute inset-0 rounded-full bg-white/5 blur-sm" />
-            <span className="absolute inset-0.5 rounded-full bg-dark/50"></span>
+            <span className="absolute inset-0 rounded-3xl bg-white/10 blur-md animate-pulse" />
+            <span className="absolute inset-1 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-white/10 backdrop-blur-sm"></span>
+            <span className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-[shimmer_2s_ease-in-out_infinite]"></span>
           </motion.button>
           <motion.p 
             className="text-gray-400 mt-4 italic"
