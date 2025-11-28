@@ -161,11 +161,46 @@ Best regards,
                   <AvatarImage src="/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png" alt="Ananth N" className="object-cover" />
                   <AvatarFallback className="bg-emerald-600 text-4xl">AN</AvatarFallback>
                 </div>
-                <div className="flip-card-back bg-gradient-to-br from-emerald-600 to-teal-700 flex items-center justify-center">
-                  <div className="text-center">
-                    <h3 className="text-xl font-bold">Ananth N</h3>
-                    <p className="text-sm">Full Stack Developer</p>
-                    <p className="text-xs mt-2">Interactive Resume</p>
+                <div className="flip-card-back bg-gradient-to-br from-slate-900 via-slate-800 to-black flex items-center justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 animate-pulse"></div>
+                  <div className="absolute inset-0">
+                    <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-float-3d"></div>
+                    <div className="absolute bottom-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl animate-float-3d" style={{ animationDelay: '1s' }}></div>
+                  </div>
+                  <div className="text-center relative z-10 p-6">
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      <div className="w-24 h-24 mx-auto mb-4 relative">
+                        <motion.div 
+                          className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-full"
+                          animate={{ 
+                            scale: [1, 1.1, 1],
+                            rotate: [0, 180, 360]
+                          }}
+                          transition={{ 
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "linear"
+                          }}
+                        />
+                        <div className="absolute inset-2 bg-gradient-to-br from-slate-700 to-slate-900 rounded-full flex items-center justify-center">
+                          <Code className="w-10 h-10 text-white" />
+                        </div>
+                      </div>
+                      <h3 className="text-2xl font-bold text-white mb-2">Ananth N</h3>
+                      <p className="text-sm text-gray-300 mb-1">Vibe Coder</p>
+                      <p className="text-xs text-gray-400">Full Stack Developer</p>
+                      <motion.div 
+                        className="mt-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs text-white"
+                        animate={{ opacity: [0.5, 1, 0.5] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      >
+                        ✨ Interactive Portfolio
+                      </motion.div>
+                    </motion.div>
                   </div>
                 </div>
               </Avatar>
