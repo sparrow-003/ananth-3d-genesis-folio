@@ -445,4 +445,62 @@
   .animate-loading-bar {
     animation: loading-bar 1.5s ease-in-out infinite;
   }
+  
+  /* Hero 3D Avatar Effects */
+  @keyframes hero-float {
+    0%, 100% {
+      transform: translateY(0) rotateY(0);
+    }
+    25% {
+      transform: translateY(-10px) rotateY(2deg);
+    }
+    50% {
+      transform: translateY(-5px) rotateY(0);
+    }
+    75% {
+      transform: translateY(-15px) rotateY(-2deg);
+    }
+  }
+  
+  @keyframes glow-pulse {
+    0%, 100% {
+      box-shadow: 0 0 30px rgba(16, 185, 129, 0.3), 0 0 60px rgba(20, 184, 166, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 50px rgba(16, 185, 129, 0.5), 0 0 100px rgba(20, 184, 166, 0.3);
+    }
+  }
+  
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+  
+  .animate-hero-float {
+    animation: hero-float 8s ease-in-out infinite;
+  }
+  
+  .animate-glow-pulse {
+    animation: glow-pulse 3s ease-in-out infinite;
+  }
+  
+  .animate-shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(16, 185, 129, 0.1) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s ease-in-out infinite;
+  }
+  
+  /* Radial gradient background utility */
+  .bg-gradient-radial {
+    background: radial-gradient(circle, var(--tw-gradient-stops));
+  }
 }
