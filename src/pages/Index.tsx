@@ -129,16 +129,34 @@ const Index = () => {
     };
   }, []);
 
-  // Loading screen with cinematic effect
   if (isLoading) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-dark z-50">
-        <div className="flex flex-col items-center">
-          <div className="w-16 h-16 relative">
-            <div className="absolute inset-0 rounded-full border-4 border-t-transparent border-b-transparent border-l-violet-500 border-r-green-500 animate-spin"></div>
-            <div className="absolute inset-1 rounded-full border-4 border-t-transparent border-b-transparent border-l-green-500 border-r-yellow-500 animate-spin-slow"></div>
+      <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
+        {/* Animated background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-black to-teal-950/20" />
+        
+        {/* Main loading content */}
+        <div className="relative z-10 flex flex-col items-center gap-8">
+          {/* Glowing orb */}
+          <div className="relative w-20 h-20">
+            <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 blur-xl opacity-50 animate-pulse" />
+            <div className="absolute inset-2 rounded-full border-2 border-emerald-500/50 animate-spin" style={{ animationDuration: '3s' }} />
+            <div className="absolute inset-4 rounded-full border-2 border-teal-400/50 animate-spin" style={{ animationDuration: '2s', animationDirection: 'reverse' }} />
+            <div className="absolute inset-6 rounded-full bg-emerald-500/20 animate-pulse" />
           </div>
-          <p className="text-gradient text-xl mt-4 animate-pulse">Loading Cinematic Experience...</p>
+          
+          {/* Loading text */}
+          <div className="text-center space-y-2">
+            <p className="text-emerald-400/60 text-sm tracking-widest uppercase">You're looking into</p>
+            <h1 className="text-4xl sm:text-5xl font-bold text-gradient animate-pulse">
+              ANANTH DEV
+            </h1>
+          </div>
+          
+          {/* Loading bar */}
+          <div className="w-48 h-1 bg-gray-800 rounded-full overflow-hidden">
+            <div className="h-full bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full animate-loading-bar" />
+          </div>
         </div>
       </div>
     );

@@ -1,151 +1,47 @@
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Mail, Heart, Code, Zap } from 'lucide-react';
+import { Code, Terminal } from 'lucide-react';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
-  const socialLinks = [
-    { 
-      icon: Github, 
-      href: '#', 
-      label: 'GitHub',
-      color: 'hover:text-emerald-400'
-    },
-    { 
-      icon: Linkedin, 
-      href: '#', 
-      label: 'LinkedIn',
-      color: 'hover:text-blue-400'
-    },
-    { 
-      icon: Mail, 
-      href: 'mailto:contact@ananthn.dev', 
-      label: 'Email',
-      color: 'hover:text-green-400'
-    }
-  ];
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.8,
-        staggerChildren: 0.2,
-        type: "spring",
-        stiffness: 100
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        type: "spring",
-        stiffness: 120
-      }
-    }
-  };
-
-  const iconVariants = {
-    hover: {
-      scale: 1.2,
-      rotate: 360,
-      transition: {
-        duration: 0.6,
-        type: "spring",
-        stiffness: 300
-      }
-    }
-  };
-
   return (
-    <motion.footer
-      variants={containerVariants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      className="relative overflow-hidden bg-black/90 backdrop-blur-xl border-t border-emerald-500/20"
-    >
-      {/* Animated background elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            rotate: 360,
-            scale: [1, 1.1, 1]
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 rounded-full"
-        />
-        <motion.div
-          animate={{
-            rotate: -360,
-            scale: [1.1, 1, 1.1]
-          }}
-          transition={{
-            duration: 25,
-            repeat: Infinity,
-            ease: "linear"
-          }}
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-to-l from-cyan-500/5 via-emerald-500/5 to-teal-500/5 rounded-full"
-        />
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-        <div className="flex flex-col items-center justify-center text-center gap-6">
-          
-          {/* Brand & Copyright Combined */}
-          <motion.div 
-            variants={itemVariants}
-            className="text-center"
+    <footer className="relative bg-black/95 border-t border-emerald-500/20">
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex flex-col items-center gap-4">
+          {/* Main tagline */}
+          <motion.p 
+            className="text-sm text-gray-400 text-center flex items-center gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
-            <motion.h3 
-              className="text-2xl font-bold text-gradient mb-2"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              Ananth N
-            </motion.h3>
-            <motion.p 
-              className="text-gray-400 flex items-center justify-center gap-2 mb-2"
-              variants={itemVariants}
-            >
-              Made with <Heart className="w-4 h-4 text-red-500 animate-pulse" /> and <Code className="w-4 h-4 text-blue-400" />
-            </motion.p>
-            <motion.p 
-              className="text-gray-500 flex items-center justify-center gap-2"
-              whileHover={{ scale: 1.02 }}
-            >
-              <Zap className="w-4 h-4 text-yellow-400" />
-              © {currentYear} All rights reserved
-            </motion.p>
-          </motion.div>
-        </div>
-
-        {/* Bottom decorative line */}
-        <motion.div
-          className="mt-8 pt-6 border-t border-gray-800/50"
-          variants={itemVariants}
-        >
+            <Terminal className="w-4 h-4 text-emerald-400" />
+            Crafting digital experiences at the intersection of art and technology
+            <Code className="w-4 h-4 text-emerald-400" />
+          </motion.p>
+          
+          {/* Copyright */}
+          <motion.p 
+            className="text-xs text-gray-500"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+          >
+            © {currentYear} Ananth N. All Rights Reserved.
+          </motion.p>
+          
+          {/* Decorative line */}
           <motion.div
-            className="h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full mx-auto"
+            className="h-0.5 w-16 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            style={{ width: "100px" }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.3 }}
           />
-        </motion.div>
+        </div>
       </div>
-    </motion.footer>
+    </footer>
   );
 };
 

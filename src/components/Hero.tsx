@@ -1,20 +1,33 @@
-
 import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { useEffect, useState, useRef } from 'react';
+import { memo, useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
 
-const Hero = () => {
-  const roles = [
-    "Vibe Coder",
-    "Python Developer", 
-    "JavaScript/TypeScript Developer",
-    "Teaching Expert",
-    "UI/UX Designer",
-    "AI Prompt Engineer",
-    "Web Developer"
-  ];
+// Memoized roles array to prevent re-creation
+const ROLES = [
+  "Vibe Coder",
+  "Python Developer", 
+  "JavaScript/TypeScript Developer",
+  "Teaching Expert",
+  "UI/UX Designer",
+  "AI Prompt Engineer",
+  "Web Developer"
+] as const;
+
+// Memoized animation effects
+const ANIMATION_EFFECTS = ['avatar-floating', 'avatar-spinning', 'avatar-bouncing', 'avatar-shattering', 'avatar-defying-gravity'] as const;
+
+// Memoized pickup lines
+const HR_PICKUP_LINES = [
+  "A dreamer who codes worlds beyond the ordinary",
+  "Crafting futures where AI and imagination collide",
+  "Guiding 150+ minds to awaken their hidden genius",
+  "A voice of leadership, turning sparks into fire",
+  "Join me on this journey — where vision becomes destiny"
+] as const;
+
+const Hero = memo(() => {
 
   const [scrollY, setScrollY] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
@@ -51,27 +64,20 @@ const Hero = () => {
     }
   }, [avatarAnimation]);
   
-  // Random animation effect on avatar click, ensuring a different effect each time
-  const animationEffects = ['avatar-floating', 'avatar-spinning', 'avatar-bouncing', 'avatar-shattering', 'avatar-defying-gravity'];
-  
-  const handleAvatarClick = () => {
+  // Optimized animation handler
+  const handleAvatarClick = useCallback(() => {
     if (!avatarAnimation) {
-      // Get a random effect that's different from the last one
       let randomIndex;
       do {
-        randomIndex = Math.floor(Math.random() * animationEffects.length);
-      } while (randomIndex === lastAnimationIndex && animationEffects.length > 1);
+        randomIndex = Math.floor(Math.random() * ANIMATION_EFFECTS.length);
+      } while (randomIndex === lastAnimationIndex && ANIMATION_EFFECTS.length > 1);
       
-      const randomEffect = animationEffects[randomIndex];
       setLastAnimationIndex(randomIndex);
-      setAvatarAnimation(randomEffect);
-      
-      // Log the effect for debugging
-      console.log(`Avatar animation: ${randomEffect}`);
+      setAvatarAnimation(ANIMATION_EFFECTS[randomIndex]);
     }
-  };
+  }, [avatarAnimation, lastAnimationIndex]);
   
-  const handleHireMe = () => {
+  const handleHireMe = useCallback(() => {
     const subject = "Project Inquiry - I'd Like to Hire You";
     const body = `Hello Ananth,
 
@@ -91,27 +97,16 @@ Looking forward to hearing from you soon!
 Best regards,
 [Your Name]`;
 
-    const mailtoLink = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailtoLink;
-  };
+    window.location.href = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  }, []);
 
-  // Catchy lines for HR professionals
-  const hrPickupLines =[
-  "A dreamer who codes worlds beyond the ordinary",
-  "Crafting futures where AI and imagination collide",
-  "Guiding 150+ minds to awaken their hidden genius",
-  "A voice of leadership, turning sparks into fire",
-  "Join me on this journey — where vision becomes destiny"
-];
-
-
-  const [currentPickupLine, setCurrentPickupLine] = useState(hrPickupLines[0]);
+  const [currentPickupLine, setCurrentPickupLine] = useState<string>(HR_PICKUP_LINES[0]);
 
   // Rotate through pickup lines
   useEffect(() => {
     const interval = setInterval(() => {
-      const randomIndex = Math.floor(Math.random() * hrPickupLines.length);
-      setCurrentPickupLine(hrPickupLines[randomIndex]);
+      const randomIndex = Math.floor(Math.random() * HR_PICKUP_LINES.length);
+      setCurrentPickupLine(HR_PICKUP_LINES[randomIndex]);
     }, 5000);
     
     return () => clearInterval(interval);
@@ -310,7 +305,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            I'm a <AnimatedText texts={roles} className="text-emerald-500 animate-perspective-shift" interval={2500} />
+            I'm a <AnimatedText texts={[...ROLES]} className="text-emerald-500 animate-perspective-shift" interval={2500} />
           </motion.div>
           <motion.p 
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300 leading-relaxed"
@@ -467,6 +462,8 @@ Best regards,
       </motion.div>
     </section>
   );
-};
+});
+
+Hero.displayName = 'Hero';
 
 export default Hero;
