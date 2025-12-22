@@ -1,9 +1,11 @@
 import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { memo, useEffect, useState, useRef, useCallback, useMemo } from 'react';
+import { memo, useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
 import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
 
+// Lazy load the 3D avatar component
+const Hero3DAvatar = lazy(() => import('./Hero3DAvatar'));
 // Memoized roles array to prevent re-creation
 const ROLES = [
   "Vibe Coder",
@@ -128,9 +130,29 @@ Best regards,
   }, [scrollY]);
 
   return (
-    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full">
+    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full overflow-hidden">
       {/* Enhanced gradient background with emerald theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-black to-teal-950/20" />
+      
+      {/* Animated background effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-radial from-emerald-500/10 to-transparent rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div 
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-radial from-teal-500/10 to-transparent rounded-full blur-3xl"
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.5, 0.3]
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+        />
+      </div>
       
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}
@@ -272,6 +294,43 @@ Best regards,
           </motion.div>
         </motion.div>
 
+        {/* 3D Avatar Section */}
+        <motion.div
+          initial={{ opacity: 0, x: 100 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, delay: 0.5, type: "spring" }}
+          className="relative w-full lg:w-1/2 h-[400px] lg:h-[500px] hidden lg:block"
+        >
+          <Suspense fallback={
+            <div className="w-full h-full flex items-center justify-center">
+              <motion.div 
+                className="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            </div>
+          }>
+            <Hero3DAvatar />
+          </Suspense>
+          
+          {/* Decorative elements */}
+          <motion.div 
+            className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-full blur-2xl"
+            animate={{ 
+              scale: [1, 1.3, 1],
+              opacity: [0.5, 0.8, 0.5]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div 
+            className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full blur-2xl"
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.5, 0.8, 0.5]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+          />
+        </motion.div>
         {/* Text content with enhanced staggered animation */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
