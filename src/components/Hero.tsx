@@ -3,7 +3,6 @@ import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
-import AnimatedAvatar from './AnimatedAvatar';
 // Memoized roles array to prevent re-creation
 const ROLES = [
   "Vibe Coder",
@@ -292,33 +291,7 @@ Best regards,
           </motion.div>
         </motion.div>
 
-        {/* Animated Avatar Art Section */}
-        <motion.div
-          initial={{ opacity: 0, x: 100 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.5, type: "spring" }}
-          className="relative w-full lg:w-1/3 hidden lg:block"
-        >
-          <AnimatedAvatar variant="hero" className="w-full max-w-[350px] mx-auto" />
-          
-          {/* Decorative elements */}
-          <motion.div 
-            className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-full blur-2xl"
-            animate={{ 
-              scale: [1, 1.3, 1],
-              opacity: [0.5, 0.8, 0.5]
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.div 
-            className="absolute -bottom-10 -left-10 w-32 h-32 bg-gradient-to-br from-teal-500/20 to-transparent rounded-full blur-2xl"
-            animate={{ 
-              scale: [1.2, 1, 1.2],
-              opacity: [0.5, 0.8, 0.5]
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-          />
-        </motion.div>
+        
         {/* Text content with enhanced staggered animation */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
