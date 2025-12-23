@@ -85,23 +85,38 @@ Best regards,
       </motion.div>
 
       <div className="section-container relative z-10">
-        <motion.h2 
-          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-white"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-          transition={{ duration: 0.5 }}
-        >
-          Get In Touch
-        </motion.h2>
-        
-        <motion.p 
-          className="section-subtitle"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          Ready to turn your vision into reality? Let's create something extraordinary together
-        </motion.p>
+        {/* Title with Avatar */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 mb-12">
+          {/* Animated Avatar */}
+          <motion.div
+            className="flex-shrink-0"
+            initial={{ opacity: 0, scale: 0.8, x: -50 }}
+            animate={isInView ? { opacity: 1, scale: 1, x: 0 } : { opacity: 0, scale: 0.8, x: -50 }}
+            transition={{ duration: 0.8, type: "spring" }}
+          >
+            <AnimatedAvatar variant="contact" className="w-48 h-auto md:w-64 lg:w-72" />
+          </motion.div>
+          
+          {/* Title content */}
+          <motion.div
+            className="text-center lg:text-left"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h2 
+              className="section-title bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-white"
+            >
+              Get In Touch
+            </h2>
+            
+            <p 
+              className="section-subtitle max-w-xl"
+            >
+              Ready to turn your vision into reality? Let's create something extraordinary together
+            </p>
+          </motion.div>
+        </div>
         
         <motion.div 
           className="max-w-2xl mx-auto mb-16 text-center"

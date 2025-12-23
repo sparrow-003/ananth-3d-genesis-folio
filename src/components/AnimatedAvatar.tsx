@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import avatarImage1 from '@/assets/avatar-art-1.png';
 import avatarImage2 from '@/assets/avatar-art-2.png';
+import avatarImage3 from '@/assets/avatar-art-3.png';
 
 interface AnimatedAvatarProps {
   variant: 'hero' | 'about' | 'contact';
@@ -10,16 +11,17 @@ interface AnimatedAvatarProps {
 
 const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isHovered, setIsHovered] = useState(false);
   
-  // Choose image based on variant
+  // Choose image based on variant - new image for about, original for contact
   const getImage = () => {
     switch (variant) {
       case 'hero':
         return avatarImage1;
       case 'about':
-        return avatarImage2;
+        return avatarImage3; // New uploaded image
       case 'contact':
-        return avatarImage1;
+        return avatarImage2; // Art style image for contact
       default:
         return avatarImage1;
     }
@@ -30,12 +32,13 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
       case 'hero':
         return {
           animate: {
-            y: [0, -20, 0],
-            rotateY: [0, 10, 0],
-            rotateX: [-5, 5, -5],
+            y: [0, -25, 0],
+            rotateY: [0, 15, 0, -15, 0],
+            rotateX: [-8, 8, -8],
+            scale: [1, 1.03, 1],
           },
           transition: {
-            duration: 6,
+            duration: 8,
             repeat: Infinity,
             ease: "easeInOut"
           }
@@ -43,12 +46,13 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
       case 'about':
         return {
           animate: {
-            y: [0, -15, 0],
-            rotateZ: [-2, 2, -2],
-            scale: [1, 1.02, 1],
+            y: [0, -20, 0],
+            rotateZ: [-3, 3, -3],
+            rotateY: [0, 8, 0, -8, 0],
+            scale: [1, 1.05, 1],
           },
           transition: {
-            duration: 5,
+            duration: 6,
             repeat: Infinity,
             ease: "easeInOut"
           }
@@ -56,11 +60,13 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
       case 'contact':
         return {
           animate: {
-            y: [0, -10, 0],
-            rotateY: [-5, 5, -5],
+            y: [0, -18, 0],
+            rotateY: [-10, 10, -10],
+            rotateX: [5, -5, 5],
+            scale: [1, 1.04, 1],
           },
           transition: {
-            duration: 4,
+            duration: 5,
             repeat: Infinity,
             ease: "easeInOut"
           }
@@ -74,54 +80,101 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
     <div 
       ref={containerRef}
       className={`relative ${className}`}
-      style={{ perspective: '1000px' }}
+      style={{ perspective: '1200px' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Outer glow effect */}
+      {/* Enhanced outer glow effect */}
       <motion.div
-        className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-500/30 via-teal-500/20 to-cyan-500/30 blur-3xl"
+        className="absolute inset-0 rounded-3xl bg-gradient-to-br from-emerald-500/40 via-teal-500/30 to-cyan-500/40 blur-3xl"
         animate={{
-          opacity: [0.4, 0.7, 0.4],
-          scale: [0.95, 1.05, 0.95],
+          opacity: isHovered ? [0.6, 0.9, 0.6] : [0.4, 0.7, 0.4],
+          scale: isHovered ? [1, 1.15, 1] : [0.95, 1.05, 0.95],
+          rotate: [0, 5, 0, -5, 0],
         }}
         transition={{
-          duration: 4,
+          duration: 3,
           repeat: Infinity,
           ease: "easeInOut"
         }}
       />
       
-      {/* Floating particles around avatar */}
+      {/* Secondary glow layer */}
+      <motion.div
+        className="absolute inset-0 rounded-3xl bg-gradient-to-tr from-purple-500/20 via-transparent to-blue-500/20 blur-2xl"
+        animate={{
+          opacity: [0.3, 0.5, 0.3],
+          scale: [1.05, 0.95, 1.05],
+        }}
+        transition={{
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+          delay: 1
+        }}
+      />
+      
+      {/* Enhanced floating particles around avatar */}
       <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(12)].map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-2 h-2 bg-emerald-400/60 rounded-full"
+            className={`absolute rounded-full ${i % 3 === 0 ? 'w-3 h-3 bg-emerald-400/70' : i % 3 === 1 ? 'w-2 h-2 bg-teal-400/60' : 'w-1.5 h-1.5 bg-cyan-400/50'}`}
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: `${10 + (i * 7) % 80}%`,
+              top: `${15 + (i * 11) % 70}%`,
             }}
             animate={{
-              y: [0, -30, 0],
-              x: [0, Math.random() * 20 - 10, 0],
+              y: [0, -40 - (i * 5), 0],
+              x: [0, (i % 2 === 0 ? 1 : -1) * (15 + i * 2), 0],
               opacity: [0, 1, 0],
-              scale: [0, 1, 0],
+              scale: [0, 1.2, 0],
+              rotate: [0, 180, 360],
             }}
             transition={{
-              duration: 3 + Math.random() * 2,
+              duration: 2.5 + (i * 0.3),
               repeat: Infinity,
-              delay: i * 0.4,
+              delay: i * 0.25,
               ease: "easeInOut"
             }}
           />
         ))}
       </div>
       
+      {/* Orbiting particles */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+      >
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={`orbit-${i}`}
+            className="absolute w-2 h-2 bg-gradient-to-r from-emerald-400 to-teal-400 rounded-full"
+            style={{
+              left: '50%',
+              top: i % 2 === 0 ? '-5%' : '105%',
+              marginLeft: i < 2 ? '-50%' : '50%',
+            }}
+            animate={{
+              scale: [0.8, 1.2, 0.8],
+              opacity: [0.6, 1, 0.6],
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              delay: i * 0.5,
+            }}
+          />
+        ))}
+      </motion.div>
+      
       {/* Main animated container */}
       <motion.div
         className="relative z-10"
-        initial={{ opacity: 0, scale: 0.8, rotateY: -20 }}
-        animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-        transition={{ duration: 1, ease: "easeOut" }}
+        initial={{ opacity: 0, scale: 0.7, rotateY: -30, rotateX: 15 }}
+        animate={{ opacity: 1, scale: 1, rotateY: 0, rotateX: 0 }}
+        transition={{ duration: 1.2, ease: "easeOut", type: "spring", stiffness: 100 }}
         style={{ transformStyle: 'preserve-3d' }}
       >
         {/* Animated image wrapper */}
@@ -129,21 +182,41 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
           {...animProps}
           style={{ transformStyle: 'preserve-3d' }}
           whileHover={{ 
-            scale: 1.05,
-            rotateY: 15,
-            transition: { duration: 0.3 }
+            scale: 1.08,
+            rotateY: 20,
+            rotateX: -10,
+            transition: { duration: 0.4, type: "spring", stiffness: 200 }
+          }}
+          whileTap={{
+            scale: 0.95,
+            rotateZ: 5,
+            transition: { duration: 0.1 }
           }}
         >
-          {/* Ring effects */}
+          {/* Enhanced ring effects */}
           <motion.div
-            className="absolute -inset-4 rounded-full border-2 border-emerald-500/30"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -inset-4 rounded-full border-2 border-emerald-500/40"
+            animate={{ 
+              rotate: 360,
+              borderColor: ['rgba(16, 185, 129, 0.4)', 'rgba(20, 184, 166, 0.4)', 'rgba(6, 182, 212, 0.4)', 'rgba(16, 185, 129, 0.4)']
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
           />
           <motion.div
-            className="absolute -inset-8 rounded-full border border-teal-500/20"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="absolute -inset-8 rounded-full border border-teal-500/30"
+            animate={{ 
+              rotate: -360,
+              scale: [1, 1.05, 1]
+            }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="absolute -inset-12 rounded-full border border-cyan-500/20"
+            animate={{ 
+              rotate: 360,
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
           />
           
           {/* Image container with 3D shadow */}
