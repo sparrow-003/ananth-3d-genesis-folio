@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { useInView } from 'framer-motion';
 import { Mail, Phone, MapPin, Send, User, MessageSquare, Download } from 'lucide-react';
+import AnimatedAvatar from './AnimatedAvatar';
 
 const Contact = () => {
   const ref = useRef<HTMLDivElement>(null);

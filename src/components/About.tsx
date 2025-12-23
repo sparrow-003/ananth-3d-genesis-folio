@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useRef } from "react";
 import { useInView } from "framer-motion";
+import AnimatedAvatar from "./AnimatedAvatar";
 
 const fadeInUp = (delay = 0) => ({
   hidden: { opacity: 0, y: 60 },
@@ -42,24 +43,37 @@ const About = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black" />
 
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
-        {/* Title */}
-        <motion.div
-          className="text-center mb-16"
-          variants={fadeInUp(0)}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          <h2 className="text-5xl font-extrabold tracking-tight text-foreground mb-6 drop-shadow-md">
-            About Me
-          </h2>
-          <motion.p
-            className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed"
-            variants={fadeInUp(0.2)}
+        {/* Title with Avatar */}
+        <div className="flex flex-col lg:flex-row items-center gap-12 mb-16">
+          {/* Animated Avatar */}
+          <motion.div
+            className="flex-shrink-0"
+            variants={scaleIn(0)}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
           >
-            I’m Anand — a developer, educator, and innovator driven by curiosity
-            and a desire to make technology more human, accessible, and impactful.
-          </motion.p>
-        </motion.div>
+            <AnimatedAvatar variant="about" className="w-64 h-auto md:w-80" />
+          </motion.div>
+          
+          {/* Title content */}
+          <motion.div
+            className="text-center lg:text-left flex-1"
+            variants={fadeInUp(0)}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
+            <h2 className="text-5xl font-extrabold tracking-tight text-foreground mb-6 drop-shadow-md">
+              About Me
+            </h2>
+            <motion.p
+              className="text-xl text-muted-foreground max-w-3xl leading-relaxed"
+              variants={fadeInUp(0.2)}
+            >
+              I'm Anand — a developer, educator, and innovator driven by curiosity
+              and a desire to make technology more human, accessible, and impactful.
+            </motion.p>
+          </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Journey */}

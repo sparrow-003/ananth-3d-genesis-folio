@@ -1,11 +1,9 @@
 import { motion, useTransform, useScroll } from 'framer-motion';
 import AnimatedText from './AnimatedText';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { memo, useEffect, useState, useRef, useCallback, useMemo, Suspense, lazy } from 'react';
+import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
-
-// Lazy load the 3D avatar component
-const Hero3DAvatar = lazy(() => import('./Hero3DAvatar'));
+import AnimatedAvatar from './AnimatedAvatar';
 // Memoized roles array to prevent re-creation
 const ROLES = [
   "Vibe Coder",
@@ -294,24 +292,14 @@ Best regards,
           </motion.div>
         </motion.div>
 
-        {/* 3D Avatar Section */}
+        {/* Animated Avatar Art Section */}
         <motion.div
           initial={{ opacity: 0, x: 100 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1, delay: 0.5, type: "spring" }}
-          className="relative w-full lg:w-1/2 h-[400px] lg:h-[500px] hidden lg:block"
+          className="relative w-full lg:w-1/3 hidden lg:block"
         >
-          <Suspense fallback={
-            <div className="w-full h-full flex items-center justify-center">
-              <motion.div 
-                className="w-16 h-16 border-4 border-emerald-500/30 border-t-emerald-500 rounded-full"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-              />
-            </div>
-          }>
-            <Hero3DAvatar />
-          </Suspense>
+          <AnimatedAvatar variant="hero" className="w-full max-w-[350px] mx-auto" />
           
           {/* Decorative elements */}
           <motion.div 
