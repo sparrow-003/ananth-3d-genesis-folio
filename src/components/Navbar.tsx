@@ -66,10 +66,10 @@ const Navbar = () => {
           stiffness: 100,
           damping: 15
         }}
-        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-purple/10' : 'py-4 bg-black/20 backdrop-blur-sm'
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 shadow-xl shadow-emerald-500/5' : 'py-4 bg-black/40 backdrop-blur-sm'
           }`}
         style={{
-          borderBottom: isScrolled ? '1px solid rgba(155, 135, 245, 0.1)' : '1px solid transparent',
+          borderBottom: isScrolled ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid transparent',
         }}
       >
         <div className="max-w-7xl mx-auto flex justify-center items-center">
