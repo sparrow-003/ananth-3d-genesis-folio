@@ -5,10 +5,10 @@ import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, ArrowRight, Download, Briefcase, MapPin, Code } from 'lucide-react';
 // Memoized roles array to prevent re-creation
 const ROLES = [
-  "Vibe Coder",
-  "Python Developer", 
-  "JavaScript/TypeScript Developer",
+  "Python Developer",
+  "JS/TS Developer",
   "Teaching Expert",
+  "Vibe Coder",
   "UI/UX Designer",
   "AI Prompt Engineer",
   "Web Developer"
@@ -34,35 +34,35 @@ const Hero = memo(() => {
     target: sectionRef,
     offset: ["start start", "end start"]
   });
-  
+
   // Enhanced parallax values for better 3D effect
   const avatarY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const avatarRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 100]);
   const contentOpacity = useTransform(scrollYProgress, [0, 1], [1, 0.3]);
-  
+
   // State for avatar animation
   const [avatarAnimation, setAvatarAnimation] = useState<string | null>(null);
   const [isAvatarHidden, setIsAvatarHidden] = useState(false);
   const [lastAnimationIndex, setLastAnimationIndex] = useState<number>(-1);
-  
+
   // Reset avatar after animation
   useEffect(() => {
     if (avatarAnimation) {
       const timer = setTimeout(() => {
         setIsAvatarHidden(true);
-        
+
         // Add a small delay before making the avatar reappear
         setTimeout(() => {
           setAvatarAnimation(null);
           setIsAvatarHidden(false);
         }, 500);
       }, 1500);
-      
+
       return () => clearTimeout(timer);
     }
   }, [avatarAnimation]);
-  
+
   // Optimized animation handler
   const handleAvatarClick = useCallback(() => {
     if (!avatarAnimation) {
@@ -70,31 +70,27 @@ const Hero = memo(() => {
       do {
         randomIndex = Math.floor(Math.random() * ANIMATION_EFFECTS.length);
       } while (randomIndex === lastAnimationIndex && ANIMATION_EFFECTS.length > 1);
-      
+
       setLastAnimationIndex(randomIndex);
       setAvatarAnimation(ANIMATION_EFFECTS[randomIndex]);
     }
   }, [avatarAnimation, lastAnimationIndex]);
-  
+
   const handleHireMe = useCallback(() => {
     const subject = "Project Inquiry - I'd Like to Hire You";
     const body = `Hello Ananth,
 
-I came across your impressive portfolio website and I'm interested in discussing a potential project with you.
+I recently reviewed your portfolio and was genuinely impressed by the quality of your work and the clarity of your approach. I would like to explore the possibility of collaborating with you on an upcoming project.
 
-Project Overview:
-[Brief description of your project/requirements]
+The engagement involves a well-defined scope with clear objectives and a structured timeline. I believe your skill set and experience align well with the requirements, and your perspective would add significant value to the outcome.
 
-Timeline:
-[Your expected timeline]
+If you are open to a brief discussion, I would be glad to share further details and understand your availability. Please let me know a convenient time to connect.
 
-Budget Range:
-[Your budget range if applicable]
+I look forward to your response.
 
-Looking forward to hearing from you soon!
-
-Best regards,
-[Your Name]`;
+Warm regards,
+[Sender Name]
+`;
 
     window.location.href = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   }, []);
@@ -107,7 +103,7 @@ Best regards,
       const randomIndex = Math.floor(Math.random() * HR_PICKUP_LINES.length);
       setCurrentPickupLine(HR_PICKUP_LINES[randomIndex]);
     }, 5000);
-    
+
     return () => clearInterval(interval);
   }, []);
 
@@ -115,7 +111,7 @@ Best regards,
     // Improved scroll handler with performance optimization
     const handleScroll = () => {
       if (!sectionRef.current) return;
-      
+
       // Only update state if we actually need to render something different
       if (Math.abs(window.scrollY - scrollY) > 5) {
         setScrollY(window.scrollY);
@@ -130,27 +126,27 @@ Best regards,
     <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full overflow-hidden">
       {/* Enhanced gradient background with emerald theme */}
       <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-black to-teal-950/20" />
-      
+
       {/* Animated background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div 
+        <motion.div
           className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-radial from-emerald-500/10 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1, 1.2, 1],
             opacity: [0.3, 0.5, 0.3]
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
-        <motion.div 
+        <motion.div
           className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-radial from-teal-500/10 to-transparent rounded-full blur-3xl"
-          animate={{ 
+          animate={{
             scale: [1.2, 1, 1.2],
             opacity: [0.3, 0.5, 0.3]
           }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         />
       </div>
-      
+
       <div className="section-container flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 z-10">
         {/* Avatar with enhanced 3D hover effects and click animations */}
         <motion.div
@@ -160,9 +156,9 @@ Best regards,
           className="perspective"
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
-          <motion.div 
+          <motion.div
             className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-8 border-emerald-500/70 shadow-2xl shadow-emerald-500/50 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
-            whileHover={{ 
+            whileHover={{
               rotate: [0, -5, 5, -5, 0],
               scale: 1.05,
               transition: { duration: 0.5 }
@@ -188,13 +184,13 @@ Best regards,
                       transition={{ duration: 0.5 }}
                     >
                       <div className="w-24 h-24 mx-auto mb-4 relative">
-                        <motion.div 
+                        <motion.div
                           className="absolute inset-0 bg-gradient-to-br from-white/20 to-white/5 rounded-full"
-                          animate={{ 
+                          animate={{
                             scale: [1, 1.1, 1],
                             rotate: [0, 180, 360]
                           }}
-                          transition={{ 
+                          transition={{
                             duration: 3,
                             repeat: Infinity,
                             ease: "linear"
@@ -207,7 +203,7 @@ Best regards,
                       <h3 className="text-2xl font-bold text-white mb-2">Ananth N</h3>
                       <p className="text-sm text-gray-300 mb-1">Vibe Coder</p>
                       <p className="text-xs text-gray-400">Full Stack Developer</p>
-                      <motion.div 
+                      <motion.div
                         className="mt-4 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-xs text-white"
                         animate={{ opacity: [0.5, 1, 0.5] }}
                         transition={{ duration: 2, repeat: Infinity }}
@@ -222,7 +218,7 @@ Best regards,
             <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 via-teal-500/10 to-cyan-400/10 pointer-events-none" />
           </motion.div>
           <div className="mt-3 text-center text-xs text-emerald-400 animate-pulse">Click for surprise effects!</div>
-          
+
           {/* Social Media Links - Under Avatar */}
           <motion.div
             className="mt-6"
@@ -291,19 +287,19 @@ Best regards,
           </motion.div>
         </motion.div>
 
-        
+
         {/* Text content with enhanced staggered animation */}
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          style={{ 
+          style={{
             y: contentY,
-            opacity: contentOpacity 
+            opacity: contentOpacity
           }}
           className="z-10 text-center lg:text-left"
         >
-          <motion.h2 
+          <motion.h2
             className="text-xl md:text-2xl mb-4 text-gradient-green"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -311,7 +307,7 @@ Best regards,
           >
             Hello, I'm
           </motion.h2>
-          <motion.h1 
+          <motion.h1
             className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold mb-4 cinematic-text"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -319,7 +315,7 @@ Best regards,
           >
             <span className="text-gradient">ANANTH.N</span>
           </motion.h1>
-          <motion.div 
+          <motion.div
             className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -327,7 +323,7 @@ Best regards,
           >
             I'm a <AnimatedText texts={[...ROLES]} className="text-emerald-500 animate-perspective-shift" interval={2500} />
           </motion.div>
-          <motion.p 
+          <motion.p
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300 leading-relaxed"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -337,7 +333,7 @@ Best regards,
           </motion.p>
 
           {/* Cinematic HR pickup line */}
-          <motion.div 
+          <motion.div
             className="glass-card p-3 mb-12 border border-emerald-500/20 relative overflow-hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -346,7 +342,7 @@ Best regards,
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5"></div>
             <p className="text-gradient italic font-medium">"{currentPickupLine}"</p>
           </motion.div>
-          
+
           <motion.div
             className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4"
             initial={{ opacity: 0 }}
@@ -356,8 +352,8 @@ Best regards,
             {/* Enhanced buttons with 3D effect */}
             <motion.button
               className="px-8 py-3 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-700 rounded-full font-medium text-white shadow-lg shadow-emerald-500/30 hover:shadow-xl hover:shadow-emerald-500/50 transition-all relative overflow-hidden group"
-              whileHover={{ 
-                scale: 1.05, 
+              whileHover={{
+                scale: 1.05,
                 boxShadow: "0 0 25px rgba(16, 185, 129, 0.6)",
                 textShadow: "0 0 8px rgba(255, 255, 255, 0.5)"
               }}
@@ -388,7 +384,7 @@ Best regards,
               </span>
             </motion.a>
           </motion.div>
-          
+
           {/* Information cards */}
           <motion.div
             className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
@@ -396,7 +392,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 1.2, duration: 0.8 }}
           >
-            <motion.div 
+            <motion.div
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
@@ -409,7 +405,7 @@ Best regards,
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: -2 }}
             >
@@ -422,7 +418,7 @@ Best regards,
               </div>
             </motion.div>
 
-            <motion.div 
+            <motion.div
               className="cinematic-border bg-dark/40 backdrop-blur-sm p-4 rounded-xl flex items-center gap-3"
               whileHover={{ scale: 1.05, rotate: 2 }}
             >
@@ -437,16 +433,16 @@ Best regards,
           </motion.div>
         </motion.div>
       </div>
-      
+
       {/* Enhanced floating indicator to scroll down with 3D effect */}
-      <motion.div 
+      <motion.div
         className="absolute bottom-10 left-1/2 transform -translate-x-1/2"
         initial={{ opacity: 0, y: -10 }}
-        animate={{ 
+        animate={{
           opacity: 1,
           y: 0
         }}
-        transition={{ 
+        transition={{
           delay: 1.5,
           duration: 0.5
         }}
@@ -457,13 +453,13 @@ Best regards,
       >
         <div className="flex flex-col items-center">
           <span className="text-sm text-gray-400 mb-2">Scroll Down</span>
-          <motion.svg 
-            width="24" 
-            height="24" 
-            viewBox="0 0 24 24" 
-            fill="none" 
-            stroke="currentColor" 
-            strokeWidth="2" 
+          <motion.svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
             className="text-emerald-500"
             animate={{
               y: [0, 8, 0],
