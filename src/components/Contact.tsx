@@ -52,8 +52,8 @@ Best regards,
   const handleDownloadResume = () => {
     // Create a link to the resume and trigger download
     const link = document.createElement('a');
-    link.href = '/Ananth_Resume.docx';
-    link.download = 'Ananth_Resume.docx';
+    link.href = '/Resume_AnanthN.docx';
+    link.download = 'Resume_AnanthN.docx';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
