@@ -6,18 +6,19 @@ import AnimatedAvatar from './AnimatedAvatar';
 
 const Contact = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: false, amount: 0.1 });
+  const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
-
+  
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setFormStatus('submitting');
-
+    
     // Simulate form submission
     setTimeout(() => {
       setFormStatus('success');
       (e.target as HTMLFormElement).reset();
-
+      
+      // Reset after success message
       setTimeout(() => {
         setFormStatus('idle');
       }, 3000);
@@ -28,17 +29,28 @@ const Contact = () => {
     const subject = "Project Inquiry - I'd Like to Hire You";
     const body = `Hello Ananth,
 
-I came across your impressive portfolio and I'm interested in discussing a potential project.
+I came across your impressive portfolio website and I'm interested in discussing a potential project with you.
 
-I'd love to hear more about your expertise in AI and Full Stack development.
+Project Overview:
+[Brief description of your project/requirements]
 
-Best regards,`;
+Timeline:
+[Your expected timeline]
+
+Budget Range:
+[Your budget range if applicable]
+
+Looking forward to hearing from you soon!
+
+Best regards,
+[Your Name]`;
 
     const mailtoLink = `mailto:thanan757@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailtoLink;
   };
 
   const handleDownloadResume = () => {
+    // Create a link to the resume and trigger download
     const link = document.createElement('a');
     link.href = '/Ananth_Resume.docx';
     link.download = 'Ananth_Resume.docx';
@@ -48,213 +60,367 @@ Best regards,`;
   };
 
   return (
-    <section id="contact" className="py-32 relative overflow-hidden" ref={ref}>
-      {/* Cinematic Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-emerald-950/20 to-black -z-10" />
-      <div className="absolute -top-24 -left-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-[120px] -z-10 animate-float" />
-      <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-teal-500/10 rounded-full blur-[120px] -z-10 animate-float-slow" />
+    <section id="contact" className="py-24 relative overflow-hidden" ref={ref}>
+      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-black to-white/5 -z-10" />
+      {/* 3D Elements and Background */}
+      <motion.div 
+        className="absolute inset-0 -z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.15 }}
+        transition={{ duration: 2 }}
+      >
+        <div className="absolute inset-0 bg-gradient-radial from-white/5 to-transparent" />
+        
+        {/* Animated grid */}
+        <div className="grid grid-cols-6 grid-rows-8 h-full w-full">
+          {Array.from({ length: 48 }).map((_, i) => (
+            <div key={i} className="border-[0.5px] border-white/5" />
+          ))}
+        </div>
+        
+        {/* 3D floating elements */}
+        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-white/10 rounded-full animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-white/10 rounded-full animate-float-delay"></div>
+        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-white/10 rounded-full animate-float-slow"></div>
+      </motion.div>
 
-      <div className="container mx-auto px-6 max-w-7xl relative z-10">
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-16 mb-24">
+      <div className="section-container relative z-10">
+        {/* Title with Avatar */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 mb-12">
+          {/* Animated Avatar */}
           <motion.div
-            className="flex-shrink-0 relative group"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={isInView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
+            className="flex-shrink-0"
+            initial={{ opacity: 0, scale: 0.8, x: -50 }}
+            animate={isInView ? { opacity: 1, scale: 1, x: 0 } : { opacity: 0, scale: 0.8, x: -50 }}
             transition={{ duration: 0.8, type: "spring" }}
           >
-            <div className="absolute -inset-2 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full blur-xl opacity-20 group-hover:opacity-40 transition-opacity" />
-            <AnimatedAvatar variant="contact" className="w-48 h-auto md:w-64 lg:w-80 relative z-10" />
+            <AnimatedAvatar variant="contact" className="w-48 h-auto md:w-64 lg:w-72" />
           </motion.div>
-
+          
+          {/* Title content */}
           <motion.div
-            className="text-center lg:text-left flex-1"
-            initial={{ opacity: 0, x: 50 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
-            transition={{ duration: 0.8 }}
+            className="text-center lg:text-left"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+            transition={{ duration: 0.5 }}
           >
-            <span className="text-emerald-400 font-bold tracking-[0.2em] uppercase text-sm mb-4 block">Let's Connect</span>
-            <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter">
-              Start a <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400">Revolution.</span>
-            </h2>
-            <p className="text-xl text-gray-400 max-w-2xl leading-relaxed mb-10">
-              Ready to turn your vision into reality? Whether it's AI-driven apps or full-stack solutions, I'm here to build the future with you.
-            </p>
-
-            <motion.button
-              onClick={handleHireMe}
-              className="group relative px-10 py-5 bg-emerald-500 text-black font-black text-xl rounded-2xl overflow-hidden active:scale-95 transition-all shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_50px_rgba(16,185,129,0.5)]"
-              whileHover={{ scale: 1.05 }}
+            <h2 
+              className="section-title bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-white"
             >
-              <span className="relative z-10 flex items-center gap-3">
-                <Send className="w-6 h-6" />
-                HIRE ME NOW
-              </span>
-              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500" />
-            </motion.button>
+              Get In Touch
+            </h2>
+            
+            <p 
+              className="section-subtitle max-w-xl"
+            >
+              Ready to turn your vision into reality? Let's create something extraordinary together
+            </p>
           </motion.div>
         </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Elite Glassmorphism Form */}
-          <motion.div
-            className="lg:col-span-8 bg-white/[0.03] backdrop-blur-xl rounded-[2rem] p-8 md:p-12 border border-white/10 shadow-2xl relative overflow-hidden group"
-            initial={{ opacity: 0, y: 50 }}
-            animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+        
+        <motion.div 
+          className="max-w-2xl mx-auto mb-16 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <motion.button
+            onClick={handleHireMe}
+            className="px-10 py-5 bg-gradient-to-r from-white/10 to-white/5 rounded-3xl text-xl font-bold text-white border-2 border-white/30 hover:border-white/60 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:shadow-[0_0_50px_rgba(255,255,255,0.35)]"
+            whileHover={{ 
+              scale: 1.05,
+              boxShadow: "0 0 60px rgba(255, 255, 255, 0.4), 0 0 100px rgba(255, 255, 255, 0.2)"
+            }}
+            whileTap={{ scale: 0.98 }}
           >
-            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-[80px] -z-10 group-hover:bg-emerald-500/10 transition-colors" />
-            <h3 className="text-3xl font-bold text-white mb-10">Send a Mission Brief</h3>
-
-            <form className="space-y-8" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest ml-1">Your Name</label>
+            <span className="relative z-10 flex items-center justify-center gap-3">
+              <Send className="h-5 w-5" />
+              Hire Me Now
+            </span>
+            <span className="absolute inset-0 rounded-3xl bg-white/10 blur-md animate-pulse" />
+            <span className="absolute inset-1 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-white/10 backdrop-blur-sm"></span>
+            <span className="absolute inset-0 rounded-3xl bg-gradient-to-r from-transparent via-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-[shimmer_2s_ease-in-out_infinite]"></span>
+          </motion.button>
+          <motion.p 
+            className="text-gray-400 mt-4 italic"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.8 }}
+            transition={{ delay: 0.8 }}
+          >
+            *Opens your default email app with a pre-filled template
+          </motion.p>
+        </motion.div>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+          {/* Contact Form with enhanced animations */}
+          <motion.div 
+            className="bg-dark/40 backdrop-blur-sm rounded-xl p-8 lg:col-span-3 border border-white/10"
+            initial={{ opacity: 0, x: -50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <h3 className="text-2xl font-bold mb-6 text-white">Send Me a Message</h3>
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label htmlFor="name" className="text-light block">Your Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500/50" />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <User size={18} />
+                    </div>
                     <input
                       type="text"
+                      id="name"
+                      name="name"
                       required
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-gray-600"
-                      placeholder="Anand Dev"
+                      className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
+                      placeholder="John Doe"
                     />
                   </div>
                 </div>
-                <div className="space-y-3">
-                  <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                <div className="space-y-2">
+                  <label htmlFor="email" className="text-light block">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500/50" />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                      <Mail size={18} />
+                    </div>
                     <input
                       type="email"
+                      id="email"
+                      name="email"
                       required
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-gray-600"
-                      placeholder="anand@genesis.io"
+                      className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
+                      placeholder="john@example.com"
                     />
                   </div>
                 </div>
               </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest ml-1">Subject</label>
+              <div className="space-y-2">
+                <label htmlFor="subject" className="text-light block">Subject</label>
                 <div className="relative">
-                  <MessageSquare className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500/50" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <MessageSquare size={18} />
+                  </div>
                   <input
                     type="text"
+                    id="subject"
+                    name="subject"
                     required
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-gray-600"
+                    className="w-full bg-dark/50 border border-white/10 rounded-md pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light transition-all"
                     placeholder="Project Inquiry"
                   />
                 </div>
               </div>
-
-              <div className="space-y-3">
-                <label className="text-sm font-semibold text-gray-400 uppercase tracking-widest ml-1">Message</label>
+              <div className="space-y-2">
+                <label htmlFor="message" className="text-light block">Message</label>
                 <textarea
+                  id="message"
+                  name="message"
+                  rows={6}
                   required
-                  rows={5}
-                  className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500/50 transition-all placeholder:text-gray-600 resize-none"
-                  placeholder="The future starts here..."
+                  className="w-full bg-dark/50 border border-white/10 rounded-md px-4 py-3 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-white/30 text-light resize-none transition-all"
+                  placeholder="Tell me about your project..."
                 ></textarea>
               </div>
-
               <motion.button
                 type="submit"
-                className="w-full md:w-auto px-12 py-4 bg-white/5 border border-white/10 rounded-2xl text-white font-bold hover:bg-white/10 hover:border-emerald-500/50 transition-all flex items-center justify-center gap-3 active:scale-95"
-                whileHover={{ y: -2 }}
+                className="px-8 py-3 bg-white/10 rounded-md font-medium text-white border border-white/20 hover:bg-white/20 transition-all w-full md:w-auto relative overflow-hidden group"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 disabled={formStatus === 'submitting'}
               >
-                {formStatus === 'idle' && (
-                  <>
-                    <Send className="w-5 h-5 text-emerald-400" />
-                    Launch Message
-                  </>
-                )}
-                {formStatus === 'submitting' && <span className="animate-pulse">Transmitting...</span>}
-                {formStatus === 'success' && <span className="text-emerald-400">Transmission Successful!</span>}
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {formStatus === 'idle' && (
+                    <>
+                      <Send size={18} />
+                      Send Message
+                    </>
+                  )}
+                  {formStatus === 'submitting' && 'Sending...'}
+                  {formStatus === 'success' && 'Message Sent!'}
+                  {formStatus === 'error' && 'Please Try Again'}
+                </span>
+                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/10 transition-opacity"></span>
               </motion.button>
+              
+              {formStatus === 'success' && (
+                <motion.div 
+                  className="text-green-400 mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  Thank you for reaching out! I'll get back to you soon.
+                </motion.div>
+              )}
+              
+              {formStatus === 'error' && (
+                <motion.div 
+                  className="text-red-400 mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  There was an error sending your message. Please try again.
+                </motion.div>
+              )}
             </form>
           </motion.div>
-
-          {/* Contact Details & Socials */}
-          <motion.div
-            className="lg:col-span-4 space-y-8"
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 30 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+          
+          {/* Contact Info with enhanced animations */}
+          <motion.div 
+            className="bg-dark/40 backdrop-blur-sm rounded-xl p-8 lg:col-span-2 border border-white/10"
+            initial={{ opacity: 0, x: 50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: 50 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <div className="bg-white/[0.03] backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 shadow-xl">
-              <h4 className="text-xl font-bold text-white mb-8 tracking-tight">Direct Channels</h4>
-              <div className="space-y-6">
-                {[
-                  { icon: Phone, label: "Neural Link", value: "+91 6384227309", color: "text-emerald-400" },
-                  { icon: Mail, label: "Data Stream", value: "thanan757@gmail.com", color: "text-teal-400" },
-                  { icon: MapPin, label: "Core Location", value: "Madurai, India", color: "text-cyan-400" },
-                ].map((item, i) => (
-                  <motion.div
-                    key={i}
-                    className="flex items-center gap-4 group cursor-pointer"
-                    whileHover={{ x: 8 }}
-                  >
-                    <div className={`w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10 group-hover:border-emerald-500/50 transition-all`}>
-                      <item.icon className={`w-5 h-5 ${item.color}`} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-bold">{item.label}</p>
-                      <p className="text-gray-200 font-medium">{item.value}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
+            <h3 className="text-2xl font-bold mb-6 text-white">Contact Information</h3>
+            <div className="space-y-6">
+              <motion.div 
+                className="flex items-start gap-4"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <motion.div 
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+                >
+                  <Phone size={18} className="text-white" />
+                </motion.div>
+                <div>
+                  <h4 className="font-semibold text-white">Phone</h4>
+                  <p className="text-gray-300">+91 6384227309</p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-start gap-4"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <motion.div 
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+                >
+                  <Mail size={18} className="text-white" />
+                </motion.div>
+                <div>
+                  <h4 className="font-semibold text-white">Email</h4>
+                  <p className="text-gray-300">thanan757@gmail.com</p>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="flex items-start gap-4"
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              >
+                <motion.div 
+                  className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center flex-shrink-0"
+                  whileHover={{ scale: 1.1, backgroundColor: "rgba(255, 255, 255, 0.15)" }}
+                >
+                  <MapPin size={18} className="text-white" />
+                </motion.div>
+                <div>
+                  <h4 className="font-semibold text-white">Location</h4>
+                  <p className="text-gray-300">Madurai, Tamil Nadu, India</p>
+                </div>
+              </motion.div>
             </div>
-
-            {/* Elite Social Grid */}
-            <div className="bg-white/[0.03] backdrop-blur-xl rounded-[2rem] p-8 border border-white/10 shadow-xl">
-              <h4 className="text-xl font-bold text-white mb-8 tracking-tight">External Nodes</h4>
-              <div className="grid grid-cols-4 gap-4">
-                {[
-                  { icon: "linkedin", url: "https://www.linkedin.com/in/ananth-n-583036233" },
-                  { icon: "github", url: "https://github.com/sparrow-003" },
-                  { icon: "instagram", url: "https://www.instagram.com/_alexxz_0" },
-                  { icon: "whatsapp", url: "https://api.whatsapp.com/send?phone=916384227309" },
-                ].map((social, i) => (
-                  <motion.a
-                    key={i}
-                    href={social.url}
-                    target="_blank"
-                    className="aspect-square bg-white/5 border border-white/10 rounded-2xl flex items-center justify-center hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all"
-                    whileHover={{ scale: 1.1, rotate: 5 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    {/* SVG Icons for socials */}
-                    {social.icon === "linkedin" && <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" /></svg>}
-                    {social.icon === "github" && <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" /></svg>}
-                    {social.icon === "instagram" && <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.791-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.209-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>}
-                    {social.icon === "whatsapp" && <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.246 2.248 3.484 5.232 3.483 8.412-.003 6.557-5.338 11.892-11.893 11.892-1.997-.001-3.951-.5-5.688-1.448l-6.308 1.656zm6.304-4.055c1.552.921 3.31 1.408 5.103 1.409 5.421 0 9.832-4.412 9.835-9.832.001-2.628-1.023-5.097-2.88-6.956-1.857-1.859-4.325-2.883-6.953-2.884-5.424 0-9.835 4.411-9.838 9.83.001 1.921.56 3.791 1.616 5.385l-1.018 3.722 3.816-1.001zm10.975-6.73c-.273-.137-1.614-.797-1.863-.888-.249-.091-.43-.137-.611.137-.181.273-.701.888-.859 1.07-.158.182-.317.205-.59.068-.273-.137-1.15-.425-2.191-1.353-.808-.721-1.353-1.611-1.511-1.884-.158-.273-.017-.42.12-.556.123-.122.273-.319.41-.478.136-.159.182-.273.273-.455.09-.182.045-.341-.023-.478-.068-.137-.611-1.472-.837-2.019-.22-.53-.442-.457-.611-.466-.158-.008-.339-.01-.52-.01-.181 0-.476.068-.725.341-.249.273-.951.932-.951 2.272s.974 2.64 1.11 2.822c.136.182 1.919 2.93 4.648 4.113.649.282 1.157.45 1.551.576.652.207 1.245.178 1.714.108.523-.078 1.614-.66 1.841-1.298.226-.638.226-1.185.158-1.298-.068-.113-.249-.204-.522-.341z" /></svg>}
-                  </motion.a>
-                ))}
-              </div>
+            
+            {/* Social Links with enhanced animations */}
+            <h3 className="text-xl font-bold mt-10 mb-6 text-white">Connect With Me</h3>
+            <div className="flex gap-4">
+              <motion.a 
+                href="https://www.linkedin.com/in/ananth-n-583036233" 
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path>
+                  <rect x="2" y="9" width="4" height="12"></rect>
+                  <circle cx="4" cy="4" r="2"></circle>
+                </svg>
+              </motion.a>
+              
+              <motion.a 
+                href="https://github.com/sparrow-003" 
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+                </svg>
+              </motion.a>
+              
+              <motion.a 
+                href="https://www.instagram.com/_alexxz_0" 
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: 10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                </svg>
+              </motion.a>
+              
+              <motion.a 
+                href="https://api.whatsapp.com/send?phone=916384227309"
+                target="_blank"
+                rel="noreferrer"
+                className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center hover:bg-white/20 hover:text-white transition-all"
+                whileHover={{ scale: 1.2, rotate: -10 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                </svg>
+              </motion.a>
+            </div>
+            
+            {/* Resume Download with enhanced animation */}
+            <div className="mt-10">
+              <motion.button 
+                onClick={handleDownloadResume}
+                className="inline-flex items-center gap-2 px-6 py-3 border border-emerald-500 rounded-md font-medium text-light hover:bg-emerald-500/10 transition-all group relative overflow-hidden"
+                whileHover={{ scale: 1.05, borderColor: "#10B981" }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Download size={18} />
+                <span className="relative z-10">Download Resume</span>
+                <span className="absolute inset-0 bg-emerald-500/10 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></span>
+              </motion.button>
             </div>
           </motion.div>
         </div>
       </div>
+      
       {/* Footer with cinematic animation */}
-      <footer className="mt-20 border-t border-white/5 pt-12 pb-8">
-        <div className="max-w-7xl mx-auto px-4 text-center">
-          <motion.p
-            className="text-gray-500 font-medium"
+      <footer className="mt-20 border-t border-emerald-500/20 pt-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <motion.p 
+            className="text-gray-400"
             initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ delay: 1 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
           >
             © 2025 Ananth N. All Rights Reserved.
           </motion.p>
-          <motion.p
-            className="text-gray-600 text-sm mt-3 tracking-widest uppercase"
+          <motion.p 
+            className="text-gray-500 text-sm mt-2"
             initial={{ opacity: 0 }}
-            animate={isInView ? { opacity: 1 } : { opacity: 0 }}
-            transition={{ delay: 1.2 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
           >
-            Building the Digital Genesis
+            Crafting digital experiences at the intersection of art and technology
           </motion.p>
         </div>
       </footer>

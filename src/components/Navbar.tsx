@@ -1,26 +1,25 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-
+    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   const navItems = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/#about' },
-    { name: 'Projects', href: '/#projects' },
-    { name: 'Blog', href: '/blog' },
+    { name: 'Home', href: '#home' },
+    { name: 'About', href: '#about' },
+    { name: 'Skills', href: '#skills' },
+    { name: 'Projects', href: '#projects' },
     { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
     { name: 'Hire Me', href: 'mailto', isHireMe: true }
   ];
@@ -34,24 +33,16 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  const scrollToSection = (href: string) => {
-    setMobileMenuOpen(false);
-
-    if (href.startsWith('/#')) {
-      const id = href.substring(1); // remove the '/'
-      if (location.pathname === '/') {
-        const element = document.querySelector(id);
-        if (element) {
-          element.scrollIntoView({ behavior: 'smooth' });
-        }
-      } else {
-        navigate(href);
-      }
-    } else if (href.startsWith('/')) {
-      navigate(href);
+  const scrollToSection = (id: string, isExternal?: boolean) => {
+    if (isExternal) {
+      window.open(id, '_blank');
+      setMobileMenuOpen(false);
+      return;
+    }
+    const element = document.querySelector(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+      setMobileMenuOpen(false);
     }
   };
 
@@ -60,16 +51,17 @@ const Navbar = () => {
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{
+        transition={{ 
           duration: 0.8,
           type: "spring",
           stiffness: 100,
           damping: 15
         }}
-        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 shadow-xl shadow-emerald-500/5' : 'py-4 bg-black/40 backdrop-blur-sm'
-          }`}
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${
+          isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-purple/10' : 'py-4 bg-black/20 backdrop-blur-sm'
+        }`}
         style={{
-          borderBottom: isScrolled ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid transparent',
+          borderBottom: isScrolled ? '1px solid rgba(155, 135, 245, 0.1)' : '1px solid transparent',
         }}
       >
         <div className="max-w-7xl mx-auto flex justify-center items-center">
@@ -79,17 +71,14 @@ const Navbar = () => {
               <motion.a
                 key={item.name}
                 href={item.href}
-                className={`text-sm lg:text-base font-bold transition-all ${item.name === 'Blog'
-                    ? 'px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:bg-emerald-500 hover:text-black hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]'
-                    : 'text-light opacity-80 hover:opacity-100 hover:text-purple'
-                  }`}
-                whileHover={{ scale: 1.05, y: -2 }}
+                className="text-sm lg:text-base text-light opacity-80 hover:opacity-100 hover:text-purple transition-all"
+                whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
-                animate={{
-                  opacity: 1,
+                animate={{ 
+                  opacity: 1, 
                   y: 0,
-                  transition: { delay: 0.1 * index, duration: 0.5 }
+                  transition: { delay: 0.1 * index, duration: 0.5 } 
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -101,6 +90,8 @@ const Navbar = () => {
                     window.open(item.href, '_blank');
                   }
                 }}
+                target={item.external && !(item as any).isHireMe ? '_blank' : undefined}
+                rel={item.external && !(item as any).isHireMe ? 'noopener noreferrer' : undefined}
               >
                 {item.name}
               </motion.a>
@@ -177,24 +168,24 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Scroll Indicator - Small arrow bouncing at bottom of viewport */}
-      <motion.div
+      <motion.div 
         className="hidden md:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-30"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: [0, 10, 0] }}
-        transition={{
+        transition={{ 
           delay: 2,
           duration: 1.5,
           repeat: Infinity,
           repeatType: "loop"
         }}
       >
-        <svg
-          width="30"
-          height="30"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
+        <svg 
+          width="30" 
+          height="30" 
+          viewBox="0 0 24 24" 
+          fill="none" 
+          stroke="currentColor" 
+          strokeWidth="2" 
           className="text-purple"
         >
           <path d="M7 13l5 5 5-5M7 7l5 5 5-5" />

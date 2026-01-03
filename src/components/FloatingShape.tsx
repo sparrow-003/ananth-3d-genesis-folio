@@ -1,6 +1,7 @@
+
 import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
-import { Octahedron, Tetrahedron, Icosahedron, Sphere, Torus } from '@react-three/drei';
+import { Octahedron, Tetrahedron, Icosahedron, Sphere, Torus, Text } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface FloatingShapeProps {
@@ -13,7 +14,7 @@ interface FloatingShapeProps {
   rotation?: [number, number, number];
 }
 
-const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 0] }: FloatingShapeProps) => {
+const FloatingShape = ({ position, size, color, shape, speed, text, rotation = [0, 0, 0] }: FloatingShapeProps) => {
   const meshRef = useRef<THREE.Mesh>(null);
   
   useFrame((state) => {
@@ -42,6 +43,25 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
     wireframe: wireframe
   });
 
+  // Function to render text if provided
+  const renderText = () => {
+    if (!text) return null;
+    
+    return (
+      <Text
+        position={[0, 0, size + 0.5]}
+        fontSize={0.3}
+        color="white"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.02}
+        outlineColor={color}
+      >
+        {text}
+      </Text>
+    );
+  };
+
   // Render the appropriate shape with initial rotation
   const renderShape = () => {
     switch (shape) {
@@ -56,6 +76,7 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
               receiveShadow
               material={material}
             />
+            {renderText()}
           </group>
         );
       case 'tetrahedron':
@@ -69,6 +90,7 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
               receiveShadow
               material={material}
             />
+            {renderText()}
           </group>
         );
       case 'icosahedron':
@@ -82,6 +104,7 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
               receiveShadow
               material={material}
             />
+            {renderText()}
           </group>
         );
       case 'torus':
@@ -95,6 +118,7 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
               receiveShadow
               material={material}
             />
+            {renderText()}
           </group>
         );
       case 'sphere':
@@ -109,6 +133,7 @@ const FloatingShape = ({ position, size, color, shape, speed, rotation = [0, 0, 
               receiveShadow
               material={material}
             />
+            {renderText()}
           </group>
         );
     }

@@ -98,9 +98,7 @@
   }
 
   .glass-nav {
-    background: hsla(0, 0%, 0%, 0.7);
-    backdrop-filter: blur(20px) saturate(180%);
-    border-bottom: 1px solid hsla(160, 84%, 39%, 0.15);
+    @apply bg-glass/5 backdrop-blur-md border-b border-gray-300/20;
   }
 
   .text-gradient {
