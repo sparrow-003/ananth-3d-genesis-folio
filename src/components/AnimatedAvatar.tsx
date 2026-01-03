@@ -13,15 +13,15 @@ const AnimatedAvatar = ({ variant, className = '' }: AnimatedAvatarProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
   
-  // Choose image based on variant - new image for about, original for contact
+  // Choose image based on variant
   const getImage = () => {
     switch (variant) {
       case 'hero':
         return avatarImage1;
       case 'about':
-        return avatarImage3; // New uploaded image
+        return avatarImage3;
       case 'contact':
-        return avatarImage2; // Art style image for contact
+        return avatarImage1; // Using avatar-art-1 for contact page
       default:
         return avatarImage1;
     }

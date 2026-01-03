@@ -1,6 +1,6 @@
 
-import { useEffect, useState, useRef } from 'react';
-import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { motion, useScroll, useSpring, useTransform, useMotionValue } from 'framer-motion';
 
 interface SmoothScrollProps {
   children: React.ReactNode;
@@ -10,52 +10,113 @@ const SmoothScroll = ({ children }: SmoothScrollProps) => {
   const [mounted, setMounted] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
+  const scrollY = useMotionValue(0);
   
-  // AI-powered smooth spring animation
+  // Ultra-smooth spring animation for progress bar
   const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 35,
-    restDelta: 0.001
+    stiffness: 80,
+    damping: 25,
+    restDelta: 0.0001
   });
   
-  // Dynamic parallax transforms
-  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '40%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [1, 0.95, 0.95, 1]);
+  // Smoother parallax transforms
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
+  
+  // Smooth scroll implementation with lerp
+  const smoothScrollTo = useCallback((target: number, duration: number = 800) => {
+    const start = window.scrollY;
+    const change = target - start;
+    const startTime = performance.now();
+    
+    const easeOutExpo = (t: number) => t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = easeOutExpo(progress);
+      
+      window.scrollTo(0, start + change * eased);
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+    
+    requestAnimationFrame(animateScroll);
+  }, []);
   
   useEffect(() => {
     const timer = setTimeout(() => {
       setMounted(true);
-    }, 200);
+    }, 150);
     
-    // Enhanced smooth scrolling with AI-like prediction
+    // Enhanced smooth scrolling CSS
     document.documentElement.style.scrollBehavior = 'smooth';
+    document.body.style.scrollBehavior = 'smooth';
     
-    // Add parallax effect to sections
+    // Smooth parallax effect with requestAnimationFrame
+    let ticking = false;
+    let lastScrollY = window.scrollY;
+    
     const handleScroll = () => {
-      const sections = document.querySelectorAll('section');
-      sections.forEach((section) => {
-        const rect = section.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight && rect.bottom > 0;
-        
-        if (isVisible) {
-          const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
-          const translateY = Math.max(0, Math.min(30, progress * 40));
-          const sectionOpacity = Math.min(1, Math.max(0.7, progress * 1.5));
+      lastScrollY = window.scrollY;
+      
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          const sections = document.querySelectorAll('section');
+          sections.forEach((section) => {
+            const rect = section.getBoundingClientRect();
+            const isVisible = rect.top < window.innerHeight * 1.2 && rect.bottom > -100;
+            
+            if (isVisible) {
+              const progress = (window.innerHeight - rect.top) / (window.innerHeight + rect.height);
+              const clampedProgress = Math.max(0, Math.min(1, progress));
+              const translateY = clampedProgress * 20;
+              const sectionOpacity = 0.85 + (clampedProgress * 0.15);
+              
+              section.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.3s ease';
+              section.style.transform = `translateY(${translateY}px)`;
+              section.style.opacity = sectionOpacity.toString();
+            }
+          });
           
-          section.style.transform = `translateY(${translateY}px)`;
-          section.style.opacity = sectionOpacity.toString();
-        }
-      });
+          scrollY.set(lastScrollY);
+          ticking = false;
+        });
+        
+        ticking = true;
+      }
     };
     
+    // Use passive scroll listener for better performance
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
+    
+    // Intercept anchor link clicks for smooth scrolling
+    const handleAnchorClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const anchor = target.closest('a[href^="#"]');
+      
+      if (anchor) {
+        e.preventDefault();
+        const targetId = anchor.getAttribute('href')?.slice(1);
+        const targetElement = document.getElementById(targetId || '');
+        
+        if (targetElement) {
+          const offsetTop = targetElement.offsetTop - 80;
+          smoothScrollTo(offsetTop, 1000);
+        }
+      }
+    };
+    
+    document.addEventListener('click', handleAnchorClick);
     
     return () => {
       clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
+      document.removeEventListener('click', handleAnchorClick);
     };
-  }, []);
+  }, [scrollY, smoothScrollTo]);
 
   return (
     <>
