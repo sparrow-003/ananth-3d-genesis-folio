@@ -2,6 +2,7 @@ import React, { useEffect, useState, lazy, Suspense, memo } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import usePerformanceMetrics from "../hooks/usePerformanceMetrics";
 
 // Lazy load heavy components
 const ParticleBackground = lazy(() => import("../components/ParticleBackground"));
@@ -22,9 +23,11 @@ SectionLoader.displayName = 'SectionLoader';
 
 const Index = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Log performance metrics to console
+  usePerformanceMetrics();
 
   useEffect(() => {
-    document.title = "Ananth N - Portfolio";
     
     // Faster loading - 800ms instead of 1500ms
     const timer = setTimeout(() => {
