@@ -57,12 +57,17 @@
     scroll-behavior: smooth;
     overflow-x: hidden;
     width: 100%;
-    scroll-snap-type: y proximity;
+    -webkit-overflow-scrolling: touch;
   }
   
   section {
-    scroll-snap-align: start;
     scroll-margin-top: 80px;
+  }
+  
+  /* Smooth image rendering */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
   }
 
   body {
@@ -505,6 +510,44 @@
     animation: shimmer 2s ease-in-out infinite;
   }
   
+  /* Ultra smooth scrolling */
+  * {
+    scroll-behavior: smooth;
+  }
+  
+  /* Optimized image display */
+  .avatar-image-container {
+    @apply relative overflow-hidden;
+    will-change: transform;
+  }
+  
+  .avatar-image-container img {
+    @apply w-full h-full object-cover object-center;
+    will-change: transform;
+    transform: translateZ(0);
+  }
+  
+  /* Smooth transitions for all interactive elements */
+  a, button, [role="button"] {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  /* Performance optimizations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    will-change: transform, opacity;
+  }
+  
+  /* Responsive image containers */
+  .responsive-avatar {
+    @apply relative w-full aspect-square overflow-hidden rounded-3xl;
+  }
+  
+  .responsive-avatar img {
+    @apply absolute inset-0 w-full h-full object-cover object-center;
+  }
+
   /* Radial gradient background utility */
   .bg-gradient-radial {
     background: radial-gradient(circle, var(--tw-gradient-stops));
