@@ -161,19 +161,31 @@ Best regards,
           style={{ y: avatarY, rotateY: avatarRotate }}
         >
           <motion.div 
-            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-hidden border-8 border-emerald-500/70 shadow-2xl shadow-emerald-500/50 transform glow-effect cinematic-border animate-float-3d ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
+            className={`relative w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 rounded-full overflow-visible border-4 border-emerald-500/50 shadow-2xl shadow-emerald-500/30 glow-effect ${avatarAnimation || ''} ${isAvatarHidden ? 'avatar-reappear' : ''}`}
             whileHover={{ 
-              rotate: [0, -5, 5, -5, 0],
-              scale: 1.05,
-              transition: { duration: 0.5 }
+              scale: 1.03,
+              transition: { duration: 0.3, ease: "easeOut" }
+            }}
+            animate={{
+              y: [0, -8, 0],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut"
             }}
             onClick={handleAvatarClick}
           >
-            <div className="avatar-container group cursor-pointer">
-              <Avatar className="w-full h-full rounded-full image-3d flip-card-inner">
-                <div className="flip-card-front">
-                  <AvatarImage src="/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png" alt="Ananth N" className="object-cover" />
-                  <AvatarFallback className="bg-emerald-600 text-4xl">AN</AvatarFallback>
+            <div className="avatar-container group cursor-pointer w-full h-full">
+              <Avatar className="w-full h-full rounded-full flip-card-inner">
+                <div className="flip-card-front w-full h-full">
+                  <AvatarImage 
+                    src="/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png" 
+                    alt="Ananth N" 
+                    className="w-full h-full object-cover object-center rounded-full"
+                    style={{ objectFit: 'cover', objectPosition: 'center' }}
+                  />
+                  <AvatarFallback className="bg-emerald-600 text-4xl w-full h-full">AN</AvatarFallback>
                 </div>
                 <div className="flip-card-back bg-gradient-to-br from-slate-900 via-slate-800 to-black flex items-center justify-center relative overflow-hidden">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-white/5 animate-pulse"></div>
