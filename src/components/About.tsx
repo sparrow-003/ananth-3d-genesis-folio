@@ -52,7 +52,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <AnimatedAvatar variant="about" className="w-64 h-auto md:w-80" />
+            <AnimatedAvatar variant="about" className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80" />
           </motion.div>
           
           {/* Title content */}

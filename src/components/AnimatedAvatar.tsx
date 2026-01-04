@@ -104,16 +104,17 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
           />
           
           {/* Image */}
-          <div className="relative">
+          <div className="relative w-full aspect-square overflow-hidden rounded-3xl">
             <img
               src={getImage()}
               alt="Ananth Avatar"
-              className="w-full h-auto rounded-3xl shadow-xl shadow-emerald-500/20 border border-emerald-500/20"
+              className="w-full h-full object-cover object-center rounded-3xl shadow-xl shadow-emerald-500/20 border border-emerald-500/20"
               loading="lazy"
+              style={{ imageRendering: 'auto' }}
             />
             
             {/* Simple overlay */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-emerald-500/5" />
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 to-emerald-500/5 pointer-events-none" />
           </div>
         </motion.div>
       </motion.div>

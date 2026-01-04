@@ -94,7 +94,7 @@ Best regards,
             animate={isInView ? { opacity: 1, scale: 1, x: 0 } : { opacity: 0, scale: 0.8, x: -50 }}
             transition={{ duration: 0.8, type: "spring" }}
           >
-            <AnimatedAvatar variant="contact" className="w-48 h-auto md:w-64 lg:w-72" />
+            <AnimatedAvatar variant="contact" className="w-40 h-40 md:w-56 md:h-56 lg:w-64 lg:h-64" />
           </motion.div>
           
           {/* Title content */}
