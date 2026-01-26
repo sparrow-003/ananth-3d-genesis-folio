@@ -20,6 +20,7 @@ const Navbar = () => {
     { name: 'About', href: '#about' },
     { name: 'Skills', href: '#skills' },
     { name: 'Projects', href: '#projects' },
+    { name: 'Blog', href: '/blog', isRoute: true },
     { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
     { name: 'Hire Me', href: 'mailto', isHireMe: true }
   ];
@@ -33,9 +34,14 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const scrollToSection = (id: string, isExternal?: boolean) => {
+  const scrollToSection = (id: string, isExternal?: boolean, isRoute?: boolean) => {
     if (isExternal) {
       window.open(id, '_blank');
+      setMobileMenuOpen(false);
+      return;
+    }
+    if (isRoute) {
+      window.location.href = id;
       setMobileMenuOpen(false);
       return;
     }
@@ -84,8 +90,10 @@ const Navbar = () => {
                   e.preventDefault();
                   if ((item as any).isHireMe) {
                     handleHireMe();
-                  } else if (!item.external) {
+                  } else if (!item.external && !(item as any).isRoute) {
                     scrollToSection(item.href);
+                  } else if ((item as any).isRoute) {
+                    scrollToSection(item.href, false, true);
                   } else {
                     window.open(item.href, '_blank');
                   }
@@ -150,8 +158,10 @@ const Navbar = () => {
                     e.preventDefault();
                     if ((item as any).isHireMe) {
                       handleHireMe();
-                    } else if (!item.external) {
+                    } else if (!item.external && !(item as any).isRoute) {
                       scrollToSection(item.href);
+                    } else if ((item as any).isRoute) {
+                      scrollToSection(item.href, false, true);
                     } else {
                       window.open(item.href, '_blank');
                     }
