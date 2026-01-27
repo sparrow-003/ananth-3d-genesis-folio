@@ -119,14 +119,14 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
       >
         <div className="flex items-center justify-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-          <span className="text-emerald-400 font-black uppercase tracking-[0.3em] text-xs">The Digital Frontier</span>
+          <span className="text-emerald-400 font-black uppercase tracking-[0.3em] text-xs">The Digital Frame</span>
           <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
         </div>
         <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 text-gradient tracking-tighter uppercase italic">
-          3D Genesis Blog
+          Blog
         </h1>
         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-medium">
-          Architecting the future through 3D visualization, immersive web experiences, and algorithmic art.
+          Our blog is a place where we share our thoughts and ideas on a variety of topics.
         </p>
       </motion.div>
 
@@ -170,7 +170,7 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
           {/* Sort */}
           <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
             <SelectTrigger className="w-full md:w-48 bg-dark/50 border-emerald-500/20 text-light hover:border-emerald-500/40 transition-all">
-              <SelectValue />
+              <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent className="bg-black border-emerald-500/20">
               <SelectItem value="newest">
