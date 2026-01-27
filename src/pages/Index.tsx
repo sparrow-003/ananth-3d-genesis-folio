@@ -1,10 +1,9 @@
-import React, { useEffect, useState, lazy, Suspense, memo } from "react";
+import { useEffect, useState, lazy, Suspense, memo, useCallback } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import usePerformanceMetrics from "../hooks/usePerformanceMetrics";
 
-// Lazy load heavy components
+// Lazy load heavy components with prefetch
 const ParticleBackground = lazy(() => import("../components/ParticleBackground"));
 const Hero = lazy(() => import("../components/Hero"));
 const About = lazy(() => import("../components/About"));
@@ -12,54 +11,86 @@ const Skills = lazy(() => import("../components/Skills"));
 const Projects = lazy(() => import("../components/Projects"));
 const Contact = lazy(() => import("../components/Contact"));
 
-// Simple loading placeholder
+// Minimal loading placeholder
 const SectionLoader = memo(() => (
-  <div className="min-h-[50vh] flex items-center justify-center">
-    <div className="w-8 h-8 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+  <div className="min-h-[40vh] flex items-center justify-center">
+    <div className="w-6 h-6 border-2 border-emerald-500/50 border-t-emerald-500 rounded-full animate-spin" />
   </div>
 ));
 
 SectionLoader.displayName = 'SectionLoader';
 
+// Quick loading screen - minimal delay
+const LoadingScreen = memo(() => (
+  <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
+    <div className="relative z-10 flex flex-col items-center gap-4">
+      <div className="relative w-12 h-12">
+        <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
+        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+      </div>
+      <p className="text-emerald-400 text-sm font-medium tracking-wider">ANANTH DEV</p>
+    </div>
+  </div>
+));
+
+LoadingScreen.displayName = 'LoadingScreen';
+
 const Index = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
-  
-  // Log performance metrics to console
-  usePerformanceMetrics();
+  const [isReady, setIsReady] = useState(false);
 
+  // Fast initial load
   useEffect(() => {
-    
-    // Faster loading - 800ms instead of 1500ms
-    const timer = setTimeout(() => {
+    // Check if document is already loaded
+    if (document.readyState === 'complete') {
       setIsLoading(false);
-    }, 800);
+      requestAnimationFrame(() => setIsReady(true));
+      return;
+    }
+
+    // Quick timeout for fast loading
+    const quickTimer = setTimeout(() => {
+      setIsLoading(false);
+      requestAnimationFrame(() => setIsReady(true));
+    }, 400);
+
+    // Also listen for window load
+    const handleLoad = () => {
+      clearTimeout(quickTimer);
+      setIsLoading(false);
+      requestAnimationFrame(() => setIsReady(true));
+    };
+
+    window.addEventListener('load', handleLoad);
     
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(quickTimer);
+      window.removeEventListener('load', handleLoad);
+    };
   }, []);
 
+  // Prefetch components after initial render
+  useEffect(() => {
+    if (isReady) {
+      // Preload other sections in the background
+      const prefetchTimeout = setTimeout(() => {
+        import("../components/About");
+        import("../components/Skills");
+        import("../components/Projects");
+        import("../components/Contact");
+      }, 100);
+      
+      return () => clearTimeout(prefetchTimeout);
+    }
+  }, [isReady]);
+
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/10" />
-        
-        <div className="relative z-10 flex flex-col items-center gap-6">
-          {/* Simple spinner */}
-          <div className="relative w-16 h-16">
-            <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-            <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
-          </div>
-          
-          <div className="text-center space-y-2">
-            <p className="text-emerald-400/50 text-sm tracking-widest uppercase">Loading</p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-gradient">ANANTH DEV</h1>
-          </div>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (
-    <div className="w-full min-h-screen">
+    <div className="w-full min-h-screen relative overflow-x-hidden">
+      {/* Background - render immediately but with low priority */}
       <Suspense fallback={null}>
         <ParticleBackground />
       </Suspense>
