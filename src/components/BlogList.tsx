@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Search, Filter, Calendar, Tag } from 'lucide-react'
-import { BlogPost, blogAPI } from '@/lib/supabase'
+import { Search, Filter, Calendar, Tag, Sparkles } from 'lucide-react'
+import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import BlogCard from './BlogCard'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -15,12 +15,12 @@ import {
 } from '@/components/ui/select'
 
 interface BlogListProps {
-  onPostSelect: (post: BlogPost) => void
+  onPostSelect: (post: BlogPostType) => void
 }
 
 const BlogList = ({ onPostSelect }: BlogListProps) => {
-  const [posts, setPosts] = useState<BlogPost[]>([])
-  const [filteredPosts, setFilteredPosts] = useState<BlogPost[]>([])
+  const [posts, setPosts] = useState<BlogPostType[]>([])
+  const [filteredPosts, setFilteredPosts] = useState<BlogPostType[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState<string>('')
@@ -100,7 +100,10 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple"></div>
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+        </div>
       </div>
     )
   }
@@ -112,13 +115,18 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-12"
+        className="text-center mb-16"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-light mb-4">
-          My Blog
+        <div className="flex items-center justify-center gap-2 mb-4">
+          <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+          <span className="text-emerald-400 font-black uppercase tracking-[0.3em] text-xs">The Digital Frontier</span>
+          <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+        </div>
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 text-gradient tracking-tighter uppercase italic">
+          3D Genesis Blog
         </h1>
-        <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-          Thoughts, tutorials, and insights about web development, technology, and more.
+        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-medium">
+          Architecting the future through 3D visualization, immersive web experiences, and algorithmic art.
         </p>
       </motion.div>
 
@@ -137,21 +145,21 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-dark/50 border-purple/20 text-light placeholder:text-gray-400"
+              className="pl-10 bg-dark/50 border-emerald-500/20 text-light placeholder:text-gray-500 focus:border-emerald-500/50 transition-all"
             />
           </div>
 
           {/* Tag Filter */}
           <Select value={selectedTag || "all"} onValueChange={(value) => setSelectedTag(value === "all" ? "" : value)}>
-            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-purple/20 text-light">
+            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-emerald-500/20 text-light hover:border-emerald-500/40 transition-all">
               <SelectValue placeholder="Filter by tag" />
             </SelectTrigger>
-            <SelectContent className="bg-dark border-purple/20 z-50">
+            <SelectContent className="bg-black border-emerald-500/20 z-50">
               <SelectItem value="all">All tags</SelectItem>
               {getAllTags().map(tag => (
                 <SelectItem key={tag} value={tag}>
                   <div className="flex items-center gap-2">
-                    <Tag className="w-3 h-3" />
+                    <Tag className="w-3 h-3 text-emerald-400" />
                     {tag}
                   </div>
                 </SelectItem>
@@ -161,10 +169,10 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
 
           {/* Sort */}
           <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-purple/20 text-light">
+            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-emerald-500/20 text-light hover:border-emerald-500/40 transition-all">
               <SelectValue />
             </SelectTrigger>
-            <SelectContent className="bg-dark border-purple/20">
+            <SelectContent className="bg-black border-emerald-500/20">
               <SelectItem value="newest">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-3 h-3" />
@@ -191,7 +199,7 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="border-purple/20 text-gray-400 hover:text-purple hover:border-purple"
+              className="border-emerald-500/20 text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50"
             >
               Clear filters
             </Button>
@@ -202,12 +210,12 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
         {(searchTerm || selectedTag) && (
           <div className="flex flex-wrap gap-2">
             {searchTerm && (
-              <Badge variant="secondary" className="bg-purple/20 text-purple">
+              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 Search: "{searchTerm}"
               </Badge>
             )}
             {selectedTag && (
-              <Badge variant="secondary" className="bg-purple/20 text-purple">
+              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                 <Tag className="w-3 h-3 mr-1" />
                 {selectedTag}
               </Badge>
@@ -224,8 +232,8 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
           className="text-center py-12"
         >
           <p className="text-gray-400 text-lg">
-            {posts.length === 0 
-              ? "No blog posts yet. Check back soon!" 
+            {posts.length === 0
+              ? "No blog posts yet. Check back soon!"
               : "No posts match your filters. Try adjusting your search criteria."
             }
           </p>

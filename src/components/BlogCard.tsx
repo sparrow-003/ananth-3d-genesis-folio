@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Heart, Eye, Share2, Calendar, Tag } from 'lucide-react'
-import { BlogPost, blogAPI } from '@/lib/supabase'
+import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import { getUserIP } from '@/lib/auth'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
 interface BlogCardProps {
-  post: BlogPost
+  post: BlogPostType
   onClick: () => void
 }
 
@@ -58,7 +58,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
       text: post.excerpt,
       url: `${window.location.origin}/blog/${post.slug}`
     }
-    
+
     try {
       if (navigator.share) {
         await navigator.share(shareData)
@@ -93,16 +93,16 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
       whileHover={{ y: -5 }}
       transition={{ duration: 0.3 }}
     >
-      <Card 
-        className="h-full cursor-pointer bg-dark/50 border-purple/20 hover:border-purple/40 transition-all duration-300 backdrop-blur-sm"
+      <Card
+        className="h-full cursor-pointer bg-dark/50 border-emerald-500/10 hover:border-emerald-500/40 transition-all duration-500 backdrop-blur-sm group/card overflow-hidden"
         onClick={onClick}
       >
         {post.featured_image && (
-          <div className="aspect-video overflow-hidden rounded-t-lg">
-            <img 
-              src={post.featured_image} 
+          <div className="aspect-video overflow-hidden">
+            <img
+              src={post.featured_image}
               alt={post.title}
-              className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
@@ -111,32 +111,31 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
             />
           </div>
         )}
-        
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-2 text-sm text-gray-400 mb-2">
-            <Calendar className="w-4 h-4" />
+
+        <CardHeader className="pb-3 px-6 pt-6">
+          <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium mb-3 uppercase tracking-wider">
+            <Calendar className="w-3 h-3" />
             <span>{formatDate(post.created_at)}</span>
           </div>
-          
-          <h3 className="text-xl font-bold text-light line-clamp-2 hover:text-purple transition-colors">
+
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight group-hover/card:text-emerald-400 transition-colors duration-300">
             {post.title}
           </h3>
-          
-          <p className="text-gray-300 line-clamp-3 text-sm leading-relaxed">
+
+          <p className="text-gray-400 line-clamp-2 text-sm leading-relaxed mb-4">
             {post.excerpt}
           </p>
         </CardHeader>
 
-        <CardContent className="pt-0">
+        <CardContent className="px-6 pb-6 pt-0">
           {post.tags && post.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2 mb-6">
               {post.tags.slice(0, 3).map((tag, index) => (
-                <Badge 
-                  key={index} 
-                  variant="secondary" 
-                  className="bg-purple/20 text-purple border-purple/30 text-xs"
+                <Badge
+                  key={index}
+                  variant="secondary"
+                  className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] py-0 px-2 uppercase tracking-tight"
                 >
-                  <Tag className="w-3 h-3 mr-1" />
                   {tag}
                 </Badge>
               ))}
@@ -154,13 +153,12 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
                 <Eye className="w-4 h-4" />
                 <span>{post.views_count}</span>
               </div>
-              
+
               <Button
                 variant="ghost"
                 size="sm"
-                className={`flex items-center gap-1 p-0 h-auto hover:bg-transparent ${
-                  liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
-                }`}
+                className={`flex items-center gap-1 p-0 h-auto hover:bg-transparent ${liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                  }`}
                 onClick={handleLike}
                 disabled={loading}
               >
@@ -172,7 +170,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-400 hover:text-purple p-0 h-auto hover:bg-transparent"
+              className="text-gray-400 hover:text-emerald-400 p-0 h-auto hover:bg-transparent"
               onClick={handleShare}
             >
               <Share2 className="w-4 h-4" />

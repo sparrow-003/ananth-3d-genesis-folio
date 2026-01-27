@@ -11,7 +11,7 @@ const projectsData = [
     technologies: ["React", "TypeScript", "Node.js", "MongoDB", "Socket.io", "AI/ML"],
     features: [
       "AI-powered developer matching algorithm",
-      "Real-time collaborative coding environment", 
+      "Real-time collaborative coding environment",
       "Project discovery and team formation",
       "Integrated chat and video calls",
       "Code review and sharing system"
@@ -19,7 +19,7 @@ const projectsData = [
     category: "Full-Stack Development",
     type: "coding",
     icon: <Code2 className="w-8 h-8" />,
-    gradient: "from-blue-500 via-purple-500 to-cyan-500",
+    gradient: "from-emerald-500 via-teal-500 to-cyan-500",
     bgPattern: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]",
     liveUrl: "https://dev-matchs.vercel.app",
     githubUrl: "https://github.com/sparrow-003/debug-your-heart.git"
@@ -61,7 +61,7 @@ const projectsData = [
     category: "AI/ML Development",
     type: "coding",
     icon: <Bot className="w-8 h-8" />,
-    gradient: "from-violet-500 via-purple-500 to-fuchsia-500",
+    gradient: "from-teal-500 via-emerald-500 to-cyan-500",
     bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
     liveUrl: "https://v0-smart-document-summarizer.vercel.app",
     githubUrl: "https://github.com/sparrow-003/DOC-.git"
@@ -71,18 +71,17 @@ const projectsData = [
 const ProjectCard = ({ project, isActive, onClick }: any) => {
   return (
     <motion.div
-      className={`relative cursor-pointer group transition-all duration-500 ${
-        isActive ? 'scale-105' : 'scale-100 hover:scale-105'
-      }`}
+      className={`relative cursor-pointer group transition-all duration-500 ${isActive ? 'scale-105' : 'scale-100 hover:scale-105'
+        }`}
       onClick={onClick}
       whileHover={{ y: -8, scale: 1.02 }}
       whileTap={{ scale: 0.96 }}
     >
       <div className={`
         relative overflow-hidden rounded-3xl border backdrop-blur-xl
-        ${isActive 
-          ? `bg-gradient-to-br ${project.gradient} p-1 border-white/30 shadow-2xl shadow-purple/50` 
-          : 'bg-gradient-to-br from-purple/10 to-blue/10 border-purple/30 hover:from-purple/20 hover:to-blue/20 hover:border-purple/50'
+        ${isActive
+          ? `bg-gradient-to-br ${project.gradient} p-1 border-white/30 shadow-2xl shadow-emerald-500/50`
+          : 'bg-black/40 border-emerald-500/10 hover:border-emerald-500/40'
         }
         transition-all duration-700
       `}>
@@ -91,12 +90,12 @@ const ProjectCard = ({ project, isActive, onClick }: any) => {
           <div className="absolute top-4 right-4">
             <span className={`
               px-3 py-1 rounded-full text-xs font-medium
-              ${project.type === 'coding' 
-                ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30' 
-                : 'bg-green-500/20 text-green-300 border border-green-500/30'
+              ${project.type === 'coding'
+                ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                : 'bg-teal-500/20 text-teal-300 border border-teal-500/30'
               }
             `}>
-              {project.type === 'coding' ? 'Coding Project' : 'Physical Teaching'}
+              {project.type === 'coding' ? 'Genesis Engine' : 'Knowledge Node'}
             </span>
           </div>
 
@@ -141,7 +140,7 @@ const ProjectCard = ({ project, isActive, onClick }: any) => {
           `} />
           <div className={`
             absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-all duration-700
-            bg-gradient-to-t from-purple/20 via-transparent to-transparent
+            bg-gradient-to-t from-emerald-500/20 via-transparent to-transparent
           `} />
         </div>
       </div>
@@ -167,7 +166,7 @@ const ProjectDetails = ({ project }: any) => {
         <div className="relative bg-black/90 rounded-3xl backdrop-blur-xl">
           {/* Background pattern */}
           <div className={`absolute inset-0 ${project.bgPattern} ${project.gradient} opacity-10 rounded-3xl`} />
-          
+
           <div className="relative grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
             {/* Left side - Visual */}
             <div className="relative p-8 lg:p-12 flex flex-col justify-center">
@@ -177,7 +176,7 @@ const ProjectDetails = ({ project }: any) => {
               `}>
                 {project.icon}
               </div>
-              
+
               <h2 className="text-4xl lg:text-5xl font-bold text-white mb-3">
                 {project.title}
               </h2>
@@ -203,7 +202,7 @@ const ProjectDetails = ({ project }: any) => {
                   <Play className="w-5 h-5" />
                   {project.type === 'coding' ? 'Live Demo' : 'Learn More'}
                 </motion.a>
-                
+
                 {project.type === 'coding' && (
                   <motion.a
                     href={project.githubUrl}
@@ -223,8 +222,8 @@ const ProjectDetails = ({ project }: any) => {
               {/* Technologies */}
               <div className="mb-8">
                 <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-400 to-purple-400" />
-                  Technologies Used
+                  <div className="w-2 h-2 rounded-full bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  Tech Stack Integration
                 </h3>
                 <div className="grid grid-cols-2 gap-2">
                   {project.technologies.map((tech: string, i: number) => (
@@ -281,66 +280,66 @@ const Projects = () => {
 
   return (
     <section id="projects" ref={ref} className="section-container relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-purple-950/20 to-black -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black -z-10" />
       <div className="projects-section">
         {/* Enhanced background elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-float-delay" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-radial from-cyan-500/5 via-transparent to-transparent rounded-full animate-pulse" />
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-float" />
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float-delay" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-radial from-emerald-500/5 via-transparent to-transparent rounded-full animate-pulse" />
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PGNpcmNsZSBjeD0iNyIgY3k9IjciIHI9IjEiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
         </div>
 
         <div className="relative z-10">
-        {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
-        >
+          {/* Header */}
           <motion.div
-            className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-white/10 mb-6"
-            whileHover={{ scale: 1.05 }}
+            className="text-center mb-16"
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8 }}
           >
-            <Code2 className="w-5 h-5 text-blue-400" />
-            <span className="text-white font-medium">Featured Projects</span>
+            <motion.div
+              className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
+              whileHover={{ scale: 1.05 }}
+            >
+              <Code2 className="w-5 h-5 text-emerald-400" />
+              <span className="text-emerald-400 font-bold uppercase tracking-widest text-xs">Featured Work</span>
+            </motion.div>
+
+            <h2 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-6">
+              My Portfolio
+            </h2>
+            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+              Showcasing my journey in development, education, and innovation. Each project represents
+              a unique challenge solved through creativity and technical expertise.
+            </p>
           </motion.div>
-          
-          <h2 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-6">
-            My Portfolio
-          </h2>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Showcasing my journey in development, education, and innovation. Each project represents 
-            a unique challenge solved through creativity and technical expertise.
-          </p>
-        </motion.div>
 
-        {/* Project navigation */}
-        <motion.div
-          className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          {projectsData.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              isActive={activeProject.id === project.id}
-              onClick={() => setActiveProject(project)}
-            />
-          ))}
-        </motion.div>
+          {/* Project navigation */}
+          <motion.div
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            {projectsData.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                isActive={activeProject.id === project.id}
+                onClick={() => setActiveProject(project)}
+              />
+            ))}
+          </motion.div>
 
-        {/* Active project details */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <ProjectDetails project={activeProject} />
-        </motion.div>
+          {/* Active project details */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            <ProjectDetails project={activeProject} />
+          </motion.div>
         </div>
       </div>
     </section>

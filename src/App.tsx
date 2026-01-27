@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, memo } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
+import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -17,7 +18,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
-      gcTime: 1000 * 60 * 30, // 30 minutes (formerly cacheTime)
+      gcTime: 1000 * 60 * 30, // 30 minutes
       retry: 2,
       refetchOnWindowFocus: false,
     },
@@ -25,10 +26,15 @@ const queryClient = new QueryClient({
 });
 
 const LoadingSpinner = memo(() => (
-  <div className="flex items-center justify-center min-h-screen bg-black">
+  <div className="flex items-center justify-center min-h-screen bg-black relative overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
     <div className="relative">
-      <div className="w-12 h-12 rounded-full border-2 border-emerald-500/30" />
-      <div className="absolute inset-0 w-12 h-12 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+      <div className="w-16 h-16 rounded-full border-2 border-emerald-500/10" />
+      <div className="absolute inset-0 w-16 h-16 rounded-full border-t-2 border-emerald-500 animate-spin" />
+      <div className="absolute inset-2 w-12 h-12 rounded-full border-b-2 border-teal-500/50 animate-reverse-spin" />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
+      </div>
     </div>
   </div>
 ));
@@ -39,18 +45,18 @@ const App = memo(() => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <div className="w-full min-h-screen bg-black text-white overflow-x-hidden">
+        <div className="w-full min-h-screen bg-black text-white selection:bg-emerald-500/30 selection:text-emerald-200">
           <Toaster />
-          <Sonner />
+          <Sonner position="top-center" richColors theme="dark" closeButton />
           <BrowserRouter>
+            <ScrollToTop />
             <ErrorBoundary>
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<Blog />} />
-                  <Route path="/admin-secret-panel-alex2004" element={<AdminPanel />} />
-                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>

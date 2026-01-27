@@ -22,7 +22,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
 
     try {
       const success = adminAuth.login(credentials.id, credentials.password)
-      
+
       if (success) {
         toast.success('Welcome back, Admin!')
         onLogin()
@@ -37,63 +37,68 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-dark via-dark/95 to-purple/10">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-black relative overflow-hidden">
+      <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.05),transparent_50%)] -z-10" />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="w-full max-w-md relative"
       >
-        <Card className="bg-dark/80 border-purple/20 backdrop-blur-sm">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-purple/20 rounded-full flex items-center justify-center mb-4">
-              <Lock className="w-6 h-6 text-purple" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 rounded-2xl blur opacity-25" />
+
+        <Card className="bg-black/40 border-emerald-500/10 backdrop-blur-xl relative overflow-hidden shadow-2xl">
+          <CardHeader className="text-center pb-2 pt-8">
+            <div className="mx-auto w-16 h-16 bg-emerald-500/10 rounded-2xl flex items-center justify-center mb-6 border border-emerald-500/20 shadow-inner">
+              <Lock className="w-8 h-8 text-emerald-400" />
             </div>
-            <CardTitle className="text-2xl font-bold text-light">
-              Admin Login
+            <CardTitle className="text-3xl font-black text-white tracking-tighter mb-2">
+              Genesis Control
             </CardTitle>
-            <p className="text-gray-400">
-              Enter your credentials to access the admin panel
+            <p className="text-emerald-400/60 font-medium text-sm px-6 leading-relaxed">
+              Authenticate to manage your 3D Genesis Blog environment.
             </p>
           </CardHeader>
 
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="px-8 pb-10 mt-4">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-light">
-                  Admin ID
+                <label className="text-xs font-black text-emerald-400/40 uppercase tracking-[0.2em] ml-1">
+                  Access Identity
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <div className="relative group">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400/40 w-4 h-4 group-focus-within:text-emerald-400 transition-colors" />
                   <Input
                     type="text"
-                    placeholder="Enter admin ID"
+                    placeholder="Admin identifier"
                     value={credentials.id}
                     onChange={(e) => setCredentials(prev => ({ ...prev, id: e.target.value }))}
-                    className="pl-10 bg-dark/50 border-purple/20 text-light placeholder:text-gray-400"
+                    className="pl-10 bg-black/50 border-emerald-500/10 text-white placeholder:text-gray-600 h-12 focus:border-emerald-500/40 transition-all rounded-xl"
                     required
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-light">
-                  Password
+                <label className="text-xs font-black text-emerald-400/40 uppercase tracking-[0.2em] ml-1">
+                  Security Phrase
                 </label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <div className="relative group">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400/40 w-4 h-4 group-focus-within:text-emerald-400 transition-colors" />
                   <Input
                     type={showPassword ? 'text' : 'password'}
-                    placeholder="Enter password"
+                    placeholder="Enter passphrase"
                     value={credentials.password}
                     onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
-                    className="pl-10 pr-10 bg-dark/50 border-purple/20 text-light placeholder:text-gray-400"
+                    className="pl-10 pr-10 bg-black/50 border-emerald-500/10 text-white placeholder:text-gray-600 h-12 focus:border-emerald-500/40 transition-all rounded-xl"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-light"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-emerald-400/40 hover:text-emerald-400 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
@@ -102,16 +107,16 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
 
               <Button
                 type="submit"
-                className="w-full bg-purple hover:bg-purple/80 text-white"
+                className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 disabled={loading}
               >
-                {loading ? 'Signing in...' : 'Sign In'}
+                {loading ? 'Decrypting...' : 'Initiate Session'}
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
-                This is a secure admin area. Unauthorized access is prohibited.
+            <div className="mt-8 text-center border-t border-emerald-500/5 pt-6">
+              <p className="text-[10px] text-emerald-400/20 font-black uppercase tracking-tighter">
+                Genesis Protocol v2.0 &bull; Secure Node-X1
               </p>
             </div>
           </CardContent>

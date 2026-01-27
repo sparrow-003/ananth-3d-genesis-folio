@@ -6,11 +6,11 @@ import { Code, BrainCircuit, Database, Globe, Layers, Cpu, PencilRuler, CheckCir
 const Skills = () => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-  
+
   const skillCategories = [
     {
       title: "Vibe Coding Skills",
-      icon: <BrainCircuit className="text-purple-400" size={28} />,
+      icon: <BrainCircuit className="text-emerald-400" size={28} />,
       skills: [
         { name: "Flow State Programming", icon: "https://img.icons8.com/color/48/meditation.png" },
         { name: "Creative Problem Solving", icon: "https://img.icons8.com/color/48/creative-thinking.png" },
@@ -41,7 +41,7 @@ const Skills = () => {
     },
     {
       title: "AI & Machine Learning",
-      icon: <BrainCircuit className="text-purple-400" size={28} />,
+      icon: <BrainCircuit className="text-emerald-400" size={28} />,
       skills: [
         { name: "Prompt Engineering", icon: "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-ai-industry-4-flaticons-flat-flat-icons.png" },
         { name: "LLM", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
@@ -53,7 +53,7 @@ const Skills = () => {
     },
     {
       title: "Databases",
-      icon: <Database className="text-blue-400" size={28} />,
+      icon: <Database className="text-teal-400" size={28} />,
       skills: [
         { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
         { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
@@ -62,7 +62,7 @@ const Skills = () => {
     },
     {
       title: "DevOps & Cloud",
-      icon: <Layers className="text-orange-400" size={28} />,
+      icon: <Layers className="text-emerald-400" size={28} />,
       skills: [
         { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
         { name: "GitHub Actions", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
@@ -79,7 +79,7 @@ const Skills = () => {
     },
     {
       title: "Design & UI/UX",
-      icon: <PencilRuler className="text-indigo-400" size={28} />,
+      icon: <PencilRuler className="text-teal-400" size={28} />,
       skills: [
         { name: "Figma", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
         { name: "UI/UX Research", icon: "https://img.icons8.com/fluency/48/test-lab.png" },
@@ -87,7 +87,7 @@ const Skills = () => {
     },
     {
       title: "Teaching & Leadership",
-      icon: <CheckCircle className="text-violet-400" size={28} />,
+      icon: <CheckCircle className="text-emerald-400" size={28} />,
       skills: [
         { name: "AI/BI Training", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
         { name: "Campus Ambassador", icon: "https://img.icons8.com/color/48/ambassador.png" },
@@ -98,7 +98,7 @@ const Skills = () => {
       ]
     }
   ];
-  
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -108,7 +108,7 @@ const Skills = () => {
       }
     }
   };
-  
+
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0 }
@@ -116,31 +116,31 @@ const Skills = () => {
 
   return (
     <section id="skills" className="py-24 relative overflow-hidden" ref={ref}>
-      <div className="absolute inset-0 bg-gradient-to-br from-fuchsia-950/20 via-black to-violet-950/20 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
       {/* 3D Background Elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-yellow-400/10 to-yellow-600/5 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-br from-green-400/10 to-green-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-violet-400/10 to-violet-600/5 rounded-full blur-2xl"></div>
-        
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-emerald-600/5 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-br from-teal-400/10 to-teal-600/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-cyan-400/10 to-cyan-600/5 rounded-full blur-2xl"></div>
+
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#8882_1px,transparent_1px),linear-gradient(to_bottom,#8882_1px,transparent_1px)] bg-[size:44px_44px]"></div>
-        
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-violet-400/10 rounded-full animate-pulse-slow opacity-20"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-green-400/10 rounded-full animate-reverse-pulse opacity-20"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10B98111_1px,transparent_1px),linear-gradient(to_bottom,#10B98111_1px,transparent_1px)] bg-[size:44px_44px]"></div>
+
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-emerald-400/10 rounded-full animate-pulse-slow opacity-20"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-teal-400/10 rounded-full animate-reverse-pulse opacity-20"></div>
       </div>
-      
+
       <div className="section-container relative z-10">
-        <motion.h2 
-          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-violet-400 via-purple-500 to-yellow-400"
+        <motion.h2
+          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-400"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}
         >
           Technical Expertise
         </motion.h2>
-        
-        <motion.p 
+
+        <motion.p
           className="section-subtitle"
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : { opacity: 0 }}
@@ -148,20 +148,20 @@ const Skills = () => {
         >
           A comprehensive toolbox of cutting-edge technologies I've mastered through continuous learning
         </motion.p>
-        
-        <motion.div 
+
+        <motion.div
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-6"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "show" : "hidden"}
         >
           {skillCategories.map((category, categoryIndex) => (
-            <motion.div 
+            <motion.div
               key={category.title}
               className="bg-dark/40 backdrop-blur-sm p-6 border border-white/10 hover:border-white/20 transition-all h-full rounded-xl"
               variants={itemVariants}
               transition={{ duration: 0.5, delay: 0.3 + (categoryIndex * 0.1) }}
-              whileHover={{ 
+              whileHover={{
                 y: -5,
                 borderColor: "rgba(255, 255, 255, 0.25)"
               }}
@@ -172,28 +172,28 @@ const Skills = () => {
                 </div>
                 <h3 className="text-xl font-bold text-white">{category.title}</h3>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-3 lg:gap-4">
                 {category.skills.map((skill, index) => (
-                  <motion.div 
+                  <motion.div
                     key={skill.name}
                     className="flex flex-col items-center justify-center"
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ delay: 0.5 + (0.05 * index) }}
                   >
-                    <motion.div 
+                    <motion.div
                       className="w-12 h-12 lg:w-16 lg:h-16 bg-dark/60 rounded-lg flex items-center justify-center mb-2 group hover:bg-white/5 transition-all border border-white/10 hover:border-white/20"
-                      whileHover={{ 
-                        scale: 1.05, 
+                      whileHover={{
+                        scale: 1.05,
                         rotate: 2
                       }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      <img 
-                        src={skill.icon} 
-                        alt={skill.name} 
-                        className="w-6 h-6 lg:w-8 lg:h-8 object-contain filter saturate-0 opacity-80 group-hover:saturate-100 group-hover:opacity-100 transition-all" 
+                      <img
+                        src={skill.icon}
+                        alt={skill.name}
+                        className="w-6 h-6 lg:w-8 lg:h-8 object-contain filter saturate-0 opacity-80 group-hover:saturate-100 group-hover:opacity-100 transition-all"
                       />
                     </motion.div>
                     <span className="text-center text-xs lg:text-sm text-gray-300 group-hover:text-white">{skill.name}</span>
@@ -203,16 +203,16 @@ const Skills = () => {
             </motion.div>
           ))}
         </motion.div>
-        
-        <motion.div 
-          className="mt-16 bg-dark/40 backdrop-blur-sm rounded-xl p-8 text-center relative overflow-hidden border border-white/10"
+
+        <motion.div
+          className="mt-16 bg-black/40 backdrop-blur-md rounded-2xl p-8 text-center relative overflow-hidden border border-emerald-500/10 shadow-2xl"
           initial={{ opacity: 0, y: 30 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
           transition={{ duration: 0.5, delay: 0.8 }}
         >
           {/* Background gradient */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white/5 via-transparent to-white/5 z-0"></div>
-          
+          <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5 z-0"></div>
+
           <div className="relative z-10">
             <h3 className="text-2xl font-bold mb-4 text-white">Always Learning & Growing</h3>
             <p className="text-lg text-gray-300 max-w-3xl mx-auto">
@@ -220,14 +220,14 @@ const Skills = () => {
               hands-on projects, and collaboration with industry experts. I believe in staying ahead of emerging
               technologies and applying them to build innovative solutions that solve real-world problems.
             </p>
-            
-            <motion.div 
+
+            <motion.div
               className="mt-8 flex flex-wrap justify-center gap-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
             >
-              <motion.div 
+              <motion.div
                 className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
                 whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
@@ -236,8 +236,8 @@ const Skills = () => {
                 </svg>
                 <span>Quick Learner</span>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
                 whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
@@ -250,8 +250,8 @@ const Skills = () => {
                 </svg>
                 <span>Problem Solver</span>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
                 whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >
@@ -267,8 +267,8 @@ const Skills = () => {
                 </svg>
                 <span>Innovative Thinker</span>
               </motion.div>
-              
-              <motion.div 
+
+              <motion.div
                 className="flex items-center gap-2 px-4 py-2 bg-dark/60 rounded-full border border-white/10"
                 whileHover={{ scale: 1.05, backgroundColor: "rgba(255, 255, 255, 0.05)" }}
               >

@@ -1,16 +1,17 @@
-
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -41,7 +42,7 @@ const Navbar = () => {
       return;
     }
     if (isRoute) {
-      window.location.href = id;
+      navigate(id);
       setMobileMenuOpen(false);
       return;
     }
@@ -57,17 +58,16 @@ const Navbar = () => {
       <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ 
+        transition={{
           duration: 0.8,
           type: "spring",
           stiffness: 100,
           damping: 15
         }}
-        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${
-          isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-purple/10' : 'py-4 bg-black/20 backdrop-blur-sm'
-        }`}
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-emerald-500/10' : 'py-4 bg-black/20 backdrop-blur-sm'
+          }`}
         style={{
-          borderBottom: isScrolled ? '1px solid rgba(155, 135, 245, 0.1)' : '1px solid transparent',
+          borderBottom: isScrolled ? '1px solid rgba(16, 185, 129, 0.1)' : '1px solid transparent',
         }}
       >
         <div className="max-w-7xl mx-auto flex justify-center items-center">
@@ -77,14 +77,14 @@ const Navbar = () => {
               <motion.a
                 key={item.name}
                 href={item.href}
-                className="text-sm lg:text-base text-light opacity-80 hover:opacity-100 hover:text-purple transition-all"
+                className="text-sm lg:text-base text-light opacity-80 hover:opacity-100 hover:text-emerald-400 font-medium transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
-                animate={{ 
-                  opacity: 1, 
+                animate={{
+                  opacity: 1,
                   y: 0,
-                  transition: { delay: 0.1 * index, duration: 0.5 } 
+                  transition: { delay: 0.1 * index, duration: 0.5 }
                 }}
                 onClick={(e) => {
                   e.preventDefault();
@@ -178,25 +178,25 @@ const Navbar = () => {
       </AnimatePresence>
 
       {/* Scroll Indicator - Small arrow bouncing at bottom of viewport */}
-      <motion.div 
+      <motion.div
         className="hidden md:flex fixed bottom-8 left-1/2 -translate-x-1/2 z-30"
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: [0, 10, 0] }}
-        transition={{ 
+        transition={{
           delay: 2,
           duration: 1.5,
           repeat: Infinity,
           repeatType: "loop"
         }}
       >
-        <svg 
-          width="30" 
-          height="30" 
-          viewBox="0 0 24 24" 
-          fill="none" 
-          stroke="currentColor" 
-          strokeWidth="2" 
-          className="text-purple"
+        <svg
+          width="30"
+          height="30"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          className="text-emerald-500/50"
         >
           <path d="M7 13l5 5 5-5M7 7l5 5 5-5" />
         </svg>

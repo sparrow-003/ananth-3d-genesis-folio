@@ -40,7 +40,7 @@ const About = () => {
       className="min-h-screen py-20 relative w-full"
       ref={ref}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black" />
+      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/10 to-black" />
 
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
         {/* Title with Avatar */}
@@ -54,7 +54,7 @@ const About = () => {
           >
             <AnimatedAvatar variant="about" className="w-48 h-48 md:w-64 md:h-64 lg:w-80 lg:h-80" />
           </motion.div>
-          
+
           {/* Title content */}
           <motion.div
             className="text-center lg:text-left flex-1"
@@ -62,7 +62,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <h2 className="text-5xl font-extrabold tracking-tight text-foreground mb-6 drop-shadow-md">
+            <h2 className="text-5xl font-extrabold tracking-tighter text-white mb-6 drop-shadow-md uppercase italic">
               About Me
             </h2>
             <motion.p
@@ -83,7 +83,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition-shadow duration-500">
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 shadow-2xl hover:border-emerald-500/30 transition-all duration-500 group">
               <h3 className="text-3xl font-semibold text-foreground mb-6">
                 My Journey
               </h3>
@@ -108,37 +108,37 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition-shadow duration-500">
+            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 shadow-2xl hover:border-emerald-500/30 transition-all duration-500 group">
               <h3 className="text-3xl font-semibold text-foreground mb-6">
                 What I Do
               </h3>
               <div className="space-y-5">
                 {[
-                 {
-"title": "Mastery in Full Stack Development",
-"desc": "Spearheading the end-to-end creation of high-performance, scalable web applications, leveraging a comprehensive stack that includes React, TypeScript, Python, and Node.js to deliver exceptional digital experiences."
-},
-{
-"title": "Cutting-Edge AI Integration & Prompt Engineering",
-"desc": "Architecting intelligent, scalable workflows by expertly integrating AI solutions and pioneering innovative prompt engineering techniques to maximize model performance and utility."
-},
-{
-"title": "Expertise in Large Language Model (LLM) Development",
-"desc": "Innovating at the forefront of AI by developing, training, and fine-tuning next-generation language models to create sophisticated, intelligent, and human-like conversational systems."
-},
-{
-"title": "Strategic Leadership & Mentorship",
-"desc": "Inspiring and leading a community of learners, serving as a Campus Ambassador to cultivate professional growth and foster a collaborative, knowledge-driven environment."
-},
+                  {
+                    "title": "Mastery in Full Stack Development",
+                    "desc": "Spearheading the end-to-end creation of high-performance, scalable web applications, leveraging a comprehensive stack that includes React, TypeScript, Python, and Node.js to deliver exceptional digital experiences."
+                  },
+                  {
+                    "title": "Cutting-Edge AI Integration & Prompt Engineering",
+                    "desc": "Architecting intelligent, scalable workflows by expertly integrating AI solutions and pioneering innovative prompt engineering techniques to maximize model performance and utility."
+                  },
+                  {
+                    "title": "Expertise in Large Language Model (LLM) Development",
+                    "desc": "Innovating at the forefront of AI by developing, training, and fine-tuning next-generation language models to create sophisticated, intelligent, and human-like conversational systems."
+                  },
+                  {
+                    "title": "Strategic Leadership & Mentorship",
+                    "desc": "Inspiring and leading a community of learners, serving as a Campus Ambassador to cultivate professional growth and foster a collaborative, knowledge-driven environment."
+                  },
                 ].map((item, index) => (
                   <motion.div
                     key={index}
                     className="flex items-start space-x-4"
                     variants={fadeInUp(0.2 * index)}
                   >
-                    <div className="w-3 h-3 bg-primary rounded-full mt-2 shadow-md"></div>
+                    <div className="w-3 h-3 bg-emerald-500 rounded-full mt-2 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                     <div>
-                      <h4 className="text-lg font-semibold text-foreground">
+                      <h4 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
                         {item.title}
                       </h4>
                       <p className="text-muted-foreground">{item.desc}</p>
@@ -158,7 +158,7 @@ const About = () => {
           animate={isInView ? "visible" : "hidden"}
         >
           <motion.div
-            className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition duration-500"
+            className="bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-emerald-500/10 shadow-xl hover:border-emerald-500/20 transition duration-500"
             variants={scaleIn(0.2)}
           >
             <h3 className="text-2xl font-semibold mb-4">My Vision</h3>
@@ -168,7 +168,7 @@ const About = () => {
           </motion.div>
 
           <motion.div
-            className="bg-card rounded-2xl p-8 border shadow-lg hover:shadow-xl transition duration-500"
+            className="bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-emerald-500/10 shadow-xl hover:border-emerald-500/20 transition duration-500"
             variants={scaleIn(0.4)}
           >
             <h3 className="text-2xl font-semibold mb-4">Beyond Tech</h3>
@@ -193,10 +193,10 @@ const About = () => {
             ].map((stat, i) => (
               <motion.div
                 key={i}
-                className="bg-card rounded-2xl p-8 border text-center shadow-md hover:shadow-lg transition duration-500"
+                className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 text-center shadow-xl hover:border-emerald-500/30 transition duration-500"
                 variants={scaleIn(0.2 * i)}
               >
-                <div className="text-4xl font-bold text-primary mb-3 drop-shadow">
+                <div className="text-4xl font-black text-emerald-400 mb-3 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
                   {stat.number}
                 </div>
                 <div className="text-muted-foreground text-lg">

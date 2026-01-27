@@ -24,8 +24,12 @@ const AdminPanel = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark via-dark/95 to-purple/10">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple"></div>
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+        <div className="relative w-12 h-12">
+          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+        </div>
       </div>
     )
   }
