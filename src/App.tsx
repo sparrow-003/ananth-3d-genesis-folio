@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, memo } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
@@ -62,6 +63,7 @@ const App = memo(() => (
               </Suspense>
             </ErrorBoundary>
           </BrowserRouter>
+          <Analytics />
         </div>
       </TooltipProvider>
     </QueryClientProvider>
