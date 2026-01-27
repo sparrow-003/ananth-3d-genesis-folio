@@ -69,7 +69,7 @@ const About = () => {
               className="text-xl text-muted-foreground max-w-3xl leading-relaxed"
               variants={fadeInUp(0.2)}
             >
-              I'm Anand — a developer, educator, and innovator driven by curiosity
+              I'm Ananth — a developer, educator, and innovator driven by curiosity
               and a desire to make technology more human, accessible, and impactful.
             </motion.p>
           </motion.div>
