@@ -142,12 +142,12 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
           </div>
 
           {/* Tag Filter */}
-          <Select value={selectedTag} onValueChange={setSelectedTag}>
+          <Select value={selectedTag || "all"} onValueChange={(value) => setSelectedTag(value === "all" ? "" : value)}>
             <SelectTrigger className="w-full md:w-48 bg-dark/50 border-purple/20 text-light">
               <SelectValue placeholder="Filter by tag" />
             </SelectTrigger>
-            <SelectContent className="bg-dark border-purple/20">
-              <SelectItem value="">All tags</SelectItem>
+            <SelectContent className="bg-dark border-purple/20 z-50">
+              <SelectItem value="all">All tags</SelectItem>
               {getAllTags().map(tag => (
                 <SelectItem key={tag} value={tag}>
                   <div className="flex items-center gap-2">
