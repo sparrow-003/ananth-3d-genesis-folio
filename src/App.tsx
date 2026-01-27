@@ -8,11 +8,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AdminPanel from "./pages/AdminPanel"; // Eager load AdminPanel to prevent 404s
 
 // Lazy load blog components for better performance
 const Blog = lazy(() => import("./pages/Blog"));
-// Using AdminPanel which handles authentication logic
-const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 
 // Optimized query client with better caching
 const queryClient = new QueryClient({
@@ -57,7 +56,6 @@ const App = memo(() => (
                   <Route path="/" element={<Index />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<Blog />} />
-                  {/* Admin Route - Secured via obscure URL and AdminPanel auth logic */}
                   <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
