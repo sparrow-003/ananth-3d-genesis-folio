@@ -101,8 +101,8 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+          <div className="absolute inset-0 rounded-full border-2 border-zinc-200" />
+          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-orange-600 animate-spin" />
         </div>
       </div>
     )
@@ -118,15 +118,13 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
         className="text-center mb-16"
       >
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
-          <span className="text-emerald-400 font-black uppercase tracking-[0.3em] text-xs">The Digital Frame</span>
-          <Sparkles className="w-5 h-5 text-emerald-400 animate-pulse" />
+          <span className="text-orange-600 font-bold uppercase tracking-[0.3em] text-xs">The Journal</span>
         </div>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 text-gradient tracking-tighter uppercase italic">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-black mb-6 text-zinc-900 tracking-tighter uppercase">
           Blog
         </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed font-medium">
-          Our blog is a place where we share our thoughts and ideas on a variety of topics.
+        <p className="text-xl text-zinc-500 max-w-2xl mx-auto leading-relaxed font-serif">
+          Thoughts, ideas, and updates from the digital frontier.
         </p>
       </motion.div>
 
@@ -140,26 +138,26 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
         <div className="flex flex-col md:flex-row gap-4 items-center">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" />
             <Input
               placeholder="Search posts..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-dark/50 border-emerald-500/20 text-light placeholder:text-gray-500 focus:border-emerald-500/50 transition-all"
+              className="pl-10 bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400 focus:border-orange-500 rounded-none focus:ring-0 transition-all"
             />
           </div>
 
           {/* Tag Filter */}
           <Select value={selectedTag || "all"} onValueChange={(value) => setSelectedTag(value === "all" ? "" : value)}>
-            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-emerald-500/20 text-light hover:border-emerald-500/40 transition-all">
+            <SelectTrigger className="w-full md:w-48 bg-white border-zinc-200 text-zinc-900 hover:border-orange-500 rounded-none transition-all focus:ring-0">
               <SelectValue placeholder="Filter by tag" />
             </SelectTrigger>
-            <SelectContent className="bg-black border-emerald-500/20 z-50">
+            <SelectContent className="bg-white border-zinc-200 z-50 rounded-none">
               <SelectItem value="all">All tags</SelectItem>
               {getAllTags().map(tag => (
                 <SelectItem key={tag} value={tag}>
                   <div className="flex items-center gap-2">
-                    <Tag className="w-3 h-3 text-emerald-400" />
+                    <Tag className="w-3 h-3 text-orange-600" />
                     {tag}
                   </div>
                 </SelectItem>
@@ -169,10 +167,10 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
 
           {/* Sort */}
           <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
-            <SelectTrigger className="w-full md:w-48 bg-dark/50 border-emerald-500/20 text-light hover:border-emerald-500/40 transition-all">
+            <SelectTrigger className="w-full md:w-48 bg-white border-zinc-200 text-zinc-900 hover:border-orange-500 rounded-none transition-all focus:ring-0">
               <SelectValue placeholder="Sort by" />
             </SelectTrigger>
-            <SelectContent className="bg-black border-emerald-500/20">
+            <SelectContent className="bg-white border-zinc-200 rounded-none">
               <SelectItem value="newest">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-3 h-3" />
@@ -199,7 +197,7 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="border-emerald-500/20 text-gray-400 hover:text-emerald-400 hover:border-emerald-500/50"
+              className="border-zinc-200 text-zinc-500 hover:text-orange-600 hover:border-orange-500 rounded-none hover:bg-orange-50"
             >
               Clear filters
             </Button>
@@ -210,13 +208,13 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
         {(searchTerm || selectedTag) && (
           <div className="flex flex-wrap gap-2">
             {searchTerm && (
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <Badge variant="secondary" className="bg-zinc-100 text-zinc-900 border border-zinc-200 rounded-none">
                 Search: "{searchTerm}"
               </Badge>
             )}
             {selectedTag && (
-              <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <Tag className="w-3 h-3 mr-1" />
+              <Badge variant="secondary" className="bg-zinc-100 text-zinc-900 border border-zinc-200 rounded-none">
+                <Tag className="w-3 h-3 mr-1 text-orange-600" />
                 {selectedTag}
               </Badge>
             )}
@@ -231,10 +229,10 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
           animate={{ opacity: 1 }}
           className="text-center py-12"
         >
-          <p className="text-gray-400 text-lg">
+          <p className="text-zinc-400 text-lg font-serif italic">
             {posts.length === 0
               ? "No blog posts yet. Check back soon!"
-              : "No posts match your filters. Try adjusting your search criteria."
+              : "No posts match your filters."
             }
           </p>
         </motion.div>
@@ -243,7 +241,7 @@ const BlogList = ({ onPostSelect }: BlogListProps) => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
           {filteredPosts.map((post, index) => (
             <motion.div

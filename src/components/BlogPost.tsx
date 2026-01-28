@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Heart, Eye, Share2, Calendar, Tag, Clock, Send, MessageSquare, X } from 'lucide-react'
-import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
+import { BlogPost as BlogPostType, BlogComment, blogAPI } from '@/lib/supabase'
 import { getUserIP } from '@/lib/auth'
 import { parseMarkdown } from '@/lib/markdown'
 import { Button } from '@/components/ui/button'
@@ -18,13 +18,6 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
 
-interface Comment {
-  id: string
-  text: string
-  date: string
-  author: string
-}
-
 interface BlogPostProps {
   post: BlogPostType
   onBack: () => void
@@ -36,7 +29,7 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
   const [loading, setLoading] = useState(false)
   
   // Comment states
-  const [comments, setComments] = useState<Comment[]>([])
+  const [comments, setComments] = useState<BlogComment[]>([])
   const [newComment, setNewComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
   
@@ -70,10 +63,12 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
     generateShortUrl()
   }, [post.id, shareUrl])
 
-  const loadComments = () => {
-    const storedComments = localStorage.getItem(`comments_${post.id}`)
-    if (storedComments) {
-      setComments(JSON.parse(storedComments))
+  const loadComments = async () => {
+    try {
+      const data = await blogAPI.getComments(post.id)
+      setComments(data)
+    } catch (error) {
+      console.error('Error loading comments:', error)
     }
   }
 
@@ -132,7 +127,7 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
     }
   }
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!newComment.trim()) return
@@ -146,22 +141,26 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
       return
     }
 
-    const newCommentObj: Comment = {
-      id: Date.now().toString(),
-      text: newComment,
-      date: new Date().toISOString(),
-      author: commentAuthor || 'Anonymous'
-    }
+    try {
+      const createdComment = await blogAPI.createComment(
+        post.id,
+        commentAuthor || 'Anonymous',
+        newComment
+      )
 
-    const updatedComments = [newCommentObj, ...comments]
-    setComments(updatedComments)
-    localStorage.setItem(`comments_${post.id}`, JSON.stringify(updatedComments))
-    
-    // Update user count
-    localStorage.setItem(userCommentsKey, (userCommentCount + 1).toString())
-    
-    setNewComment('')
-    toast.success('Comment posted!')
+      if (createdComment) {
+        setComments([createdComment, ...comments])
+        
+        // Update user count
+        localStorage.setItem(userCommentsKey, (userCommentCount + 1).toString())
+        
+        setNewComment('')
+        toast.success('Comment posted!')
+      }
+    } catch (error) {
+      console.error('Error posting comment:', error)
+      toast.error('Failed to post comment')
+    }
   }
 
   const handleShare = () => {
@@ -197,13 +196,13 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.6, ease: "easeOut" }}
-      className="max-w-4xl mx-auto px-4 py-8 lg:py-12"
+      className="max-w-4xl mx-auto px-4 py-8 lg:py-12 font-sans"
     >
       {/* Back Button */}
       <Button
         variant="ghost"
         onClick={onBack}
-        className="mb-8 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all rounded-full group"
+        className="mb-8 text-zinc-500 hover:text-black hover:bg-zinc-100 transition-all rounded-none group"
       >
         <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
         Back to Blog list
@@ -218,7 +217,7 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
               <Badge
                 key={index}
                 variant="secondary"
-                className="bg-zinc-800 text-zinc-300 border-zinc-700 uppercase tracking-tighter text-[10px]"
+                className="bg-zinc-100 text-zinc-600 border-zinc-200 uppercase tracking-widest text-[10px] rounded-none px-2 py-1 font-bold"
               >
                 {tag}
               </Badge>
@@ -226,35 +225,35 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
           </div>
         )}
 
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 leading-[1.1] tracking-tight">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-zinc-900 mb-6 leading-[1.1] tracking-tight">
           {post.title}
         </h1>
 
-        <p className="text-xl md:text-2xl text-zinc-400 mb-8 leading-relaxed font-medium italic border-l-4 border-indigo-500/50 pl-6">
+        <p className="text-xl md:text-2xl text-zinc-500 mb-8 leading-relaxed font-serif italic border-l-2 border-orange-500 pl-6">
           {post.excerpt}
         </p>
 
-        <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-500 mb-8 pb-8 border-b border-zinc-800">
+        <div className="flex flex-wrap items-center gap-6 text-sm text-zinc-400 mb-8 pb-8 border-b border-zinc-100 uppercase tracking-widest font-medium">
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            <span className="text-zinc-400">{formatDate(post.created_at)}</span>
+            <span>{formatDate(post.created_at)}</span>
           </div>
 
           <div className="flex items-center gap-2">
             <Clock className="w-4 h-4" />
-            <span className="text-zinc-400">{estimateReadingTime(post.content)} min read</span>
+            <span>{estimateReadingTime(post.content)} MIN READ</span>
           </div>
 
           <div className="flex items-center gap-2">
             <Eye className="w-4 h-4" />
-            <span className="text-zinc-400">{post.views_count + 1} views</span>
+            <span>{post.views_count + 1} VIEWS</span>
           </div>
         </div>
       </header>
 
       {/* Featured Image */}
       {post.featured_image && (
-        <div className="aspect-video overflow-hidden rounded-2xl mb-12 shadow-2xl shadow-black/50 border border-zinc-800">
+        <div className="aspect-video overflow-hidden mb-12 shadow-sm border border-zinc-100">
           <img
             src={post.featured_image}
             alt={post.title}
@@ -264,21 +263,21 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
       )}
 
       {/* Content */}
-      <div className="prose prose-invert max-w-none mb-12 prose-headings:text-white prose-p:text-zinc-300 prose-a:text-indigo-400 hover:prose-a:text-indigo-300 prose-strong:text-white">
+      <div className="prose prose-lg prose-zinc max-w-none mb-12 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-orange-600 hover:prose-a:text-orange-700 prose-img:rounded-none">
         <div
-          className="blog-content leading-relaxed text-lg"
+          className="blog-content leading-relaxed"
           dangerouslySetInnerHTML={{ __html: parseMarkdown(post.content) }}
         />
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-10 border-t border-zinc-800">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-10 border-t border-zinc-200">
         <div className="flex items-center gap-4">
           <Button
             variant="outline"
-            className={`flex items-center gap-2 rounded-full px-6 py-6 transition-all ${liked
-              ? 'text-red-500 border-red-500/50 bg-red-500/10'
-              : 'text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800'
+            className={`flex items-center gap-2 rounded-none px-6 py-6 transition-all border-2 ${liked
+              ? 'text-red-600 border-red-600 bg-red-50'
+              : 'text-zinc-500 border-zinc-200 hover:border-zinc-900 hover:text-zinc-900'
               }`}
             onClick={handleLike}
             disabled={loading}
@@ -289,18 +288,18 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
 
           <Button
             variant="outline"
-            className="flex items-center gap-2 text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:bg-zinc-800 rounded-full px-6 py-6 transition-all"
+            className="flex items-center gap-2 text-zinc-500 border-zinc-200 border-2 hover:border-zinc-900 hover:text-zinc-900 rounded-none px-6 py-6 transition-all"
             onClick={handleShare}
           >
             <Share2 className="w-5 h-5" />
-            <span className="font-bold">Share Article</span>
+            <span className="font-bold uppercase tracking-widest text-xs">Share</span>
           </Button>
         </div>
 
         <Button
           variant="ghost"
           onClick={onBack}
-          className="text-zinc-400 hover:text-white hover:bg-zinc-800 transition-all rounded-full group px-6 py-6"
+          className="text-zinc-500 hover:text-black hover:bg-zinc-100 transition-all rounded-none group px-6 py-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
           Back to all posts
@@ -308,82 +307,84 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
       </div>
 
       {/* Comments Section */}
-      <div className="mt-12 pt-12 border-t border-zinc-800">
-        <h3 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-          <MessageSquare className="w-6 h-6 text-indigo-500" />
-          Comments ({comments.length})
-        </h3>
+      {post.allow_comments && (
+        <div className="mt-12 pt-12 border-t border-zinc-200">
+          <h3 className="text-2xl font-bold text-zinc-900 mb-8 flex items-center gap-3">
+            <MessageSquare className="w-6 h-6 text-orange-500" />
+            Comments ({comments.length})
+          </h3>
 
-        <form onSubmit={handleCommentSubmit} className="mb-12 space-y-4 bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Input
-              placeholder="Your Name (Optional)"
-              value={commentAuthor}
-              onChange={(e) => setCommentAuthor(e.target.value)}
-              className="bg-black border-zinc-800 text-white placeholder:text-zinc-600 focus:border-indigo-500/50"
+          <form onSubmit={handleCommentSubmit} className="mb-12 space-y-4 bg-zinc-50 p-8 border border-zinc-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Input
+                placeholder="Your Name (Optional)"
+                value={commentAuthor}
+                onChange={(e) => setCommentAuthor(e.target.value)}
+                className="bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400 focus:border-orange-500 focus:ring-0 rounded-none"
+              />
+            </div>
+            <Textarea
+              placeholder="Share your thoughts..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              className="bg-white border-zinc-200 text-zinc-900 placeholder:text-zinc-400 min-h-[100px] focus:border-orange-500 focus:ring-0 rounded-none"
             />
-          </div>
-          <Textarea
-            placeholder="Share your thoughts..."
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            className="bg-black border-zinc-800 text-white placeholder:text-zinc-600 min-h-[100px] focus:border-indigo-500/50"
-          />
-          <div className="flex justify-end">
-            <Button 
-              type="submit" 
-              className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8"
-              disabled={!newComment.trim()}
-            >
-              <Send className="w-4 h-4 mr-2" />
-              Post Comment
-            </Button>
-          </div>
-        </form>
+            <div className="flex justify-end">
+              <Button 
+                type="submit" 
+                className="bg-zinc-900 hover:bg-zinc-800 text-white font-bold px-8 rounded-none uppercase tracking-widest text-xs h-12"
+                disabled={!newComment.trim()}
+              >
+                <Send className="w-4 h-4 mr-2" />
+                Post Comment
+              </Button>
+            </div>
+          </form>
 
-        <div className="space-y-6">
-          {comments.map((comment) => (
-            <motion.div
-              key={comment.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-zinc-900/30 border border-zinc-800 rounded-xl p-6"
-            >
-              <div className="flex justify-between items-start mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center text-zinc-400 font-bold text-sm">
-                    {comment.author.charAt(0).toUpperCase()}
-                  </div>
-                  <div>
-                    <h4 className="font-bold text-white text-sm">{comment.author}</h4>
-                    <span className="text-xs text-zinc-500">{formatDate(comment.date)}</span>
+          <div className="space-y-6">
+            {comments.map((comment) => (
+              <motion.div
+                key={comment.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-white border-l-2 border-zinc-200 p-6 hover:border-orange-500 transition-colors"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-zinc-100 flex items-center justify-center text-zinc-600 font-bold text-sm">
+                      {comment.author.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-zinc-900 text-sm uppercase tracking-wide">{comment.author}</h4>
+                      <span className="text-xs text-zinc-400">{formatDate(comment.created_at)}</span>
+                    </div>
                   </div>
                 </div>
+                <p className="text-zinc-600 text-sm leading-relaxed font-serif">{comment.content}</p>
+              </motion.div>
+            ))}
+            
+            {comments.length === 0 && (
+              <div className="text-center py-12 text-zinc-400 italic font-serif">
+                No comments yet. Be the first to share your thoughts!
               </div>
-              <p className="text-zinc-300 text-sm leading-relaxed">{comment.text}</p>
-            </motion.div>
-          ))}
-          
-          {comments.length === 0 && (
-            <div className="text-center py-12 text-zinc-600 italic">
-              No comments yet. Be the first to share your thoughts!
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="bg-zinc-950 border border-zinc-800 text-zinc-100 sm:max-w-md">
+        <DialogContent className="bg-white border border-zinc-200 text-zinc-900 sm:max-w-md rounded-none">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-center text-white">Share this post</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center text-zinc-900">Share this post</DialogTitle>
             <DialogDescription className="text-center text-zinc-500">
               Scan the QR code or copy the link below
             </DialogDescription>
           </DialogHeader>
           
           <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="bg-white p-4 rounded-xl">
+            <div className="bg-white p-4 border border-zinc-200">
               <img 
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}&color=000000&bgcolor=ffffff`} 
                 alt="QR Code" 
@@ -392,17 +393,17 @@ const BlogPost = ({ post, onBack }: BlogPostProps) => {
             </div>
             
             <div className="w-full space-y-2">
-              <label className="text-xs font-bold text-zinc-500/50 uppercase tracking-wider ml-1">Short Link</label>
+              <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider ml-1">Short Link</label>
               <div className="flex gap-2">
                 <Input 
                   readOnly 
                   value={shortUrl || shareUrl} 
-                  className="bg-zinc-900/20 border-zinc-500/20 text-zinc-300 font-mono text-xs"
+                  className="bg-zinc-50 border-zinc-200 text-zinc-600 font-mono text-xs rounded-none"
                 />
                 <Button onClick={() => {
                   navigator.clipboard.writeText(shortUrl || shareUrl)
                   toast.success('Link copied!')
-                }} size="icon" className="shrink-0 bg-zinc-500/10 hover:bg-zinc-500/20 text-zinc-400 border border-zinc-500/20">
+                }} size="icon" className="shrink-0 bg-zinc-100 hover:bg-zinc-200 text-zinc-600 border border-zinc-200 rounded-none">
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>

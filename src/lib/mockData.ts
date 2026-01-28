@@ -61,7 +61,10 @@ Happy coding! 🚀`,
     created_at: '2024-01-20T10:00:00Z',
     updated_at: '2024-01-20T10:00:00Z',
     likes_count: 15,
-    views_count: 234
+    views_count: 234,
+    allow_comments: true,
+    author_name: 'Ananth',
+    location: 'Bangalore, India'
   },
   {
     id: '2',
@@ -143,7 +146,10 @@ These techniques will help you create more maintainable and flexible CSS. Start 
     created_at: '2024-01-18T14:30:00Z',
     updated_at: '2024-01-18T14:30:00Z',
     likes_count: 8,
-    views_count: 156
+    views_count: 156,
+    allow_comments: true,
+    author_name: 'Ananth',
+    location: 'Bangalore, India'
   },
   {
     id: '3',
@@ -233,7 +239,10 @@ Remember: **Measure first, optimize second**. Always profile your application be
     created_at: '2024-01-15T09:15:00Z',
     updated_at: '2024-01-15T09:15:00Z',
     likes_count: 23,
-    views_count: 445
+    views_count: 445,
+    allow_comments: true,
+    author_name: 'Ananth',
+    location: 'Bangalore, India'
   }
 ]
 
@@ -242,12 +251,28 @@ export const mockBlogAPI = {
   async getPosts(): Promise<BlogPost[]> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 500))
-    return mockBlogPosts.filter(post => post.published)
+    const now = new Date()
+    return mockBlogPosts.filter(post => 
+      post.published && (!post.publish_at || new Date(post.publish_at) <= now)
+    )
+  },
+
+  async getAllPosts(): Promise<BlogPost[]> {
+    await new Promise(resolve => setTimeout(resolve, 500))
+    return mockBlogPosts.map(post => ({
+      ...post,
+      comments_count: mockBlogComments.filter(c => c.post_id === post.id).length
+    }))
   },
 
   async getPostBySlug(slug: string): Promise<BlogPost | null> {
     await new Promise(resolve => setTimeout(resolve, 300))
-    return mockBlogPosts.find(post => post.slug === slug && post.published) || null
+    const now = new Date()
+    return mockBlogPosts.find(post => 
+      post.slug === slug && 
+      post.published && 
+      (!post.publish_at || new Date(post.publish_at) <= now)
+    ) || null
   },
 
   async createPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>): Promise<BlogPost> {
@@ -258,7 +283,10 @@ export const mockBlogAPI = {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       likes_count: 0,
-      views_count: 0
+      views_count: 0,
+      allow_comments: post.allow_comments ?? true,
+      author_name: post.author_name ?? 'Ananth',
+      location: post.location
     }
     mockBlogPosts.unshift(newPost)
     return newPost
@@ -309,5 +337,48 @@ export const mockBlogAPI = {
   async hasUserLiked(postId: string, userIp: string): Promise<boolean> {
     // Random for demo - in real app this would check database
     return Math.random() > 0.7
+  },
+
+  async getComments(postId: string): Promise<BlogComment[]> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    return mockBlogComments
+      .filter(c => c.post_id === postId)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  },
+
+  async getAllComments(): Promise<(BlogComment & { post_title?: string })[]> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    return mockBlogComments.map(comment => {
+      const post = mockBlogPosts.find(p => p.id === comment.post_id)
+      return {
+        ...comment,
+        post_title: post ? post.title : 'Unknown Post'
+      }
+    }).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+  },
+
+  async createComment(postId: string, author: string, content: string): Promise<BlogComment> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    const newComment: BlogComment = {
+      id: Date.now().toString(),
+      post_id: postId,
+      author,
+      content,
+      created_at: new Date().toISOString()
+    }
+    mockBlogComments.unshift(newComment)
+    return newComment
+  },
+
+  async deleteComment(id: string): Promise<void> {
+    await new Promise(resolve => setTimeout(resolve, 300))
+    const index = mockBlogComments.findIndex(c => c.id === id)
+    if (index !== -1) {
+      mockBlogComments.splice(index, 1)
+    }
+  },
+
+  async getTotalCommentsCount(): Promise<number> {
+    return mockBlogComments.length
   }
 }

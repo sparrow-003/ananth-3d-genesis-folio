@@ -65,11 +65,7 @@ const Blog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-x-hidden">
-      {/* Background gradients aligned with theme */}
-      <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.1),transparent_50%)] -z-10" />
-
+    <div className="min-h-screen bg-white relative overflow-x-hidden">
       <Navbar />
 
       <main className="pt-24 pb-12 relative z-10 min-h-[80vh]">

@@ -24,6 +24,17 @@ export interface BlogPost {
   updated_at: string
   likes_count: number
   views_count: number
+  allow_comments: boolean
+  author_name: string
+  location?: string
+}
+
+export interface BlogComment {
+  id: string
+  post_id: string
+  author: string
+  content: string
+  created_at: string
 }
 
 export interface BlogLike {
@@ -45,7 +56,8 @@ export const blogAPI = {
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*')
-      .or(`published.eq.true,publish_at.lte.${nowIso}`)
+      .eq('published', true)
+      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
       .order('created_at', { ascending: false })
     
     if (error) throw error
@@ -55,16 +67,21 @@ export const blogAPI = {
   // Get ALL posts (admin)
   async getAllPosts(): Promise<BlogPost[]> {
     if (!isSupabaseConfigured) {
-      return mockBlogAPI.getPosts()
+      return mockBlogAPI.getAllPosts()
     }
 
     const { data, error } = await supabase
       .from('blog_posts')
-      .select('*')
+      .select('*, blog_comments(count)')
       .order('created_at', { ascending: false })
     
     if (error) throw error
-    return data || []
+    
+    return data?.map(post => ({
+      ...post,
+      comments_count: post.blog_comments?.[0]?.count || 0,
+      blog_comments: undefined // Remove the raw response
+    })) || []
   },
 
   // Get single blog post by slug
@@ -78,7 +95,8 @@ export const blogAPI = {
       .from('blog_posts')
       .select('*')
       .eq('slug', slug)
-      .or(`published.eq.true,publish_at.lte.${nowIso}`)
+      .eq('published', true)
+      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
       .single()
     
     if (error) return null
@@ -194,5 +212,94 @@ export const blogAPI = {
       .single()
     
     return !!data
+  },
+
+  // Get comments for a post
+  async getComments(postId: string): Promise<BlogComment[]> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.getComments(postId)
+    }
+
+    const { data, error } = await supabase
+      .from('blog_comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching comments:', error)
+      return []
+    }
+    return data || []
+  },
+
+  // Get ALL comments (admin)
+  async getAllComments(): Promise<(BlogComment & { post_title?: string })[]> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.getAllComments()
+    }
+
+    const { data, error } = await supabase
+      .from('blog_comments')
+      .select('*, blog_posts(title)')
+      .order('created_at', { ascending: false })
+    
+    if (error) {
+      console.error('Error fetching all comments:', error)
+      return []
+    }
+    
+    // Map the joined data to a flatter structure if needed, or just return as is
+    return data?.map(item => ({
+      ...item,
+      post_title: item.blog_posts?.title
+    })) || []
+  },
+
+  // Create a comment
+  async createComment(postId: string, author: string, content: string): Promise<BlogComment | null> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.createComment(postId, author, content)
+    }
+
+    const { data, error } = await supabase
+      .from('blog_comments')
+      .insert([{ post_id: postId, author, content }])
+      .select()
+      .single()
+    
+    if (error) {
+      console.error('Error creating comment:', error)
+      return null
+    }
+    return data
+  },
+
+  // Delete a comment (admin only)
+  async deleteComment(id: string): Promise<void> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.deleteComment(id)
+    }
+
+    const { error } = await supabase
+      .from('blog_comments')
+      .delete()
+      .eq('id', id)
+    
+    if (error) throw error
+  },
+
+  // Get total comments count (for admin stats)
+  async getTotalCommentsCount(): Promise<number> {
+    if (!isSupabaseConfigured) {
+        return mockBlogAPI.getTotalCommentsCount()
+    }
+    
+    const { count, error } = await supabase
+      .from('blog_comments')
+      .select('*', { count: 'exact', head: true })
+      
+    if (error) return 0
+    return count || 0
   }
 }

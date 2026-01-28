@@ -12,7 +12,10 @@ CREATE TABLE blog_posts (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     likes_count INTEGER DEFAULT 0,
-    views_count INTEGER DEFAULT 0
+    views_count INTEGER DEFAULT 0,
+    allow_comments BOOLEAN DEFAULT true,
+    author_name TEXT DEFAULT 'Ananth',
+    location TEXT
 );
 
 -- Blog Likes Table (for tracking user likes)
@@ -24,16 +27,27 @@ CREATE TABLE blog_likes (
     UNIQUE(post_id, user_ip)
 );
 
+-- Blog Comments Table
+CREATE TABLE blog_comments (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    post_id UUID REFERENCES blog_posts(id) ON DELETE CASCADE,
+    author TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Indexes for better performance
 CREATE INDEX idx_blog_posts_published ON blog_posts(published);
 CREATE INDEX idx_blog_posts_created_at ON blog_posts(created_at);
 CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
 CREATE INDEX idx_blog_posts_publish_at ON blog_posts(publish_at);
 CREATE INDEX idx_blog_likes_post_id ON blog_likes(post_id);
+CREATE INDEX idx_blog_comments_post_id ON blog_comments(post_id);
 
 -- RLS (Row Level Security) Policies
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_likes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_comments ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access to published posts
 CREATE POLICY "Public can view published or scheduled posts" ON blog_posts
@@ -52,6 +66,14 @@ CREATE POLICY "Public can insert likes" ON blog_likes
 
 CREATE POLICY "Public can delete own likes" ON blog_likes
     FOR DELETE USING (true);
+
+-- Allow public read access to comments
+CREATE POLICY "Public can view comments" ON blog_comments
+    FOR SELECT USING (true);
+
+-- Allow public insert for comments
+CREATE POLICY "Public can insert comments" ON blog_comments
+    FOR INSERT WITH CHECK (true);
 
 -- Functions for incrementing/decrementing counters
 CREATE OR REPLACE FUNCTION increment_post_views(post_id UUID)

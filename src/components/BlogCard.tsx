@@ -94,7 +94,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
       transition={{ duration: 0.3 }}
     >
       <Card
-        className="h-full cursor-pointer bg-dark/50 border-emerald-500/10 hover:border-emerald-500/40 transition-all duration-500 backdrop-blur-sm group/card overflow-hidden"
+        className="h-full cursor-pointer bg-white border border-zinc-200 hover:border-orange-500 transition-all duration-300 group/card overflow-hidden rounded-none shadow-sm hover:shadow-md"
         onClick={onClick}
       >
         {post.featured_image && (
@@ -102,7 +102,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
             <img
               src={post.featured_image}
               alt={post.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+              className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
               loading="lazy"
               onError={(e) => {
                 const target = e.target as HTMLImageElement
@@ -113,16 +113,30 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
         )}
 
         <CardHeader className="pb-3 px-6 pt-6">
-          <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium mb-3 uppercase tracking-wider">
-            <Calendar className="w-3 h-3" />
-            <span>{formatDate(post.created_at)}</span>
+          <div className="flex flex-wrap items-center gap-4 text-xs text-orange-600 font-bold mb-3 uppercase tracking-wider">
+            <div className="flex items-center gap-2">
+              <User className="w-3 h-3" />
+              <span>{post.author_name || 'Ananth'}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Calendar className="w-3 h-3" />
+              <span>{formatDate(post.created_at)}</span>
+            </div>
+
+            {post.location && (
+              <div className="flex items-center gap-2 text-zinc-400">
+                <MapPin className="w-3 h-3" />
+                <span>{post.location}</span>
+              </div>
+            )}
           </div>
 
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-2 leading-tight group-hover/card:text-emerald-400 transition-colors duration-300">
+          <h3 className="text-xl md:text-2xl font-bold text-zinc-900 mb-2 leading-tight group-hover/card:text-orange-600 transition-colors duration-300">
             {post.title}
           </h3>
 
-          <p className="text-gray-400 line-clamp-2 text-sm leading-relaxed mb-4">
+          <p className="text-zinc-500 line-clamp-2 text-sm leading-relaxed mb-4 font-serif">
             {post.excerpt}
           </p>
         </CardHeader>
@@ -134,21 +148,21 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
                 <Badge
                   key={index}
                   variant="secondary"
-                  className="bg-emerald-500/10 text-emerald-400 border-emerald-500/20 text-[10px] py-0 px-2 uppercase tracking-tight"
+                  className="bg-zinc-100 text-zinc-600 border border-zinc-200 text-[10px] py-0 px-2 uppercase tracking-wider rounded-none hover:bg-zinc-200"
                 >
                   {tag}
                 </Badge>
               ))}
               {post.tags.length > 3 && (
-                <Badge variant="outline" className="text-xs">
+                <Badge variant="outline" className="text-xs rounded-none border-zinc-200 text-zinc-500">
                   +{post.tags.length - 3} more
                 </Badge>
               )}
             </div>
           )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4 text-sm text-gray-400">
+          <div className="flex items-center justify-between pt-4 border-t border-zinc-100">
+            <div className="flex items-center gap-4 text-sm text-zinc-400">
               <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />
                 <span>{post.views_count}</span>
@@ -157,7 +171,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
               <Button
                 variant="ghost"
                 size="sm"
-                className={`flex items-center gap-1 p-0 h-auto hover:bg-transparent ${liked ? 'text-red-500' : 'text-gray-400 hover:text-red-500'
+                className={`flex items-center gap-1 p-0 h-auto hover:bg-transparent ${liked ? 'text-red-500' : 'text-zinc-400 hover:text-red-500'
                   }`}
                 onClick={handleLike}
                 disabled={loading}
@@ -170,7 +184,7 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-gray-400 hover:text-emerald-400 p-0 h-auto hover:bg-transparent"
+              className="text-zinc-400 hover:text-orange-600 p-0 h-auto hover:bg-transparent"
               onClick={handleShare}
             >
               <Share2 className="w-4 h-4" />
