@@ -24,6 +24,7 @@ export interface BlogPost {
   updated_at: string
   likes_count: number
   views_count: number
+  comments_count?: number
   allow_comments: boolean
   author_name: string
   location?: string

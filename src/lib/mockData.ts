@@ -1,5 +1,30 @@
 // Mock data for testing the blog system without Supabase
-import { BlogPost } from './supabase'
+import { BlogPost, BlogComment } from './supabase'
+
+// Mock comments data
+export const mockBlogComments: BlogComment[] = [
+  {
+    id: '1',
+    post_id: '1',
+    author: 'John Doe',
+    content: 'Great article! Very helpful for beginners.',
+    created_at: '2024-01-21T08:00:00Z'
+  },
+  {
+    id: '2',
+    post_id: '1',
+    author: 'Jane Smith',
+    content: 'Thanks for sharing this. TypeScript really does improve code quality.',
+    created_at: '2024-01-20T15:30:00Z'
+  },
+  {
+    id: '3',
+    post_id: '3',
+    author: 'Dev User',
+    content: 'These performance tips are gold!',
+    created_at: '2024-01-16T12:00:00Z'
+  }
+]
 
 export const mockBlogPosts: BlogPost[] = [
   {
