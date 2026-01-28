@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Heart, Eye, Share2, Calendar, Tag } from 'lucide-react'
+import { Heart, Eye, Share2, Calendar, Tag, User, MapPin, MessageSquare } from 'lucide-react'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import { getUserIP } from '@/lib/auth'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -166,6 +166,11 @@ const BlogCard = ({ post, onClick }: BlogCardProps) => {
               <div className="flex items-center gap-1">
                 <Eye className="w-4 h-4" />
                 <span>{post.views_count}</span>
+              </div>
+
+              <div className="flex items-center gap-1">
+                <MessageSquare className="w-4 h-4" />
+                <span>{post.comments_count || 0}</span>
               </div>
 
               <Button
