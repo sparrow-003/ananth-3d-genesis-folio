@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,6 +24,7 @@ const Navbar = () => {
     { name: 'Projects', href: '#projects' },
     { name: 'Blog', href: '/blog', isRoute: true },
     { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
+    { name: 'Admin', href: '/genesis-node-control-x99-admin', isAdmin: true },
     { name: 'Hire Me', href: 'mailto', isHireMe: true }
   ];
 
@@ -35,9 +37,9 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const scrollToSection = (id: string, isExternal?: boolean, isRoute?: boolean) => {
-    if (isExternal) {
-      window.open(id, '_blank');
+  const scrollToSection = (id: string, isExternal?: boolean, isRoute?: boolean, isAdmin?: boolean) => {
+    if (isExternal || isAdmin) {
+      window.open(isAdmin ? window.location.origin + id : id, '_blank');
       setMobileMenuOpen(false);
       return;
     }
@@ -46,6 +48,21 @@ const Navbar = () => {
       setMobileMenuOpen(false);
       return;
     }
+    
+    // If we're not on the home page, navigate there first then scroll
+    if (location.pathname !== '/') {
+      navigate('/');
+      // Wait for navigation then scroll
+      setTimeout(() => {
+        const element = document.querySelector(id);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+      setMobileMenuOpen(false);
+      return;
+    }
+    
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -90,6 +107,8 @@ const Navbar = () => {
                   e.preventDefault();
                   if ((item as any).isHireMe) {
                     handleHireMe();
+                  } else if ((item as any).isAdmin) {
+                    scrollToSection(item.href, false, false, true);
                   } else if (!item.external && !(item as any).isRoute) {
                     scrollToSection(item.href);
                   } else if ((item as any).isRoute) {
@@ -98,8 +117,8 @@ const Navbar = () => {
                     window.open(item.href, '_blank');
                   }
                 }}
-                target={item.external && !(item as any).isHireMe ? '_blank' : undefined}
-                rel={item.external && !(item as any).isHireMe ? 'noopener noreferrer' : undefined}
+                target={item.external || (item as any).isAdmin ? '_blank' : undefined}
+                rel={item.external || (item as any).isAdmin ? 'noopener noreferrer' : undefined}
               >
                 {item.name}
               </motion.a>
@@ -158,6 +177,8 @@ const Navbar = () => {
                     e.preventDefault();
                     if ((item as any).isHireMe) {
                       handleHireMe();
+                    } else if ((item as any).isAdmin) {
+                      scrollToSection(item.href, false, false, true);
                     } else if (!item.external && !(item as any).isRoute) {
                       scrollToSection(item.href);
                     } else if ((item as any).isRoute) {
@@ -166,8 +187,8 @@ const Navbar = () => {
                       window.open(item.href, '_blank');
                     }
                   }}
-                  target={item.external && !(item as any).isHireMe ? '_blank' : undefined}
-                  rel={item.external && !(item as any).isHireMe ? 'noopener noreferrer' : undefined}
+                  target={item.external || (item as any).isAdmin ? '_blank' : undefined}
+                  rel={item.external || (item as any).isAdmin ? 'noopener noreferrer' : undefined}
                 >
                   {item.name}
                 </a>
