@@ -20,9 +20,11 @@ import {
   TrendingUp,
   History,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  Terminal,
+  ChevronRight
 } from 'lucide-react'
-import { BlogPost as BlogPostType, blogAPI, supabase } from '@/lib/supabase'
+import { BlogPost as BlogPostType, blogAPI, supabase, isSupabaseConfigured } from '@/lib/supabase'
 import { adminAuth } from '@/lib/auth'
 import { parseMarkdown } from '@/lib/markdown'
 import { Button } from '@/components/ui/button'
@@ -34,6 +36,11 @@ import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { toast } from 'sonner'
+import { Calendar as CalendarIcon, Clock as ClockIcon } from 'lucide-react'
+import { format } from 'date-fns'
+import { Calendar } from '@/components/ui/calendar'
+import * as RechartsPrimitive from 'recharts'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from '@/components/ui/chart'
 
 interface AdminDashboardProps {
   onLogout: () => void
@@ -51,12 +58,202 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     slug: '',
     featured_image: '',
     tags: '',
-    published: false
+    published: false,
+    publish_at: ''
   })
   const [activeTab, setActiveTab] = useState('command')
   const [editorMode, setEditorMode] = useState<'write' | 'preview'>('write')
   const [searchQuery, setSearchQuery] = useState('')
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null)
+  const [scheduleEnabled, setScheduleEnabled] = useState(false)
+  const [publishDate, setPublishDate] = useState<Date | undefined>(undefined)
+  const [publishTime, setPublishTime] = useState<string>('')
+  
+  // CLI Mode State
+  const [cliMode, setCliMode] = useState(false)
+  const [terminalOutput, setTerminalOutput] = useState<string[]>(['> Genesis System v4.2.0 initialized...', '> Type "help" for available commands.'])
+  const [terminalInput, setTerminalInput] = useState('')
+  const terminalRef = React.useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (terminalRef.current) {
+      terminalRef.current.scrollTop = terminalRef.current.scrollHeight
+    }
+  }, [terminalOutput, cliMode])
+
+  const handleCommand = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const cmd = terminalInput.trim().toLowerCase()
+    if (!cmd) return
+
+    if (cmd === 'clear') {
+      setTerminalOutput([])
+      setTerminalInput('')
+      return
+    }
+
+    const newOutput = [...terminalOutput, `$ ${terminalInput}`]
+    setTerminalOutput(newOutput) // Update immediately with input
+    setTerminalInput('')
+    
+    const args = cmd.split(' ')
+    const command = args[0]
+
+    // Helper to add output
+    const addOutput = (lines: string | string[]) => {
+      setTerminalOutput(prev => [...prev, ...(Array.isArray(lines) ? lines : [lines])])
+    }
+
+    switch (command) {
+      case 'help':
+        addOutput([
+          '> Available commands:',
+          '  list          - List all blog posts',
+          '  stats         - Show analytics summary',
+          '  status        - Show system status',
+          '  clear         - Clear terminal',
+          '  gui           - Switch to Graphical Interface',
+          '  edit <id>     - Open post in editor',
+          '  set <id> <field> <value> - Quick edit (title, slug)',
+          '  publish <id>  - Publish a post',
+          '  unpublish <id>- Unpublish a post',
+          '  delete <id>   - Delete a post by ID',
+          '  create        - Create new post',
+          '  exit          - Exit CLI mode'
+        ])
+        break
+      case 'list':
+        if (posts.length === 0) {
+          addOutput('> No posts found.')
+        } else {
+          addOutput([
+            '> ID | TITLE | STATUS | VIEWS | LIKES',
+            '> ------------------------------------------------'
+          ])
+          posts.forEach(p => {
+             addOutput(`  ${p.id.substring(0, 8)}... | ${p.title.substring(0, 15)}... | ${p.published ? 'LIVE' : 'DRAFT'} | ${p.views_count} | ${p.likes_count}`)
+          })
+        }
+        break
+      case 'stats':
+         const totalViews = posts.reduce((acc, p) => acc + p.views_count, 0)
+         const totalLikes = posts.reduce((acc, p) => acc + p.likes_count, 0)
+         const publishedCount = posts.filter(p => p.published).length
+         addOutput([
+           '> System Statistics:',
+           `  Total Posts: ${posts.length}`,
+           `  Published: ${publishedCount}`,
+           `  Drafts: ${posts.length - publishedCount}`,
+           `  Total Views: ${totalViews}`,
+           `  Total Likes: ${totalLikes}`
+         ])
+         break
+      case 'status':
+         addOutput([
+           `> System: Genesis v4.2.0`,
+           `> Connection: ${isSupabaseConfigured ? 'Supabase' : 'Mock Mode'}`,
+           `> Total Nodes: ${posts.length}`
+         ])
+         break
+      case 'gui':
+      case 'exit':
+        setCliMode(false)
+        addOutput('> Switching to GUI...')
+        break
+      case 'create':
+        openEditor()
+        addOutput('> Opening editor...')
+        break
+      case 'publish':
+        if (args[1]) {
+           const postToPub = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+           if (postToPub) {
+             if (!postToPub.published) {
+               addOutput(`> Publishing "${postToPub.title}"...`)
+               await togglePublished(postToPub)
+             } else {
+               addOutput(`> Post "${postToPub.title}" is already published.`)
+             }
+           } else {
+             addOutput(`> Error: Post with ID "${args[1]}" not found.`)
+           }
+        } else {
+           addOutput('> Usage: publish <id>')
+        }
+        break
+      case 'unpublish':
+        if (args[1]) {
+           const postToUnpub = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+           if (postToUnpub) {
+             if (postToUnpub.published) {
+                addOutput(`> Unpublishing "${postToUnpub.title}"...`)
+                await togglePublished(postToUnpub)
+             } else {
+                addOutput(`> Post "${postToUnpub.title}" is already unpublished.`)
+             }
+           } else {
+             addOutput(`> Error: Post with ID "${args[1]}" not found.`)
+           }
+        } else {
+           addOutput('> Usage: unpublish <id>')
+        }
+        break
+      case 'edit':
+        if (args[1]) {
+           const postToEdit = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+           if (postToEdit) {
+             openEditor(postToEdit)
+             addOutput(`> Opening editor for "${postToEdit.title}"...`)
+           } else {
+             addOutput(`> Error: Post with ID "${args[1]}" not found.`)
+           }
+        } else {
+           addOutput('> Usage: edit <id>')
+        }
+        break
+      case 'set':
+        if (args.length >= 4) {
+          const [_, idPrefix, field, ...valueParts] = args
+          const value = valueParts.join(' ').replace(/^["']|["']$/g, '')
+          const postToUpdate = posts.find(p => p.id.startsWith(idPrefix) || p.id === idPrefix)
+          
+          if (postToUpdate) {
+             if (['title', 'slug', 'excerpt'].includes(field)) {
+               try {
+                 addOutput(`> Updating ${field} for "${postToUpdate.title}"...`)
+                 await blogAPI.updatePost(postToUpdate.id, { [field]: value })
+                 addOutput(`> Success: ${field} updated to "${value}"`)
+                 loadAllPosts()
+               } catch (err) {
+                 addOutput(`> Error: Failed to update post.`)
+               }
+             } else {
+               addOutput(`> Error: Field "${field}" not editable via CLI (use GUI).`)
+             }
+          } else {
+             addOutput(`> Error: Post "${idPrefix}" not found.`)
+          }
+        } else {
+           addOutput('> Usage: set <id> <field> <value>')
+        }
+        break
+      case 'delete':
+         if (args[1]) {
+           const postToDelete = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+           if (postToDelete) {
+             addOutput(`> Deleting "${postToDelete.title}"...`)
+             await handleDelete(postToDelete.id)
+           } else {
+             addOutput(`> Error: Post with ID "${args[1]}" not found.`)
+           }
+         } else {
+            addOutput('> Usage: delete <id>')
+         }
+         break
+      default:
+        addOutput(`> Command not found: ${command}`)
+    }
+  }
 
   useEffect(() => {
     loadAllPosts()
@@ -65,8 +262,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const loadAllPosts = async () => {
     try {
       setLoading(true)
-      // For now, use the same API as public posts since we're using mock data
-      const data = await blogAPI.getPosts()
+      // Use getAllPosts to see everything including drafts
+      const data = await blogAPI.getAllPosts()
       setPosts(data)
     } catch (error) {
       console.error('Error loading posts:', error)
@@ -92,8 +289,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         slug: post.slug,
         featured_image: post.featured_image || '',
         tags: post.tags ? post.tags.join(', ') : '',
-        published: post.published
+        published: post.published,
+        publish_at: post.publish_at || ''
       })
+      setScheduleEnabled(!!post.publish_at)
+      setPublishDate(post.publish_at ? new Date(post.publish_at) : undefined)
+      setPublishTime(post.publish_at ? format(new Date(post.publish_at), 'HH:mm') : '')
     } else {
       setEditingPost(null)
       setFormData({
@@ -103,8 +304,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         slug: '',
         featured_image: '',
         tags: '',
-        published: false
+        published: false,
+        publish_at: ''
       })
+      setScheduleEnabled(false)
+      setPublishDate(undefined)
+      setPublishTime('')
     }
     setShowEditor(true)
   }
@@ -119,8 +324,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       slug: '',
       featured_image: '',
       tags: '',
-      published: false
+      published: false,
+      publish_at: ''
     })
+    setScheduleEnabled(false)
+    setPublishDate(undefined)
+    setPublishTime('')
   }
 
   const generateSlug = (title: string) => {
@@ -147,8 +356,17 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         return
       }
 
+      let publish_at: string | null = null
+      if (scheduleEnabled && publishDate) {
+        const [hh = '00', mm = '00'] = publishTime.split(':')
+        const d = new Date(publishDate)
+        d.setHours(parseInt(hh), parseInt(mm), 0, 0)
+        publish_at = d.toISOString()
+      }
+
       const postData = {
         ...formData,
+        publish_at: publish_at ?? null,
         tags: formData.tags.split(',').map(tag => tag.trim()).filter(Boolean),
         slug: formData.slug || generateSlug(formData.title)
       }
@@ -245,9 +463,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             </div>
 
             <div className="flex items-center gap-3">
-              <div className="hidden lg:flex items-center gap-3 mr-4 px-4 border-r border-emerald-500/10">
-                <div className="flex flex-col items-end">
-                  <span className="text-[10px] text-emerald-400/40 font-black uppercase tracking-widest">Visibility Status</span>
+              <div className="hidden lg:flex items-center gap-6 mr-4 px-4 border-r border-emerald-500/10">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-emerald-400/40 font-black uppercase tracking-widest">Visibility</span>
                   <span className={`text-[10px] font-black uppercase tracking-widest ${formData.published ? 'text-green-400' : 'text-orange-400'}`}>
                     {formData.published ? 'Public Node' : 'Encrypted Draft'}
                   </span>
@@ -255,6 +473,19 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                 <Switch
                   checked={formData.published}
                   onCheckedChange={(checked) => setFormData(prev => ({ ...prev, published: checked }))}
+                  className="data-[state=checked]:bg-emerald-500"
+                />
+              </div>
+              <div className="hidden lg:flex items-center gap-4">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-emerald-400/40 font-black uppercase tracking-widest">Schedule</span>
+                  <span className={`text-[10px] font-black uppercase tracking-widest ${scheduleEnabled ? 'text-emerald-400' : 'text-emerald-400/40'}`}>
+                    {scheduleEnabled ? (publishDate ? `${format(publishDate, 'MMM d, yyyy')} ${publishTime || ''}` : 'Select time') : 'Off'}
+                  </span>
+                </div>
+                <Switch
+                  checked={scheduleEnabled}
+                  onCheckedChange={(checked) => setScheduleEnabled(checked)}
                   className="data-[state=checked]:bg-emerald-500"
                 />
               </div>
@@ -300,6 +531,32 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       placeholder="Genesis, Code, Art..."
                       className="bg-emerald-500/5 border-emerald-500/10 text-emerald-400 focus:border-emerald-500/30"
                     />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-emerald-400/40 uppercase tracking-[0.3em] ml-1">Schedule Date</label>
+                    <div className={`p-2 rounded-xl border ${scheduleEnabled ? 'border-emerald-500/20' : 'border-emerald-500/5 opacity-40'}`}>
+                      <Calendar
+                        mode="single"
+                        selected={publishDate}
+                        onSelect={setPublishDate}
+                        disabled={!scheduleEnabled}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-black text-emerald-400/40 uppercase tracking-[0.3em] ml-1">Schedule Time (HH:MM)</label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        value={publishTime}
+                        onChange={(e) => setPublishTime(e.target.value)}
+                        placeholder="14:30"
+                        className="bg-emerald-500/5 border-emerald-500/10 text-emerald-400 focus:border-emerald-500/30"
+                        disabled={!scheduleEnabled}
+                      />
+                    </div>
                   </div>
                 </div>
 
@@ -399,24 +656,40 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               <h1 className="text-3xl font-black text-white tracking-tighter uppercase italic">Genesis Dashboard</h1>
             </div>
             <p className="text-emerald-400/40 text-sm font-black uppercase tracking-widest ml-1">Administrative Neural Interface v4.2.0</p>
+            <div className="mt-2">
+              <Badge className={`rounded-md text-[9px] font-black uppercase tracking-widest px-2 py-0.5 ${isSupabaseConfigured ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-400/20'}`}>
+                {isSupabaseConfigured ? 'Supabase Connected' : 'Mock Data Mode'}
+              </Badge>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 bg-emerald-500/5 p-1.5 rounded-2xl border border-emerald-500/10">
             <Button
               variant="ghost"
+              onClick={() => setCliMode(!cliMode)}
+              className={`rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs transition-all ${cliMode ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+            >
+              <Terminal className="w-4 h-4 mr-2" />
+              {cliMode ? 'GUI' : 'CMD'}
+            </Button>
+            <Separator orientation="vertical" className="h-6 mx-2 bg-emerald-500/20" />
+            <Button
+              variant="ghost"
               onClick={() => setActiveTab('command')}
-              className={`rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs transition-all ${activeTab === 'command' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+              className={`rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs transition-all ${!cliMode && activeTab === 'command' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+              disabled={cliMode}
             >
               <FileText className="w-4 h-4 mr-2" />
-              Command Center
+              Center
             </Button>
             <Button
               variant="ghost"
               onClick={() => setActiveTab('nexus')}
-              className={`rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs transition-all ${activeTab === 'nexus' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+              className={`rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs transition-all ${!cliMode && activeTab === 'nexus' ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/20' : 'text-emerald-400/60 hover:text-emerald-400'}`}
+              disabled={cliMode}
             >
               <BarChart3 className="w-4 h-4 mr-2" />
-              Nexus Analytics
+              Nexus
             </Button>
             <Separator orientation="vertical" className="h-6 mx-2 bg-emerald-500/20" />
             <Button variant="ghost" onClick={handleLogout} className="rounded-xl px-6 h-10 font-black uppercase tracking-widest text-xs text-red-500/60 hover:text-red-500 hover:bg-red-500/10">
@@ -502,6 +775,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                             <Badge className={`rounded-md text-[9px] font-black uppercase tracking-widest px-2 py-0.5 ${post.published ? 'bg-green-500/10 text-green-400 border border-green-500/20' : 'bg-orange-500/10 text-orange-400 border border-orange-400/20'}`}>
                               {post.published ? 'Active Signal' : 'Encrypted Draft'}
                             </Badge>
+                          {post.publish_at && !post.published && (
+                            <span className="text-[10px] text-emerald-400/40 font-black uppercase tracking-widest flex items-center gap-1">
+                              <CalendarIcon className="w-3 h-3" /> Scheduled: {format(new Date(post.publish_at), 'MMM d, yyyy HH:mm')}
+                            </span>
+                          )}
                             <span className="text-[10px] text-emerald-400/20 font-black uppercase tracking-[0.2em]">{formatDate(post.created_at)}</span>
                           </div>
                           <h3 className="text-xl font-black text-white truncate group-hover:text-emerald-400 transition-colors uppercase italic tracking-tighter mb-1">{post.title}</h3>
@@ -620,6 +898,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                       <th className="p-6">Interception Count</th>
                       <th className="p-6">Resonance Stability</th>
                       <th className="p-6">Launch Coordinate</th>
+                      <th className="p-6">Schedule</th>
                       <th className="p-6">Efficiency Rank</th>
                     </tr>
                   </thead>
@@ -639,6 +918,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                         <td className="p-6">
                           <span className="text-xs font-black text-emerald-400/40 uppercase tracking-widest">{formatDate(post.created_at)}</span>
                         </td>
+                        <td className="p-6">
+                          <span className="text-xs font-black text-emerald-400/40 uppercase tracking-widest">
+                            {post.publish_at ? format(new Date(post.publish_at), 'MMM d, yyyy HH:mm') : '-'}
+                          </span>
+                        </td>
                         <td className="p-6 text-right">
                           <div className={`inline-block px-3 py-1 rounded-full text-[10px] font-black ${i === 0 ? 'bg-emerald-500 text-black shadow-lg shadow-emerald-500/30' : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'}`}>
                             {i === 0 ? 'PRIME NODE' : `COORD-0${i + 1}`}
@@ -648,6 +932,33 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            </div>
+
+            {/* Engagement Chart */}
+            <div className="bg-black/40 border border-emerald-500/10 rounded-3xl overflow-hidden backdrop-blur-xl">
+              <div className="p-8 border-b border-emerald-500/10 bg-emerald-500/5">
+                <h3 className="text-xl font-black text-white uppercase italic tracking-tighter">Engagement Overview</h3>
+                <p className="text-emerald-400/40 text-[10px] font-black uppercase tracking-widest mt-1">Views vs Likes across posts</p>
+              </div>
+              <div className="p-6">
+                <div className="w-full h-[300px]">
+                  {/* Simple bar chart using Recharts */}
+                  {/* Avoid heavy config; show basic bars */}
+                  <ChartContainer
+                    config={{ views: { label: 'Views', color: '#34d399' }, likes: { label: 'Likes', color: '#60a5fa' } }}
+                  >
+                    <RechartsPrimitive.BarChart data={posts.map(p => ({ name: p.title, views: p.views_count, likes: p.likes_count }))}>
+                      <RechartsPrimitive.CartesianGrid strokeDasharray="3 3" />
+                      <RechartsPrimitive.XAxis dataKey="name" tick={false} />
+                      <RechartsPrimitive.YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <ChartLegend content={<ChartLegendContent />} />
+                      <RechartsPrimitive.Bar dataKey="views" fill="var(--color-views)" />
+                      <RechartsPrimitive.Bar dataKey="likes" fill="var(--color-likes)" />
+                    </RechartsPrimitive.BarChart>
+                  </ChartContainer>
+                </div>
               </div>
             </div>
           </motion.div>

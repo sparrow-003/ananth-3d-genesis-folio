@@ -8,7 +8,7 @@ const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
 // Check if Supabase is properly configured
-const isSupabaseConfigured = supabaseUrl !== 'https://your-project.supabase.co' && supabaseAnonKey !== 'your-anon-key'
+export const isSupabaseConfigured = supabaseUrl !== 'https://your-project.supabase.co' && supabaseAnonKey !== 'your-anon-key'
 
 export interface BlogPost {
   id: string
@@ -19,6 +19,7 @@ export interface BlogPost {
   featured_image?: string
   tags: string[]
   published: boolean
+  publish_at?: string
   created_at: string
   updated_at: string
   likes_count: number
@@ -34,8 +35,25 @@ export interface BlogLike {
 
 // Blog API functions - will use mock data if Supabase is not configured
 export const blogAPI = {
-  // Get all published blog posts
+  // Get all published blog posts (public)
   async getPosts(): Promise<BlogPost[]> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.getPosts()
+    }
+
+    const nowIso = new Date().toISOString()
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select('*')
+      .or(`published.eq.true,publish_at.lte.${nowIso}`)
+      .order('created_at', { ascending: false })
+    
+    if (error) throw error
+    return data || []
+  },
+
+  // Get ALL posts (admin)
+  async getAllPosts(): Promise<BlogPost[]> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.getPosts()
     }
@@ -43,7 +61,6 @@ export const blogAPI = {
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*')
-      .eq('published', true)
       .order('created_at', { ascending: false })
     
     if (error) throw error
@@ -56,11 +73,12 @@ export const blogAPI = {
       return mockBlogAPI.getPostBySlug(slug)
     }
 
+    const nowIso = new Date().toISOString()
     const { data, error } = await supabase
       .from('blog_posts')
       .select('*')
       .eq('slug', slug)
-      .eq('published', true)
+      .or(`published.eq.true,publish_at.lte.${nowIso}`)
       .single()
     
     if (error) return null

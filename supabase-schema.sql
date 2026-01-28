@@ -8,6 +8,7 @@ CREATE TABLE blog_posts (
     featured_image TEXT,
     tags TEXT[] DEFAULT '{}',
     published BOOLEAN DEFAULT false,
+    publish_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     likes_count INTEGER DEFAULT 0,
@@ -27,6 +28,7 @@ CREATE TABLE blog_likes (
 CREATE INDEX idx_blog_posts_published ON blog_posts(published);
 CREATE INDEX idx_blog_posts_created_at ON blog_posts(created_at);
 CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX idx_blog_posts_publish_at ON blog_posts(publish_at);
 CREATE INDEX idx_blog_likes_post_id ON blog_likes(post_id);
 
 -- RLS (Row Level Security) Policies
@@ -34,8 +36,11 @@ ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_likes ENABLE ROW LEVEL SECURITY;
 
 -- Allow public read access to published posts
-CREATE POLICY "Public can view published posts" ON blog_posts
-    FOR SELECT USING (published = true);
+CREATE POLICY "Public can view published or scheduled posts" ON blog_posts
+    FOR SELECT USING (
+        published = true
+        OR (publish_at IS NOT NULL AND publish_at <= NOW())
+    );
 
 -- Allow public read access to likes
 CREATE POLICY "Public can view likes" ON blog_likes
