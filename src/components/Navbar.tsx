@@ -24,7 +24,6 @@ const Navbar = () => {
     { name: 'Projects', href: '#projects' },
     { name: 'Blog', href: '/blog', isRoute: true },
     { name: 'Articles', href: 'https://ananthdev.blogspot.com/', external: true },
-    { name: 'Admin', href: '/genesis-node-control-x99-admin', isAdmin: true },
     { name: 'Hire Me', href: 'mailto', isHireMe: true }
   ];
 
@@ -37,9 +36,9 @@ const Navbar = () => {
     setMobileMenuOpen(false);
   };
 
-  const scrollToSection = (id: string, isExternal?: boolean, isRoute?: boolean, isAdmin?: boolean) => {
-    if (isExternal || isAdmin) {
-      window.open(isAdmin ? window.location.origin + id : id, '_blank');
+  const scrollToSection = (id: string, isExternal?: boolean, isRoute?: boolean) => {
+    if (isExternal) {
+      window.open(id, '_blank');
       setMobileMenuOpen(false);
       return;
     }
@@ -107,8 +106,6 @@ const Navbar = () => {
                   e.preventDefault();
                   if ((item as any).isHireMe) {
                     handleHireMe();
-                  } else if ((item as any).isAdmin) {
-                    scrollToSection(item.href, false, false, true);
                   } else if (!item.external && !(item as any).isRoute) {
                     scrollToSection(item.href);
                   } else if ((item as any).isRoute) {
@@ -117,8 +114,8 @@ const Navbar = () => {
                     window.open(item.href, '_blank');
                   }
                 }}
-                target={item.external || (item as any).isAdmin ? '_blank' : undefined}
-                rel={item.external || (item as any).isAdmin ? 'noopener noreferrer' : undefined}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
               >
                 {item.name}
               </motion.a>
@@ -177,8 +174,6 @@ const Navbar = () => {
                     e.preventDefault();
                     if ((item as any).isHireMe) {
                       handleHireMe();
-                    } else if ((item as any).isAdmin) {
-                      scrollToSection(item.href, false, false, true);
                     } else if (!item.external && !(item as any).isRoute) {
                       scrollToSection(item.href);
                     } else if ((item as any).isRoute) {
@@ -187,8 +182,8 @@ const Navbar = () => {
                       window.open(item.href, '_blank');
                     }
                   }}
-                  target={item.external || (item as any).isAdmin ? '_blank' : undefined}
-                  rel={item.external || (item as any).isAdmin ? 'noopener noreferrer' : undefined}
+                  target={item.external ? '_blank' : undefined}
+                  rel={item.external ? 'noopener noreferrer' : undefined}
                 >
                   {item.name}
                 </a>
