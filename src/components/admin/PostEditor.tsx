@@ -17,6 +17,16 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { format } from 'date-fns'
 import { BlogPost } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -50,6 +60,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   const [scheduleEnabled, setScheduleEnabled] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   useEffect(() => {
     if (post) {
@@ -132,8 +143,8 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
             <div className="w-8 h-8 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
               <Sparkles className="w-4 h-4 text-emerald-400" />
             </div>
-            <span className="font-black text-white tracking-tighter hidden sm:block">
-              {post ? 'UPDATING FREQUENCY' : 'NEW BROADCAST'}
+            <span className="font-black text-white tracking-tighter hidden sm:block uppercase">
+              {post ? 'Updating Frequency' : 'New Broadcast'}
             </span>
           </div>
         </div>
@@ -257,7 +268,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => { if(window.confirm('Terminate signal sequence?')) onDelete?.(post.id) }}
+                    onClick={() => setIsDeleteDialogOpen(true)}
                     className="text-zinc-600 hover:text-red-400 transition-colors"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -326,6 +337,33 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                     placeholder="Separate with commas (AI, Tech, 3D...)"
                     className="bg-zinc-950/50 border-zinc-800 rounded-2xl text-xs min-h-[80px] focus:border-emerald-500/50"
                   />
+                </div>
+
+                {/* Identity Group */}
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest flex items-center gap-2">
+                    <User className="w-3 h-3 text-emerald-400" /> Bio Signatures
+                  </h4>
+                  <div className="space-y-3 bg-zinc-950/50 p-4 rounded-2xl border border-zinc-800/50">
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Origin (Author)</label>
+                      <Input
+                        value={formData.author_name}
+                        onChange={e => setFormData({...formData, author_name: e.target.value})}
+                        className="bg-zinc-900 border-zinc-800 rounded-xl text-[10px] font-mono focus:border-emerald-500/50"
+                        placeholder="Author ID"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest ml-1">Coordinate (Location)</label>
+                      <Input
+                        value={formData.location}
+                        onChange={e => setFormData({...formData, location: e.target.value})}
+                        className="bg-zinc-900 border-zinc-800 rounded-xl text-[10px] font-mono focus:border-emerald-500/50"
+                        placeholder="e.g. Neo Tokyo, JP"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Permalink Group */}
@@ -398,6 +436,31 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
           )}
         </AnimatePresence>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white rounded-3xl shadow-2xl backdrop-blur-xl max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-black tracking-tighter flex items-center gap-3 text-red-500">
+              <Trash2 className="w-6 h-6" /> TERMINATE?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-zinc-400 font-medium py-2 leading-relaxed">
+              Are you sure you want to purge <span className="text-white font-bold">"{formData.title || 'this signal'}"</span>? This action is irreversible and the neural data will be lost from the mainframe.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="mt-6 flex gap-2">
+            <AlertDialogCancel className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white rounded-xl font-bold h-12 transition-all">
+              Hold Position
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => post && onDelete?.(post.id)}
+              className="flex-1 bg-red-500 hover:bg-red-400 text-white font-black rounded-xl h-12 shadow-lg shadow-red-500/20 transition-all"
+            >
+              Confirm Purge
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   )
 }

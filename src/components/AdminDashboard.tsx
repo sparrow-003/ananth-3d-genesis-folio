@@ -19,7 +19,8 @@ import {
   Trash2,
   TrendingUp,
   Layers,
-  Globe
+  Globe,
+  Download
 } from 'lucide-react'
 import { BlogPost as BlogPostType, BlogComment, blogAPI, isSupabaseConfigured, BlogStats } from '@/lib/supabase'
 import { adminAuth } from '@/lib/auth'
@@ -41,6 +42,16 @@ import {
   Bar,
   Cell
 } from 'recharts'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { cn } from '@/lib/utils'
 
 interface AdminDashboardProps {
@@ -61,9 +72,28 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [showEditor, setShowEditor] = useState(false)
   const [cliMode, setCliMode] = useState(false)
   
+  // Settings State
+  const [nodeSettings, setNodeSettings] = useState({
+    title: localStorage.getItem('genesis_node_title') || 'Genesis Blog v4.2',
+    visibility: localStorage.getItem('genesis_node_visibility') !== 'false'
+  })
+
   // Search and Filter State
   const [searchTerm, setSearchTerm] = useState('')
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+
+  // Delete Confirmation State
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    type: 'post' | 'comment';
+    id: string;
+    title: string;
+  }>({
+    isOpen: false,
+    type: 'post',
+    id: '',
+    title: '',
+  })
 
   // Editor State
   const [editingPost, setEditingPost] = useState<BlogPostType | null>(null)
@@ -314,26 +344,51 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     }
   }
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return
+  const handleDeleteRequest = (type: 'post' | 'comment', id: string, title: string) => {
+    setDeleteConfirm({
+      isOpen: true,
+      type,
+      id,
+      title
+    })
+  }
+
+  const confirmDelete = async () => {
     try {
-      await blogAPI.deletePost(id)
-      toast.success('Post deleted')
-      loadAllPosts()
+      if (deleteConfirm.type === 'post') {
+        await blogAPI.deletePost(deleteConfirm.id)
+        toast.success('Post purged from mainframe')
+        loadAllPosts()
+      } else {
+        await blogAPI.deleteComment(deleteConfirm.id)
+        toast.success('Signal interference neutralized')
+        loadAllComments()
+      }
     } catch (error) {
-      toast.error('Failed to delete')
+      toast.error('Failed to complete purge operation')
+    } finally {
+      setDeleteConfirm(prev => ({ ...prev, isOpen: false }))
     }
   }
 
-  const handleDeleteComment = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this comment?')) return
-    try {
-      await blogAPI.deleteComment(id)
-      toast.success('Comment deleted')
-      loadAllComments()
-    } catch (error) {
-      toast.error('Failed to delete comment')
-    }
+  const handleExportData = () => {
+    const dataStr = JSON.stringify({ posts, comments, stats }, null, 2)
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+    const exportFileDefaultName = `genesis_node_export_${format(new Date(), 'yyyyMMdd_HHmm')}.json`
+
+    const linkElement = document.createElement('a')
+    linkElement.setAttribute('href', dataUri)
+    linkElement.setAttribute('download', exportFileDefaultName)
+    linkElement.click()
+    toast.success('Mainframe data exported successfully')
+  }
+
+  const updateNodeSettings = (updates: Partial<typeof nodeSettings>) => {
+    const newSettings = { ...nodeSettings, ...updates }
+    setNodeSettings(newSettings)
+    if (updates.title !== undefined) localStorage.setItem('genesis_node_title', updates.title)
+    if (updates.visibility !== undefined) localStorage.setItem('genesis_node_visibility', String(updates.visibility))
+    toast.success('Node parameters updated')
   }
 
   // --- Filtered Posts ---
@@ -387,7 +442,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         post={editingPost}
         onSave={handleSave}
         onClose={closeEditor}
-        onDelete={handleDelete}
+        onDelete={(id) => handleDeleteRequest('post', id, editingPost?.title || 'Signal')}
       />
     )
   }
@@ -409,7 +464,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
             G
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-lg tracking-tighter text-white leading-none">GENESIS</span>
+            <span className="font-black text-lg tracking-tighter text-white leading-none uppercase">{nodeSettings.title.split(' ')[0]}</span>
             <span className="text-[10px] text-emerald-500 font-bold tracking-[0.2em] uppercase mt-1">Control Node</span>
           </div>
         </div>
@@ -587,7 +642,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                               size="icon"
                               variant="ghost"
                               className="h-10 w-10 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl"
-                              onClick={(e) => { e.stopPropagation(); handleDelete(post.id) }}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteRequest('post', post.id, post.title) }}
                              >
                                <Trash2 className="w-5 h-5" />
                              </Button>
@@ -614,8 +669,12 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                     <h1 className="text-4xl font-black text-white tracking-tighter">Analytics</h1>
                     <p className="text-zinc-500 font-medium mt-1">Real-time signal data monitoring.</p>
                   </div>
-                  <Button variant="outline" className="border-zinc-800 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/5 rounded-xl gap-2 font-bold">
-                    <Send className="w-4 h-4" /> Export Report
+                  <Button
+                    variant="outline"
+                    onClick={handleExportData}
+                    className="border-zinc-800 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/5 rounded-xl gap-2 font-bold"
+                  >
+                    <Download className="w-4 h-4" /> Export Mainframe
                   </Button>
                 </div>
 
@@ -741,7 +800,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                               variant="ghost"
                               size="sm"
                               className="h-9 px-4 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-xl font-bold gap-2"
-                              onClick={() => handleDeleteComment(comment.id)}
+                              onClick={() => handleDeleteRequest('comment', comment.id, `Comment by ${comment.author}`)}
                             >
                               <Trash2 className="w-4 h-4" /> Purge Signal
                             </Button>
@@ -774,9 +833,13 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                        <div className="w-2 h-2 rounded-full bg-emerald-500" /> System Identity
                     </h3>
                     <div className="space-y-4">
-                      <div className="flex justify-between items-center py-2 border-b border-zinc-800/30">
-                        <span className="text-zinc-500 font-bold text-sm uppercase tracking-wider">Node Title</span>
-                        <span className="text-white font-black tracking-tight">Genesis Blog v4.2</span>
+                      <div className="flex flex-col gap-2 py-2 border-b border-zinc-800/30">
+                        <label className="text-zinc-500 font-bold text-[10px] uppercase tracking-wider">Node Identity (Title)</label>
+                        <Input
+                          value={nodeSettings.title}
+                          onChange={(e) => updateNodeSettings({ title: e.target.value })}
+                          className="bg-zinc-900 border-zinc-800 text-white font-black tracking-tight rounded-xl focus:border-emerald-500/50"
+                        />
                       </div>
                       <div className="flex justify-between items-center py-2 border-b border-zinc-800/30">
                         <span className="text-zinc-500 font-bold text-sm uppercase tracking-wider">Protocol</span>
@@ -800,7 +863,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                          <div className="text-white font-black text-sm tracking-tight">Public Visibility</div>
                          <div className="text-zinc-500 text-xs">Broadcast signal to global search engines.</div>
                        </div>
-                       <Switch checked={true} className="data-[state=checked]:bg-emerald-500" />
+                       <Switch
+                        checked={nodeSettings.visibility}
+                        onCheckedChange={(c) => updateNodeSettings({ visibility: c })}
+                        className="data-[state=checked]:bg-emerald-500"
+                       />
                     </div>
                   </div>
 
@@ -813,6 +880,31 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
               </motion.div>
             )}
           </AnimatePresence>
+
+          {/* Delete Confirmation Dialog */}
+          <AlertDialog open={deleteConfirm.isOpen} onOpenChange={(open) => setDeleteConfirm(prev => ({ ...prev, isOpen: open }))}>
+            <AlertDialogContent className="bg-zinc-900 border-zinc-800 text-white rounded-3xl shadow-2xl backdrop-blur-xl max-w-sm">
+              <AlertDialogHeader>
+                <AlertDialogTitle className="text-2xl font-black tracking-tighter flex items-center gap-3 text-red-500">
+                  <Trash2 className="w-6 h-6" /> TERMINATE?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-zinc-400 font-medium py-2 leading-relaxed">
+                  Are you sure you want to purge <span className="text-white font-bold">"{deleteConfirm.title}"</span>? This action is irreversible and the neural data will be lost from the mainframe.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="mt-6 flex gap-2">
+                <AlertDialogCancel className="flex-1 bg-zinc-800 border-zinc-700 text-zinc-400 hover:text-white rounded-xl font-bold h-12 transition-all">
+                  Hold Position
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={confirmDelete}
+                  className="flex-1 bg-red-500 hover:bg-red-400 text-white font-black rounded-xl h-12 shadow-lg shadow-red-500/20 transition-all"
+                >
+                  Confirm Purge
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
 
         </main>
       </div>
