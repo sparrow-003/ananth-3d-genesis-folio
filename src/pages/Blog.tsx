@@ -1,4 +1,4 @@
-import { useState, useEffect, Suspense, lazy } from 'react'
+import { useState, useEffect, Suspense, lazy, memo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
@@ -6,20 +6,23 @@ import { toast } from 'sonner'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
-// Lazy load components
+// Lazy load components for better performance
 const BlogList = lazy(() => import('@/components/BlogList'))
 const BlogPost = lazy(() => import('@/components/BlogPost'))
 
-const LoadingSpinner = () => (
+const LoadingSpinner = memo(() => (
   <div className="flex items-center justify-center min-h-[400px]">
     <div className="relative w-12 h-12">
-      <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+      <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
+      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
+      <div className="absolute inset-2 rounded-full border-2 border-transparent border-b-secondary/50 animate-reverse-spin" />
     </div>
   </div>
-)
+))
 
-const Blog = () => {
+LoadingSpinner.displayName = 'LoadingSpinner'
+
+const Blog = memo(() => {
   const { slug } = useParams()
   const navigate = useNavigate()
   const [selectedPost, setSelectedPost] = useState<BlogPostType | null>(null)
@@ -33,13 +36,12 @@ const Blog = () => {
     }
   }, [slug])
 
-  const loadPostBySlug = async (postSlug: string) => {
+  const loadPostBySlug = useCallback(async (postSlug: string) => {
     setLoading(true)
     try {
       const post = await blogAPI.getPostBySlug(postSlug)
       if (post) {
         setSelectedPost(post)
-        // Increment view count when post is accessed
         blogAPI.incrementViews(post.id)
       } else {
         toast.error('Post not found')
@@ -52,20 +54,24 @@ const Blog = () => {
     } finally {
       setLoading(false)
     }
-  }
+  }, [navigate])
 
-  const handlePostSelect = (post: BlogPostType) => {
+  const handlePostSelect = useCallback((post: BlogPostType) => {
     setSelectedPost(post)
     navigate(`/blog/${post.slug}`)
-  }
+  }, [navigate])
 
-  const handleBackToBlog = () => {
+  const handleBackToBlog = useCallback(() => {
     setSelectedPost(null)
     navigate('/blog')
-  }
+  }, [navigate])
 
   return (
-    <div className="min-h-screen bg-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-background relative overflow-x-hidden">
+      {/* Background gradient matching main site */}
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 -z-10" />
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent -z-10" />
+      
       <Navbar />
 
       <main className="pt-24 pb-12 relative z-10 min-h-[80vh]">
@@ -85,7 +91,7 @@ const Blog = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4, ease: "easeOut" }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
             >
               <Suspense fallback={<LoadingSpinner />}>
                 {selectedPost ? (
@@ -102,6 +108,8 @@ const Blog = () => {
       <Footer />
     </div>
   )
-}
+})
+
+Blog.displayName = 'Blog'
 
 export default Blog
