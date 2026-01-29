@@ -45,6 +45,13 @@ export interface BlogLike {
   created_at: string
 }
 
+export interface BlogStats {
+  totalViews: number
+  totalLikes: number
+  postCount: number
+  commentCount: number
+}
+
 // Blog API functions - will use mock data if Supabase is not configured
 export const blogAPI = {
   // Get all published blog posts (public)
@@ -53,16 +60,21 @@ export const blogAPI = {
       return mockBlogAPI.getPosts()
     }
 
-    const nowIso = new Date().toISOString()
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('published', true)
-      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    return data || []
+    try {
+      const nowIso = new Date().toISOString()
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .or(`publish_at.lte.${nowIso},publish_at.is.null`)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
+      console.error('Error fetching posts:', error)
+      return []
+    }
   },
 
   // Get ALL posts (admin)
@@ -71,18 +83,23 @@ export const blogAPI = {
       return mockBlogAPI.getAllPosts()
     }
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*, blog_comments(count)')
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    
-    return data?.map(post => ({
-      ...post,
-      comments_count: post.blog_comments?.[0]?.count || 0,
-      blog_comments: undefined // Remove the raw response
-    })) || []
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*, blog_comments(count)')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      return data?.map(post => ({
+        ...post,
+        comments_count: post.blog_comments?.[0]?.count || 0,
+        blog_comments: undefined // Remove the raw response
+      })) || []
+    } catch (error) {
+      console.error('Error fetching all posts:', error)
+      return []
+    }
   },
 
   // Get single blog post by slug
@@ -91,17 +108,22 @@ export const blogAPI = {
       return mockBlogAPI.getPostBySlug(slug)
     }
 
-    const nowIso = new Date().toISOString()
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('published', true)
-      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
-      .single()
-    
-    if (error) return null
-    return data
+    try {
+      const nowIso = new Date().toISOString()
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .or(`publish_at.lte.${nowIso},publish_at.is.null`)
+        .single()
+
+      if (error) return null
+      return data
+    } catch (error) {
+      console.error('Error fetching post by slug:', error)
+      return null
+    }
   },
 
   // Create new blog post (admin only)
@@ -171,31 +193,36 @@ export const blogAPI = {
       return mockBlogAPI.toggleLike(postId, userIp)
     }
 
-    // Check if user already liked this post
-    const { data: existingLike } = await supabase
-      .from('blog_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_ip', userIp)
-      .single()
+    try {
+      // Check if user already liked this post
+      const { data: existingLike } = await supabase
+        .from('blog_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_ip', userIp)
+        .single()
 
-    if (existingLike) {
-      // Unlike
-      await supabase
-        .from('blog_likes')
-        .delete()
-        .eq('id', existingLike.id)
-      
-      await supabase.rpc('decrement_post_likes', { post_id: postId })
+      if (existingLike) {
+        // Unlike
+        await supabase
+          .from('blog_likes')
+          .delete()
+          .eq('id', existingLike.id)
+
+        await supabase.rpc('decrement_post_likes', { post_id: postId })
+        return false
+      } else {
+        // Like
+        await supabase
+          .from('blog_likes')
+          .insert([{ post_id: postId, user_ip: userIp }])
+
+        await supabase.rpc('increment_post_likes', { post_id: postId })
+        return true
+      }
+    } catch (error) {
+      console.error('Error toggling like:', error)
       return false
-    } else {
-      // Like
-      await supabase
-        .from('blog_likes')
-        .insert([{ post_id: postId, user_ip: userIp }])
-      
-      await supabase.rpc('increment_post_likes', { post_id: postId })
-      return true
     }
   },
 
@@ -205,14 +232,18 @@ export const blogAPI = {
       return mockBlogAPI.hasUserLiked(postId, userIp)
     }
 
-    const { data } = await supabase
-      .from('blog_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_ip', userIp)
-      .single()
-    
-    return !!data
+    try {
+      const { data } = await supabase
+        .from('blog_likes')
+        .select('id')
+        .eq('post_id', postId)
+        .eq('user_ip', userIp)
+        .single()
+
+      return !!data
+    } catch (error) {
+      return false
+    }
   },
 
   // Get comments for a post
@@ -221,17 +252,19 @@ export const blogAPI = {
       return mockBlogAPI.getComments(postId)
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending: false })
-    
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+      return data || []
+    } catch (error) {
       console.error('Error fetching comments:', error)
       return []
     }
-    return data || []
   },
 
   // Get ALL comments (admin)
@@ -240,21 +273,22 @@ export const blogAPI = {
       return mockBlogAPI.getAllComments()
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .select('*, blog_posts(title)')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*, blog_posts(title)')
+        .order('created_at', { ascending: false })
+
+      if (error) throw error
+
+      return data?.map(item => ({
+        ...item,
+        post_title: item.blog_posts?.title
+      })) || []
+    } catch (error) {
       console.error('Error fetching all comments:', error)
       return []
     }
-    
-    // Map the joined data to a flatter structure if needed, or just return as is
-    return data?.map(item => ({
-      ...item,
-      post_title: item.blog_posts?.title
-    })) || []
   },
 
   // Create a comment
@@ -263,17 +297,19 @@ export const blogAPI = {
       return mockBlogAPI.createComment(postId, author, content)
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .insert([{ post_id: postId, author, content }])
-      .select()
-      .single()
-    
-    if (error) {
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .insert([{ post_id: postId, author, content }])
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } catch (error) {
       console.error('Error creating comment:', error)
       return null
     }
-    return data
   },
 
   // Delete a comment (admin only)
@@ -296,11 +332,46 @@ export const blogAPI = {
         return mockBlogAPI.getTotalCommentsCount()
     }
     
-    const { count, error } = await supabase
-      .from('blog_comments')
-      .select('*', { count: 'exact', head: true })
-      
-    if (error) return 0
-    return count || 0
+    try {
+      const { count, error } = await supabase
+        .from('blog_comments')
+        .select('*', { count: 'exact', head: true })
+
+      if (error) return 0
+      return count || 0
+    } catch (error) {
+      return 0
+    }
+  },
+
+  // Get aggregated stats for dashboard
+  async getStats(): Promise<BlogStats> {
+    if (!isSupabaseConfigured) {
+      return mockBlogAPI.getStats()
+    }
+
+    try {
+      const { data: postsData, error: postsError } = await supabase
+        .from('blog_posts')
+        .select('views_count, likes_count')
+
+      if (postsError) throw postsError
+
+      const totalViews = postsData?.reduce((acc, p) => acc + (p.views_count || 0), 0) || 0
+      const totalLikes = postsData?.reduce((acc, p) => acc + (p.likes_count || 0), 0) || 0
+      const postCount = postsData?.length || 0
+
+      const commentCount = await this.getTotalCommentsCount()
+
+      return {
+        totalViews,
+        totalLikes,
+        postCount,
+        commentCount
+      }
+    } catch (error) {
+      console.error('Error fetching blog stats:', error)
+      return { totalViews: 0, totalLikes: 0, postCount: 0, commentCount: 0 }
+    }
   }
 }
