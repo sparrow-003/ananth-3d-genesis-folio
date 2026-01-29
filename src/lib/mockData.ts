@@ -1,5 +1,5 @@
 // Mock data for testing the blog system without Supabase
-import { BlogPost, BlogComment } from './supabase'
+import { BlogPost, BlogComment, BlogStats } from './supabase'
 
 // Mock comments data
 export const mockBlogComments: BlogComment[] = [
@@ -405,5 +405,19 @@ export const mockBlogAPI = {
 
   async getTotalCommentsCount(): Promise<number> {
     return mockBlogComments.length
+  },
+
+  async getStats(): Promise<BlogStats> {
+    const totalViews = mockBlogPosts.reduce((acc, p) => acc + p.views_count, 0)
+    const totalLikes = mockBlogPosts.reduce((acc, p) => acc + p.likes_count, 0)
+    const postCount = mockBlogPosts.length
+    const commentCount = mockBlogComments.length
+
+    return {
+      totalViews,
+      totalLikes,
+      postCount,
+      commentCount
+    }
   }
 }

@@ -1,40 +1,27 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   FileText,
   BarChart2,
   MessageSquare,
   Settings,
-  Layout,
   LogOut,
   Plus,
   Search,
-  Filter,
-  MoreVertical,
-  ChevronDown,
-  ChevronRight,
-  Bold,
-  Italic,
-  Link as LinkIcon,
-  Image as ImageIcon,
-  List,
-  Quote,
-  Heading,
-  Code,
+  ChevronLeft,
   Eye,
   Save,
   Send,
   Calendar as CalendarIcon,
   Clock,
-  MapPin,
-  Globe,
   Terminal,
-  X,
   Check,
-  AlertCircle,
-  Trash2
+  Trash2,
+  TrendingUp,
+  Layers,
+  Globe
 } from 'lucide-react'
-import { BlogPost as BlogPostType, BlogComment, blogAPI, isSupabaseConfigured } from '@/lib/supabase'
+import { BlogPost as BlogPostType, BlogComment, blogAPI, isSupabaseConfigured, BlogStats } from '@/lib/supabase'
 import { adminAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,13 +29,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { toast } from 'sonner'
 import { format } from 'date-fns'
-import { Calendar } from '@/components/ui/calendar'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   Area,
   AreaChart,
@@ -58,8 +38,10 @@ import {
   XAxis,
   YAxis,
   BarChart,
-  Bar
+  Bar,
+  Cell
 } from 'recharts'
+import { cn } from '@/lib/utils'
 
 interface AdminDashboardProps {
   onLogout: () => void
@@ -67,14 +49,22 @@ interface AdminDashboardProps {
 
 import { PostEditor } from './admin/PostEditor'
 
+type DashboardView = 'stats' | 'posts' | 'comments' | 'settings'
+type StatusFilter = 'all' | 'published' | 'draft' | 'scheduled'
+
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
-  const [activeView, setActiveView] = useState<'posts' | 'stats' | 'comments' | 'settings' | 'layout'>('posts')
+  const [activeView, setActiveView] = useState<DashboardView>('posts')
   const [posts, setPosts] = useState<BlogPostType[]>([])
   const [comments, setComments] = useState<(BlogComment & { post_title?: string })[]>([])
+  const [stats, setStats] = useState<BlogStats>({ totalViews: 0, totalLikes: 0, postCount: 0, commentCount: 0 })
   const [loading, setLoading] = useState(true)
   const [showEditor, setShowEditor] = useState(false)
   const [cliMode, setCliMode] = useState(false)
   
+  // Search and Filter State
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all')
+
   // Editor State
   const [editingPost, setEditingPost] = useState<BlogPostType | null>(null)
   
@@ -85,8 +75,11 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
   useEffect(() => {
     loadAllPosts()
-    if (activeView === 'comments' || activeView === 'stats') {
+    if (activeView === 'comments') {
       loadAllComments()
+    }
+    if (activeView === 'stats') {
+      loadStats()
     }
   }, [activeView])
 
@@ -116,6 +109,15 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     } catch (error) {
       console.error('Error loading comments:', error)
       toast.error('Failed to load comments')
+    }
+  }
+
+  const loadStats = async () => {
+    try {
+      const data = await blogAPI.getStats()
+      setStats(data)
+    } catch (error) {
+      console.error('Error loading stats:', error)
     }
   }
 
@@ -166,11 +168,10 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
         }
         break
       case 'stats':
-         const totalViews = posts.reduce((acc, p) => acc + p.views_count, 0)
          addOutput([
            '> System Statistics:',
            `  Total Posts: ${posts.length}`,
-           `  Total Views: ${totalViews}`
+           `  Total Views: ${posts.reduce((acc, p) => acc + p.views_count, 0)}`
          ])
          break
       case 'status':
@@ -280,16 +281,29 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     setEditingPost(null)
   }
 
-  const handleSave = async (data: any, shouldPublish: boolean) => {
+  const handleSave = async (data: Partial<BlogPostType>, shouldPublish: boolean) => {
     try {
-      const isScheduled = data.published && data.publish_at && new Date(data.publish_at) > new Date()
+      const isScheduled = shouldPublish && data.publish_at && new Date(data.publish_at) > new Date()
       
       if (editingPost) {
-        await blogAPI.updatePost(editingPost.id, data)
-        toast.success(isScheduled ? 'Post scheduled!' : (data.published ? 'Post updated!' : 'Draft saved'))
+        await blogAPI.updatePost(editingPost.id, { ...data, published: shouldPublish })
+        toast.success(isScheduled ? 'Post scheduled!' : (shouldPublish ? 'Post updated!' : 'Draft saved'))
       } else {
-        await blogAPI.createPost(data)
-        toast.success(isScheduled ? 'Post scheduled!' : (data.published ? 'Post created!' : 'Draft saved'))
+        const createData = {
+          title: data.title || 'Untitled',
+          content: data.content || '',
+          excerpt: data.excerpt || '',
+          slug: data.slug || Date.now().toString(),
+          tags: data.tags || [],
+          published: shouldPublish,
+          publish_at: data.publish_at,
+          allow_comments: data.allow_comments ?? true,
+          author_name: data.author_name || 'Ananth',
+          featured_image: data.featured_image,
+          location: data.location
+        }
+        await blogAPI.createPost(createData)
+        toast.success(isScheduled ? 'Post scheduled!' : (shouldPublish ? 'Post created!' : 'Draft saved'))
       }
 
       closeEditor()
@@ -322,24 +336,43 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     }
   }
 
+  // --- Filtered Posts ---
+  const filteredPosts = useMemo(() => {
+    return posts.filter(post => {
+      const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           post.excerpt.toLowerCase().includes(searchTerm.toLowerCase())
+
+      const now = new Date()
+      const isScheduled = post.published && post.publish_at && new Date(post.publish_at) > now
+      const isPublished = post.published && (!post.publish_at || new Date(post.publish_at) <= now)
+      const isDraft = !post.published
+
+      if (statusFilter === 'published') return matchesSearch && isPublished
+      if (statusFilter === 'draft') return matchesSearch && isDraft
+      if (statusFilter === 'scheduled') return matchesSearch && isScheduled
+
+      return matchesSearch
+    })
+  }, [posts, searchTerm, statusFilter])
+
   // --- Views ---
 
   if (cliMode) {
     return (
-      <div className="min-h-screen bg-black text-green-500 font-mono p-4 flex flex-col" onClick={() => document.getElementById('cli-input')?.focus()}>
+      <div className="min-h-screen bg-black text-emerald-500 font-mono p-4 flex flex-col" onClick={() => document.getElementById('cli-input')?.focus()}>
         <div className="flex-1 overflow-y-auto custom-scrollbar space-y-1 pb-4" ref={terminalRef}>
           {terminalOutput.map((line, i) => (
             <div key={i} className="whitespace-pre-wrap">{line}</div>
           ))}
         </div>
-        <form onSubmit={handleCommand} className="flex gap-2 border-t border-green-900/50 pt-2">
-          <span className="text-green-500 font-bold">{'>'}</span>
+        <form onSubmit={handleCommand} className="flex gap-2 border-t border-emerald-900/50 pt-2">
+          <span className="text-emerald-500 font-bold">{'>'}</span>
           <input
             id="cli-input"
             type="text"
             value={terminalInput}
             onChange={(e) => setTerminalInput(e.target.value)}
-            className="flex-1 bg-transparent border-none outline-none text-green-500 focus:ring-0"
+            className="flex-1 bg-transparent border-none outline-none text-emerald-500 focus:ring-0"
             autoFocus
             autoComplete="off"
           />
@@ -359,298 +392,429 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     )
   }
 
+  const sidebarItems: { id: DashboardView, icon: React.ElementType, label: string }[] = [
+    { id: 'stats', icon: BarChart2, label: 'Overview' },
+    { id: 'posts', icon: FileText, label: 'Posts' },
+    { id: 'comments', icon: MessageSquare, label: 'Comments' },
+    { id: 'settings', icon: Settings, label: 'Settings' },
+  ]
+
   // --- Main Dashboard Layout ---
   return (
-    <div className="min-h-screen bg-zinc-100 flex font-sans text-zinc-900">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-white border-r border-zinc-200 flex flex-col fixed h-full z-10">
-        <div className="h-16 flex items-center px-6 border-b border-zinc-100">
-          <div className="w-8 h-8 bg-orange-500 rounded-sm flex items-center justify-center text-white font-bold text-lg mr-3">
-            B
+    <div className="min-h-screen bg-zinc-950 flex font-sans text-zinc-200">
+      {/* Sidebar */}
+      <div className="w-64 bg-zinc-900/50 border-r border-zinc-800/50 backdrop-blur-xl flex flex-col fixed h-full z-20">
+        <div className="h-20 flex items-center px-6 border-b border-zinc-800/50">
+          <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-zinc-950 font-black text-xl mr-3 shadow-lg shadow-emerald-500/20">
+            G
           </div>
-          <span className="font-bold text-xl tracking-tight text-zinc-800">Blogger</span>
+          <div className="flex flex-col">
+            <span className="font-black text-lg tracking-tighter text-white leading-none">GENESIS</span>
+            <span className="text-[10px] text-emerald-500 font-bold tracking-[0.2em] uppercase mt-1">Control Node</span>
+          </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-4 mt-2">
           <Button 
              onClick={() => openEditor()} 
-             className="w-full bg-white border border-zinc-200 hover:border-orange-500 hover:bg-orange-50 text-orange-600 font-bold rounded-full h-12 shadow-sm flex items-center gap-2 transition-all justify-start px-6"
+             className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black rounded-xl h-12 shadow-lg shadow-emerald-500/10 flex items-center gap-2 transition-all group"
           >
-            <Plus className="w-5 h-5" /> New Post
+            <Plus className="w-5 h-5 group-hover:rotate-90 transition-transform duration-300" /> New Broadcast
           </Button>
         </div>
 
-        <nav className="flex-1 px-2 space-y-1 overflow-y-auto">
-          {[
-            { id: 'posts', icon: FileText, label: 'Posts' },
-            { id: 'stats', icon: BarChart2, label: 'Stats' },
-            { id: 'comments', icon: MessageSquare, label: 'Comments' },
-            { id: 'earnings', icon: Globe, label: 'Earnings' },
-            { id: 'pages', icon: Layout, label: 'Pages' },
-            { id: 'layout', icon: Layout, label: 'Layout' },
-            { id: 'theme', icon: ImageIcon, label: 'Theme' },
-            { id: 'settings', icon: Settings, label: 'Settings' },
-          ].map((item) => (
+        <nav className="flex-1 px-3 space-y-1 mt-4">
+          {sidebarItems.map((item) => (
             <button
               key={item.id}
-              onClick={() => setActiveView(item.id as any)}
-              className={`w-full flex items-center gap-4 px-6 py-3 text-sm font-medium transition-colors rounded-r-full mr-2 ${
+              onClick={() => setActiveView(item.id)}
+              className={cn(
+                "w-full flex items-center gap-3 px-4 py-3 text-sm font-bold transition-all rounded-xl relative group",
                 activeView === item.id 
-                  ? 'bg-orange-50 text-orange-600 border-l-4 border-orange-500' 
-                  : 'text-zinc-600 hover:bg-zinc-50 hover:text-zinc-900 border-l-4 border-transparent'
-              }`}
+                  ? 'bg-emerald-500/10 text-emerald-400'
+                  : 'text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300'
+              )}
             >
-              <item.icon className="w-5 h-5" />
+              <item.icon className={cn("w-5 h-5 transition-transform duration-300 group-hover:scale-110", activeView === item.id ? "text-emerald-400" : "text-zinc-500")} />
               {item.label}
+              {activeView === item.id && (
+                <motion.div layoutId="activeNav" className="absolute left-0 w-1 h-6 bg-emerald-500 rounded-r-full" />
+              )}
             </button>
           ))}
         </nav>
         
-        <div className="p-4 border-t border-zinc-100">
+        <div className="p-4 border-t border-zinc-800/50">
           <Button
             variant="ghost"
             onClick={() => setCliMode(true)}
-            className="w-full justify-start text-zinc-500 hover:text-zinc-900 px-4 rounded-sm mb-2"
+            className="w-full justify-start text-zinc-500 hover:text-emerald-400 hover:bg-emerald-500/5 px-4 rounded-xl mb-2 font-bold"
           >
             <Terminal className="w-4 h-4 mr-3" /> CLI Mode
           </Button>
           <Button
             variant="ghost"
             onClick={() => { adminAuth.logout(); onLogout() }}
-            className="w-full justify-start text-zinc-500 hover:text-red-600 px-4 rounded-sm"
+            className="w-full justify-start text-zinc-500 hover:text-red-400 hover:bg-red-400/5 px-4 rounded-xl font-bold"
           >
-            <LogOut className="w-4 h-4 mr-3" /> Sign Out
+            <LogOut className="w-4 h-4 mr-3" /> Terminate
           </Button>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 ml-64 p-8 max-w-7xl mx-auto w-full">
+      {/* Main Content Area */}
+      <div className="flex-1 ml-64 min-h-screen relative overflow-x-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-[120px] -mr-64 -mt-64" />
         
-        {/* Posts View */}
-        {activeView === 'posts' && (
-          <div className="space-y-6">
-             <div className="flex items-center justify-between">
-               <h1 className="text-2xl font-bold text-zinc-800">Posts</h1>
-               <div className="flex items-center gap-2">
-                 <div className="relative">
-                   <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-                   <Input placeholder="Search posts..." className="pl-9 w-64 bg-white border-zinc-200 rounded-sm focus:border-orange-500 focus:ring-0" />
-                 </div>
-                 <Button variant="outline" className="rounded-sm border-zinc-200 text-zinc-600 bg-white">Manage</Button>
-               </div>
-             </div>
+        <main className="p-8 max-w-7xl mx-auto w-full relative z-10">
 
-             <div className="bg-white border border-zinc-200 rounded-sm shadow-sm overflow-hidden">
-               {/* Filters */}
-               <div className="flex items-center gap-4 p-4 border-b border-zinc-100 text-sm text-zinc-500 bg-zinc-50/50">
-                 <span className="font-bold text-orange-600 border-b-2 border-orange-600 pb-4 -mb-4 px-1">All ({posts.length})</span>
-                 <span className="cursor-pointer hover:text-zinc-800 pb-4 -mb-4 px-1">Published ({posts.filter(p => p.published && (!p.publish_at || new Date(p.publish_at) <= new Date())).length})</span>
-                 <span className="cursor-pointer hover:text-zinc-800 pb-4 -mb-4 px-1">Drafts ({posts.filter(p => !p.published).length})</span>
-                 <span className="cursor-pointer hover:text-zinc-800 pb-4 -mb-4 px-1">Scheduled ({posts.filter(p => p.published && p.publish_at && new Date(p.publish_at) > new Date()).length})</span>
-               </div>
-
-               {/* Post List */}
-               <div className="divide-y divide-zinc-100">
-                 {loading ? (
-                   <div className="p-8 text-center text-zinc-400">Loading posts...</div>
-                 ) : posts.length === 0 ? (
-                   <div className="p-12 text-center flex flex-col items-center gap-4">
-                     <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
-                       <FileText className="w-8 h-8 text-zinc-300" />
-                     </div>
-                     <p className="text-zinc-500 font-medium">No posts found</p>
-                     <Button onClick={() => openEditor()} className="rounded-sm bg-orange-600 hover:bg-orange-700 text-white">Create your first post</Button>
-                   </div>
-                 ) : (
-                   posts.map(post => (
-                     <div key={post.id} className="group flex items-center gap-4 p-4 hover:bg-orange-50/30 transition-colors cursor-pointer relative" onClick={() => openEditor(post)}>
-                        <div className="w-10 h-10 bg-zinc-100 rounded-sm flex items-center justify-center flex-shrink-0 font-bold text-zinc-400 uppercase">
-                          {post.title.charAt(0)}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-bold text-zinc-800 truncate group-hover:text-orange-600 transition-colors">{post.title}</h3>
-                          <div className="flex items-center gap-3 text-xs text-zinc-500 mt-1">
-                             {post.published ? (
-                               post.publish_at && new Date(post.publish_at) > new Date() ? (
-                                 <span className="text-blue-600 font-medium flex items-center gap-1"><Clock className="w-3 h-3" /> Scheduled</span>
-                               ) : (
-                                 <span className="text-green-600 font-medium flex items-center gap-1"><Check className="w-3 h-3" /> Published</span>
-                               )
-                             ) : (
-                               <span className="text-orange-500 font-medium flex items-center gap-1"><FileText className="w-3 h-3" /> Draft</span>
-                             )}
-                             <span>•</span>
-                             <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
-                             <span>•</span>
-                             <span className="flex items-center gap-1"><Eye className="w-3 h-3" /> {post.views_count}</span>
-                             <span>•</span>
-                             <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" /> {post.comments_count || 0}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button size="icon" variant="ghost" className="h-8 w-8 text-zinc-400 hover:text-red-600" onClick={(e) => { e.stopPropagation(); handleDelete(post.id) }}>
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
-                     </div>
-                   ))
-                 )}
-               </div>
-             </div>
-          </div>
-        )}
-
-        {/* Stats View */}
-        {activeView === 'stats' && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-zinc-800">Stats</h1>
-            
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white p-6 border border-zinc-200 rounded-sm shadow-sm">
-                 <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-2">Total Views</h3>
-                 <p className="text-4xl font-bold text-zinc-900">{posts.reduce((acc, p) => acc + p.views_count, 0)}</p>
-                 <div className="mt-4 h-1 w-full bg-zinc-100 overflow-hidden">
-                   <div className="h-full bg-orange-500 w-3/4" />
-                 </div>
-              </div>
-              <div className="bg-white p-6 border border-zinc-200 rounded-sm shadow-sm">
-                 <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-2">Total Posts</h3>
-                 <p className="text-4xl font-bold text-zinc-900">{posts.length}</p>
-                 <div className="mt-4 h-1 w-full bg-zinc-100 overflow-hidden">
-                   <div className="h-full bg-blue-500 w-1/2" />
-                 </div>
-              </div>
-              <div className="bg-white p-6 border border-zinc-200 rounded-sm shadow-sm">
-                 <h3 className="text-sm font-medium text-zinc-500 uppercase tracking-wider mb-2">Total Comments</h3>
-                 <p className="text-4xl font-bold text-zinc-900">{comments.length}</p>
-                 <div className="mt-4 h-1 w-full bg-zinc-100 overflow-hidden">
-                   <div className="h-full bg-green-500 w-1/2" />
-                 </div>
-              </div>
-            </div>
-
-            <div className="bg-white p-6 border border-zinc-200 rounded-sm shadow-sm">
-              <h3 className="font-bold text-lg mb-6">Views Overview</h3>
-              <div className="h-[300px] w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={posts.slice(0, 7).map(p => ({ name: p.title.substring(0, 10), views: p.views_count }))}>
-                    <defs>
-                      <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#f97316" stopOpacity={0.1}/>
-                        <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f4f4f5" />
-                    <XAxis dataKey="name" stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                    <YAxis stroke="#a1a1aa" fontSize={12} tickLine={false} axisLine={false} />
-                    <Tooltip contentStyle={{ border: 'none', borderRadius: '4px', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
-                    <Area type="monotone" dataKey="views" stroke="#f97316" strokeWidth={2} fillOpacity={1} fill="url(#colorViews)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Comments View */}
-        {activeView === 'comments' && (
-          <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-zinc-800">Comments</h1>
-            
-            <div className="bg-white border border-zinc-200 rounded-sm shadow-sm overflow-hidden">
-              <div className="divide-y divide-zinc-100">
-                {comments.length === 0 ? (
-                  <div className="p-12 text-center flex flex-col items-center gap-4">
-                    <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center">
-                      <MessageSquare className="w-8 h-8 text-zinc-300" />
-                    </div>
-                    <p className="text-zinc-500 font-medium">No comments found</p>
+          <AnimatePresence mode="wait">
+            {/* Posts View */}
+            {activeView === 'posts' && (
+              <motion.div
+                key="posts"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-8"
+              >
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <div>
+                    <h1 className="text-4xl font-black text-white tracking-tighter">Broadcasts</h1>
+                    <p className="text-zinc-500 font-medium mt-1">Manage and monitor your digital signals.</p>
                   </div>
-                ) : (
-                  comments.map(comment => (
-                    <div key={comment.id} className="group p-6 hover:bg-orange-50/30 transition-colors">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-600 font-bold text-xs">
-                            {comment.author.charAt(0).toUpperCase()}
+
+                  <div className="flex items-center gap-3">
+                    <div className="relative group">
+                      <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-emerald-400 transition-colors" />
+                      <Input
+                        placeholder="Search posts..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10 w-full md:w-64 bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-600 focus:border-emerald-500/50 focus:ring-0 rounded-xl transition-all"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl overflow-hidden backdrop-blur-sm shadow-2xl">
+                  {/* Status Filters */}
+                  <div className="flex items-center gap-6 p-4 border-b border-zinc-800/50 text-sm font-bold bg-zinc-900/30 overflow-x-auto no-scrollbar">
+                    {(['all', 'published', 'draft', 'scheduled'] as StatusFilter[]).map(fid => {
+                      const labels: Record<StatusFilter, string> = {
+                        all: 'All Signals',
+                        published: 'Live',
+                        draft: 'Drafts',
+                        scheduled: 'Scheduled'
+                      }
+                      const count = fid === 'all' ? posts.length :
+                                    fid === 'published' ? posts.filter(p => p.published && (!p.publish_at || new Date(p.publish_at) <= new Date())).length :
+                                    fid === 'draft' ? posts.filter(p => !p.published).length :
+                                    posts.filter(p => p.published && p.publish_at && new Date(p.publish_at) > new Date()).length
+
+                      return (
+                        <button
+                          key={fid}
+                          onClick={() => setStatusFilter(fid)}
+                          className={cn(
+                            "whitespace-nowrap pb-4 -mb-4 px-1 transition-all relative",
+                            statusFilter === fid ? "text-emerald-400" : "text-zinc-500 hover:text-zinc-300"
+                          )}
+                        >
+                          {labels[fid]} <span className="ml-1 opacity-40 text-[10px]">{count}</span>
+                          {statusFilter === fid && (
+                            <motion.div layoutId="filterUnderline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {/* Post List */}
+                  <div className="divide-y divide-zinc-800/30">
+                    {loading ? (
+                      <div className="p-20 text-center">
+                        <div className="w-10 h-10 border-2 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mx-auto mb-4" />
+                        <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">Scanning Frequencies...</p>
+                      </div>
+                    ) : filteredPosts.length === 0 ? (
+                      <div className="p-20 text-center flex flex-col items-center gap-6">
+                        <div className="w-20 h-20 bg-zinc-800/50 rounded-3xl flex items-center justify-center border border-zinc-700/50">
+                          <FileText className="w-10 h-10 text-zinc-600" />
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-white font-black text-xl tracking-tight">No signals detected</p>
+                          <p className="text-zinc-500 max-w-xs mx-auto">Try adjusting your filters or initiate a new broadcast session.</p>
+                        </div>
+                        <Button onClick={() => openEditor()} className="bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black rounded-xl">Create Post</Button>
+                      </div>
+                    ) : (
+                      filteredPosts.map(post => (
+                        <div
+                          key={post.id}
+                          className="group flex items-center gap-6 p-5 hover:bg-emerald-500/5 transition-all cursor-pointer relative"
+                          onClick={() => openEditor(post)}
+                        >
+                           <div className="w-14 h-14 bg-zinc-800/50 rounded-2xl flex items-center justify-center flex-shrink-0 font-black text-zinc-600 text-xl border border-zinc-700/30 group-hover:border-emerald-500/30 transition-all overflow-hidden relative">
+                             {post.featured_image ? (
+                               <img src={post.featured_image} alt="" className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity" />
+                             ) : (
+                               post.title.charAt(0)
+                             )}
+                             <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/80 to-transparent" />
+                           </div>
+
+                           <div className="flex-1 min-w-0">
+                             <h3 className="font-bold text-white text-lg truncate group-hover:text-emerald-400 transition-colors tracking-tight">{post.title}</h3>
+                             <div className="flex items-center gap-4 text-[10px] text-zinc-500 mt-2 font-bold uppercase tracking-wider">
+                                {post.published ? (
+                                  post.publish_at && new Date(post.publish_at) > new Date() ? (
+                                    <span className="text-blue-400 flex items-center gap-1.5 bg-blue-400/10 px-2 py-0.5 rounded-md border border-blue-400/20"><Clock className="w-3 h-3" /> Scheduled</span>
+                                  ) : (
+                                    <span className="text-emerald-400 flex items-center gap-1.5 bg-emerald-400/10 px-2 py-0.5 rounded-md border border-emerald-400/20"><Check className="w-3 h-3" /> Active</span>
+                                  )
+                                ) : (
+                                  <span className="text-zinc-400 flex items-center gap-1.5 bg-zinc-800 px-2 py-0.5 rounded-md border border-zinc-700"><FileText className="w-3 h-3" /> Offline</span>
+                                )}
+                                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5" /> {post.views_count}</span>
+                                <span className="flex items-center gap-1.5"><MessageSquare className="w-3.5 h-3.5" /> {post.comments_count || 0}</span>
+                                <span>{format(new Date(post.created_at), 'MMM d, yyyy')}</span>
+                             </div>
+                           </div>
+
+                           <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0">
+                             <Button
+                              size="icon"
+                              variant="ghost"
+                              className="h-10 w-10 text-zinc-500 hover:text-red-400 hover:bg-red-400/10 rounded-xl"
+                              onClick={(e) => { e.stopPropagation(); handleDelete(post.id) }}
+                             >
+                               <Trash2 className="w-5 h-5" />
+                             </Button>
+                           </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Stats View */}
+            {activeView === 'stats' && (
+              <motion.div
+                key="stats"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-8"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h1 className="text-4xl font-black text-white tracking-tighter">Analytics</h1>
+                    <p className="text-zinc-500 font-medium mt-1">Real-time signal data monitoring.</p>
+                  </div>
+                  <Button variant="outline" className="border-zinc-800 text-zinc-400 hover:text-emerald-400 hover:bg-emerald-400/5 rounded-xl gap-2 font-bold">
+                    <Send className="w-4 h-4" /> Export Report
+                  </Button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[
+                    { label: 'Total Signal Reach', value: stats.totalViews, icon: Eye, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
+                    { label: 'Network Resonance', value: stats.totalLikes, icon: TrendingUp, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+                    { label: 'Broadcast Count', value: stats.postCount, icon: Layers, color: 'text-purple-400', bg: 'bg-purple-400/10' },
+                    { label: 'User Feedback', value: stats.commentCount, icon: MessageSquare, color: 'text-amber-400', bg: 'bg-amber-400/10' },
+                  ].map((stat, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: i * 0.1 }}
+                      className="bg-zinc-900/50 p-6 border border-zinc-800/50 rounded-2xl shadow-xl backdrop-blur-sm group hover:border-emerald-500/20 transition-all"
+                    >
+                       <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-300", stat.bg)}>
+                          <stat.icon className={cn("w-6 h-6", stat.color)} />
+                       </div>
+                       <h3 className="text-xs font-black text-zinc-500 uppercase tracking-widest mb-1">{stat.label}</h3>
+                       <p className="text-3xl font-black text-white tracking-tighter">{stat.value.toLocaleString()}</p>
+                    </motion.div>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="bg-zinc-900/50 p-6 border border-zinc-800/50 rounded-2xl shadow-xl backdrop-blur-sm">
+                    <h3 className="font-black text-white text-lg mb-8 tracking-tight">Signal Distribution</h3>
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={posts.slice(0, 10).reverse().map(p => ({ name: p.title.substring(0, 10), views: p.views_count }))}>
+                          <defs>
+                            <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                              <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+                          <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
+                          <Tooltip
+                            contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px', color: '#fff' }}
+                            itemStyle={{ color: '#10b981' }}
+                          />
+                          <Area type="monotone" dataKey="views" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorViews)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  <div className="bg-zinc-900/50 p-6 border border-zinc-800/50 rounded-2xl shadow-xl backdrop-blur-sm">
+                    <h3 className="font-black text-white text-lg mb-8 tracking-tight">Post Engagement</h3>
+                    <div className="h-[300px] w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={posts.slice(0, 8).map(p => ({ name: p.title.substring(0, 10), engagement: (p.likes_count || 0) + (p.comments_count || 0) }))}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#27272a" />
+                          <XAxis dataKey="name" stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
+                          <YAxis stroke="#52525b" fontSize={10} tickLine={false} axisLine={false} />
+                          <Tooltip
+                             contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '12px', color: '#fff' }}
+                          />
+                          <Bar dataKey="engagement" fill="#3b82f6" radius={[6, 6, 0, 0]}>
+                            {posts.slice(0, 8).map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={index % 2 === 0 ? '#10b981' : '#3b82f6'} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Comments View */}
+            {activeView === 'comments' && (
+              <motion.div
+                key="comments"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="space-y-8"
+              >
+                <div>
+                  <h1 className="text-4xl font-black text-white tracking-tighter">Feedback Loop</h1>
+                  <p className="text-zinc-500 font-medium mt-1">Direct communication from the network.</p>
+                </div>
+
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl shadow-xl backdrop-blur-sm overflow-hidden">
+                  <div className="divide-y divide-zinc-800/50">
+                    {comments.length === 0 ? (
+                      <div className="p-20 text-center flex flex-col items-center gap-6">
+                        <div className="w-20 h-20 bg-zinc-800/50 rounded-3xl flex items-center justify-center border border-zinc-700/50">
+                          <MessageSquare className="w-10 h-10 text-zinc-600" />
+                        </div>
+                        <p className="text-zinc-500 font-bold uppercase tracking-widest text-xs">No feedback signals received</p>
+                      </div>
+                    ) : (
+                      comments.map(comment => (
+                        <div key={comment.id} className="group p-6 hover:bg-emerald-500/5 transition-all">
+                          <div className="flex justify-between items-start mb-4">
+                            <div className="flex items-center gap-4">
+                              <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center text-emerald-400 font-black text-sm border border-emerald-500/20">
+                                {comment.author.charAt(0).toUpperCase()}
+                              </div>
+                              <div>
+                                <span className="font-black text-white block text-sm tracking-tight">{comment.author}</span>
+                                <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">
+                                  Signal: <span className="text-emerald-500">{comment.post_title || 'Unknown Source'}</span>
+                                </span>
+                              </div>
+                            </div>
+                            <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest bg-zinc-800/50 px-2 py-1 rounded-md">
+                              {format(new Date(comment.created_at), 'MMM d, HH:mm')}
+                            </span>
                           </div>
-                          <div>
-                            <span className="font-bold text-zinc-900 block text-sm">{comment.author}</span>
-                            <span className="text-xs text-zinc-500">on <span className="font-medium text-orange-600">{comment.post_title || 'Unknown Post'}</span></span>
+
+                          <p className="text-zinc-400 text-sm pl-14 mb-6 leading-relaxed">{comment.content}</p>
+
+                          <div className="pl-14 flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all translate-y-1 group-hover:translate-y-0">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-9 px-4 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-xl font-bold gap-2"
+                              onClick={() => handleDeleteComment(comment.id)}
+                            >
+                              <Trash2 className="w-4 h-4" /> Purge Signal
+                            </Button>
                           </div>
                         </div>
-                        <span className="text-xs text-zinc-400">{format(new Date(comment.created_at), 'MMM d, yyyy • h:mm a')}</span>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* Settings View */}
+            {activeView === 'settings' && (
+              <motion.div
+                key="settings"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="max-w-3xl space-y-8"
+              >
+                <div>
+                  <h1 className="text-4xl font-black text-white tracking-tighter">Core Config</h1>
+                  <p className="text-zinc-500 font-medium mt-1">Adjust Genesis Node parameters.</p>
+                </div>
+
+                <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-2xl shadow-xl backdrop-blur-sm p-8 space-y-10">
+                  <div className="space-y-6">
+                    <h3 className="text-emerald-400 font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-emerald-500" /> System Identity
+                    </h3>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-zinc-800/30">
+                        <span className="text-zinc-500 font-bold text-sm uppercase tracking-wider">Node Title</span>
+                        <span className="text-white font-black tracking-tight">Genesis Blog v4.2</span>
                       </div>
-                      
-                      <p className="text-zinc-600 text-sm pl-11 mb-4">{comment.content}</p>
-                      
-                      <div className="pl-11 flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 text-red-500 hover:text-red-600 hover:bg-red-50 -ml-2"
-                          onClick={() => handleDeleteComment(comment.id)}
-                        >
-                          <Trash2 className="w-3 h-3 mr-2" /> Delete
-                        </Button>
+                      <div className="flex justify-between items-center py-2 border-b border-zinc-800/30">
+                        <span className="text-zinc-500 font-bold text-sm uppercase tracking-wider">Protocol</span>
+                        <span className="text-emerald-500 font-bold font-mono text-xs">HTTPS / SECURE</span>
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-        
-        {/* Settings / Other Views */}
-        {['settings', 'layout', 'theme', 'pages', 'earnings'].includes(activeView) && (
-           <div className="bg-white border border-zinc-200 rounded-sm shadow-sm p-8 max-w-3xl">
-              <h2 className="text-xl font-bold mb-6 capitalize">{activeView}</h2>
-              
-              {activeView === 'settings' && (
-                <div className="space-y-8">
-                  <div className="space-y-4">
-                    <h3 className="text-orange-600 font-bold border-b border-zinc-100 pb-2">Basic</h3>
-                    <div className="grid grid-cols-3 gap-4 py-2">
-                       <div className="text-zinc-500 font-medium">Title</div>
-                       <div className="col-span-2 text-zinc-900 font-medium">Genesis Blog</div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-4 py-2">
-                       <div className="text-zinc-500 font-medium">Description</div>
-                       <div className="col-span-2 text-zinc-900">A futuristic tech blog about AI and 3D web.</div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-zinc-500 font-bold text-sm uppercase tracking-wider">Status</span>
+                        <span className="text-emerald-400 flex items-center gap-2 font-black text-xs">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> OPTIMAL
+                        </span>
+                      </div>
                     </div>
                   </div>
                   
-                  <div className="space-y-4">
-                    <h3 className="text-orange-600 font-bold border-b border-zinc-100 pb-2">Privacy</h3>
-                    <div className="flex items-center justify-between py-2">
-                       <div className="text-zinc-900 font-medium">Visible to search engines</div>
-                       <Switch checked={true} className="data-[state=checked]:bg-orange-500" />
+                  <div className="space-y-6">
+                    <h3 className="text-emerald-400 font-black text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+                       <div className="w-2 h-2 rounded-full bg-emerald-500" /> Encryption & Privacy
+                    </h3>
+                    <div className="flex items-center justify-between p-4 bg-zinc-800/30 rounded-xl border border-zinc-700/30">
+                       <div className="space-y-1">
+                         <div className="text-white font-black text-sm tracking-tight">Public Visibility</div>
+                         <div className="text-zinc-500 text-xs">Broadcast signal to global search engines.</div>
+                       </div>
+                       <Switch checked={true} className="data-[state=checked]:bg-emerald-500" />
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <h3 className="text-orange-600 font-bold border-b border-zinc-100 pb-2">Publishing</h3>
-                    <div className="grid grid-cols-3 gap-4 py-2">
-                       <div className="text-zinc-500 font-medium">Blog Address</div>
-                       <div className="col-span-2 text-zinc-900 font-mono bg-zinc-50 p-2 rounded-sm">ananth-dev.blogspot.com</div>
-                    </div>
+                  <div className="p-6 bg-emerald-500/5 border border-emerald-500/10 rounded-xl">
+                    <p className="text-emerald-400 text-xs font-bold leading-relaxed text-center italic">
+                      "Control is an illusion, but settings are real. Configure with absolute intent."
+                    </p>
                   </div>
                 </div>
-              )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-              {activeView !== 'settings' && (
-                <div className="text-center py-12 text-zinc-400">
-                  <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                     <Settings className="w-8 h-8 text-zinc-300" />
-                  </div>
-                  <p>This module is currently under construction.</p>
-                </div>
-              )}
-           </div>
-        )}
-
+        </main>
       </div>
     </div>
   )
