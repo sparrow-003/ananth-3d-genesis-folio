@@ -2,6 +2,8 @@ import { useEffect, useState, lazy, Suspense, memo, useCallback } from "react";
 import SmoothScroll from "../components/SmoothScroll";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import MatrixLoader from "../components/MatrixLoader";
+import { AnimatePresence } from "framer-motion";
 
 // Lazy load heavy components with prefetch
 const ParticleBackground = lazy(() => import("../components/ParticleBackground"));
@@ -20,20 +22,7 @@ const SectionLoader = memo(() => (
 
 SectionLoader.displayName = 'SectionLoader';
 
-// Quick loading screen - minimal delay
-const LoadingScreen = memo(() => (
-  <div className="fixed inset-0 flex flex-col items-center justify-center bg-black z-50">
-    <div className="relative z-10 flex flex-col items-center gap-4">
-      <div className="relative w-12 h-12">
-        <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-        <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
-      </div>
-      <p className="text-emerald-400 text-sm font-medium tracking-wider">ANANTH DEV</p>
-    </div>
-  </div>
-));
-
-LoadingScreen.displayName = 'LoadingScreen';
+SectionLoader.displayName = 'SectionLoader';
 
 const Index = memo(() => {
   const [isLoading, setIsLoading] = useState(true);
@@ -62,7 +51,7 @@ const Index = memo(() => {
     };
 
     window.addEventListener('load', handleLoad);
-    
+
     return () => {
       clearTimeout(quickTimer);
       window.removeEventListener('load', handleLoad);
@@ -79,24 +68,23 @@ const Index = memo(() => {
         import("../components/Projects");
         import("../components/Contact");
       }, 100);
-      
+
       return () => clearTimeout(prefetchTimeout);
     }
   }, [isReady]);
 
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
-
   return (
     <div className="w-full min-h-screen relative overflow-x-hidden">
+      <AnimatePresence>
+        {isLoading && <MatrixLoader onComplete={() => setIsLoading(false)} />}
+      </AnimatePresence>
       {/* Background - render immediately but with low priority */}
       <Suspense fallback={null}>
         <ParticleBackground />
       </Suspense>
-      
+
       <Navbar />
-      
+
       <main className="relative w-full">
         <SmoothScroll>
           <Suspense fallback={<SectionLoader />}>
@@ -116,7 +104,7 @@ const Index = memo(() => {
           </Suspense>
         </SmoothScroll>
       </main>
-      
+
       <Footer />
     </div>
   );
