@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { memo, useState, useRef, useEffect } from 'react';
-import avatarImage1 from '@/assets/avatar-art-1.png';
+import avatarImage1 from '/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png';
 import avatarImage2 from '@/assets/avatar-art-2.png';
 import avatarImage3 from '@/assets/avatar-art-3.png';
 
@@ -59,7 +59,7 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className={`relative cursor-none group ${className}`}
       onMouseMove={handleMouseMove}
@@ -69,11 +69,10 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
     >
       {/* 1. Cinematic Aura (Ambient Glow) */}
       <motion.div
-        className={`absolute -inset-8 rounded-[40px] opacity-20 blur-3xl transition-colors duration-700 bg-gradient-to-br ${
-          variant === 'hero' ? 'from-emerald-500 via-emerald-400 to-transparent' : 
-          variant === 'about' ? 'from-teal-500 via-emerald-400 to-transparent' : 
-          'from-cyan-500 via-teal-400 to-transparent'
-        }`}
+        className={`absolute -inset-8 rounded-[40px] opacity-20 blur-3xl transition-colors duration-700 bg-gradient-to-br ${variant === 'hero' ? 'from-emerald-500 via-emerald-400 to-transparent' :
+            variant === 'about' ? 'from-teal-500 via-emerald-400 to-transparent' :
+              'from-cyan-500 via-teal-400 to-transparent'
+          }`}
         animate={{
           scale: isHovered ? [1, 1.2, 1] : 1,
           opacity: isHovered ? 0.4 : 0.2,
@@ -146,7 +145,7 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
           />
 
           {/* Liquid Light Sweep Effect */}
-          <motion.div 
+          <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full"
             animate={{
               translateX: ["100%", "-100%"],
@@ -161,7 +160,7 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
 
           {/* Glass Overlay with Chromatic Aberration Simulation */}
           <div className="absolute inset-0 bg-gradient-to-br from-white/10 via-transparent to-black/40 pointer-events-none" />
-          
+
           {/* Subtle Scanline Overlay */}
           <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.1)_50%),linear-gradient(90deg,rgba(255,0,0,0.03),rgba(0,255,0,0.01),rgba(0,0,255,0.03))] z-10 bg-[length:100%_4px,3px_100%] pointer-events-none opacity-20" />
         </div>
