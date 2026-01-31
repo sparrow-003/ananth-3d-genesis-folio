@@ -62,11 +62,11 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <h2 className="text-5xl font-extrabold tracking-tighter text-white mb-6 drop-shadow-md uppercase italic">
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-white mb-6 drop-shadow-md uppercase italic">
               About Me
             </h2>
             <motion.p
-              className="text-xl text-muted-foreground max-w-3xl leading-relaxed"
+              className="text-lg md:text-xl text-muted-foreground max-w-3xl leading-relaxed"
               variants={fadeInUp(0.2)}
             >
               I'm Ananth — a developer, educator, and innovator driven by curiosity

@@ -105,7 +105,7 @@ Best regards,
             transition={{ duration: 0.5 }}
           >
             <h2
-              className="section-title bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 uppercase italic tracking-tighter"
+              className="section-title text-3xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 uppercase italic tracking-tighter"
             >
               Get In Touch
             </h2>
@@ -152,7 +152,7 @@ Best regards,
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Contact Form with enhanced animations */}
           <motion.div
-            className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 lg:col-span-3 border border-emerald-500/10 shadow-2xl"
+            className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 md:p-8 lg:col-span-3 border border-emerald-500/10 shadow-2xl"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.5, delay: 0.3 }}

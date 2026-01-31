@@ -1,6 +1,7 @@
 import { useState, useEffect, Suspense, lazy, memo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import { toast } from 'sonner'
 import Navbar from '@/components/Navbar'
@@ -29,35 +30,34 @@ const Blog = memo(() => {
   const { slug } = useParams()
   const navigate = useNavigate()
   const [selectedPost, setSelectedPost] = useState<BlogPostType | null>(null)
-  const [loading, setLoading] = useState(false)
+
+  const { data: fetchedPost, isLoading, isError } = useQuery({
+    queryKey: ['post', slug],
+    queryFn: () => blogAPI.getPostBySlug(slug!),
+    enabled: !!slug,
+    retry: 1
+  })
 
   useEffect(() => {
-    if (slug) {
-      loadPostBySlug(slug)
-    } else {
+    if (slug && fetchedPost) {
+      setSelectedPost(fetchedPost)
+      blogAPI.incrementViews(fetchedPost.id)
+    } else if (!slug) {
       setSelectedPost(null)
     }
-  }, [slug])
+  }, [slug, fetchedPost])
 
-  const loadPostBySlug = useCallback(async (postSlug: string) => {
-    setLoading(true)
-    try {
-      const post = await blogAPI.getPostBySlug(postSlug)
-      if (post) {
-        setSelectedPost(post)
-        blogAPI.incrementViews(post.id)
-      } else {
-        toast.error('Post not found')
-        navigate('/blog')
-      }
-    } catch (error) {
-      console.error('Error loading post:', error)
+  useEffect(() => {
+    if (isError) {
       toast.error('Failed to load post')
       navigate('/blog')
-    } finally {
-      setLoading(false)
     }
-  }, [navigate])
+    if (slug && !isLoading && !fetchedPost && !isError) {
+       // Post not found
+       // toast.error('Post not found') // Optional: might be double toast if isError also triggers
+    }
+  }, [isError, slug, isLoading, fetchedPost, navigate])
+
 
   const handlePostSelect = useCallback((post: BlogPostType) => {
     setSelectedPost(post)
@@ -79,7 +79,7 @@ const Blog = memo(() => {
 
       <main className="pt-24 pb-12 relative z-10 min-h-[80vh]">
         <AnimatePresence mode="wait">
-          {loading ? (
+          {isLoading ? (
             <motion.div
               key="loading"
               initial={{ opacity: 0 }}

@@ -1,7 +1,7 @@
 // Simple admin authentication
 const ADMIN_CREDENTIALS = {
-  ID: "alex@2004",
-  PASS: "alex@2004"
+  ID: import.meta.env.VITE_ADMIN_ID,
+  PASS: import.meta.env.VITE_ADMIN_PASS
 }
 
 export const adminAuth = {

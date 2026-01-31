@@ -2,13 +2,26 @@ import { createClient } from '@supabase/supabase-js'
 import { mockBlogAPI } from './mockData'
 
 // Supabase configuration - connected to your database
-const supabaseUrl = 'https://ahdxviaqamejzvtbsicg.supabase.co'
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoZHh2aWFxYW1lanp2dGJzaWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MjY3MDAsImV4cCI6MjA4NTEwMjcwMH0.ekoCAaOd6WVrdWT3AnTsYVsQVte2wqlsdvXGXLQ'
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn('Supabase URL or Anon Key is missing. Check your .env.local file.')
+}
+
+export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
 
 // Supabase is now configured and connected
-export const isSupabaseConfigured = true
+export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey
+
+// Helper to sanitize post data before sending to Supabase
+const sanitizePostData = (post: any) => {
+  const { 
+    id, created_at, updated_at, likes_count, views_count, comments_count, blog_comments, 
+    ...cleanData 
+  } = post
+  return cleanData
+}
 
 export interface BlogPost {
   id: string
@@ -110,17 +123,24 @@ export const blogAPI = {
       return mockBlogAPI.createPost(post)
     }
 
+    // Ensure slug is unique-ish or handle error later
+    // Sanitize data to remove any unknown fields
+    const cleanPost = sanitizePostData(post)
+
     const { data, error } = await supabase
       .from('blog_posts')
       .insert([{
-        ...post,
+        ...cleanPost,
         likes_count: 0,
         views_count: 0
       }])
       .select()
       .single()
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase createPost error:', error)
+      throw new Error(error.message)
+    }
     return data
   },
 
@@ -130,14 +150,19 @@ export const blogAPI = {
       return mockBlogAPI.updatePost(id, updates)
     }
 
+    const cleanUpdates = sanitizePostData(updates)
+
     const { data, error } = await supabase
       .from('blog_posts')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
       .eq('id', id)
       .select()
       .single()
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase updatePost error:', error)
+      throw new Error(error.message)
+    }
     return data
   },
 

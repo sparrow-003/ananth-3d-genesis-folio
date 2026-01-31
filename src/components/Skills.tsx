@@ -132,7 +132,7 @@ const Skills = () => {
 
       <div className="section-container relative z-10">
         <motion.h2
-          className="section-title text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-400"
+          className="section-title text-3xl md:text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-400"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}

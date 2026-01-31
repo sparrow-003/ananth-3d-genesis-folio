@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useMemo, useCallback, memo } from 'react'
+import React, { useState, useMemo, useCallback, memo } from 'react'
 import { motion } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 import { Search, Filter, Calendar, Tag } from 'lucide-react'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import BlogCard from './BlogCard'
@@ -30,27 +31,14 @@ const LoadingSpinner = memo(() => (
 LoadingSpinner.displayName = 'LoadingSpinner'
 
 const BlogList = memo(({ onPostSelect }: BlogListProps) => {
-  const [posts, setPosts] = useState<BlogPostType[]>([])
-  const [loading, setLoading] = useState(true)
+  const { data: posts = [], isLoading: loading } = useQuery({
+    queryKey: ['posts'],
+    queryFn: blogAPI.getPosts
+  })
+
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedTag, setSelectedTag] = useState<string>('')
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest')
-
-  useEffect(() => {
-    loadPosts()
-  }, [])
-
-  const loadPosts = useCallback(async () => {
-    try {
-      setLoading(true)
-      const data = await blogAPI.getPosts()
-      setPosts(data)
-    } catch (error) {
-      console.error('Error loading posts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
 
   const allTags = useMemo(() => {
     const tagSet = new Set<string>()
@@ -127,7 +115,7 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
         <div className="flex items-center justify-center gap-2 mb-4">
           <span className="text-primary font-bold uppercase tracking-[0.3em] text-xs">The Journal</span>
         </div>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 text-foreground tracking-tighter uppercase">
+        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 text-foreground tracking-tighter uppercase">
           Blog
         </h1>
         <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-serif px-4">

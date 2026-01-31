@@ -6,6 +6,50 @@
 
 @layer base {
   :root {
+    /* Light Mode (Premium Emerald/White Theme) */
+    --background: 0 0% 100%;
+    --foreground: 160 50% 5%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 160 50% 5%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 160 50% 5%;
+
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 160 20% 96%;
+    --secondary-foreground: 160 50% 5%;
+
+    --muted: 160 20% 96%;
+    --muted-foreground: 160 5% 45%;
+
+    --accent: 160 20% 96%;
+    --accent-foreground: 160 50% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 160 20% 90%;
+    --input: 160 20% 90%;
+    --ring: 160 84% 39%;
+
+    --radius: 0.75rem;
+
+    /* Light Mode Gradients - Subtle & Clean */
+    --bg-main: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(160, 30%, 97%) 50%, hsl(167, 40%, 96%) 100%);
+    --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(160, 20%, 98%) 100%);
+    --bg-projects: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(160, 25%, 97%) 30%, hsl(167, 30%, 96%) 70%, hsl(173, 35%, 95%) 100%);
+    --bg-glass: hsla(160, 30%, 95%, 0.6);
+
+    /* Light Mode Glows */
+    --glow-primary: 0 0 60px hsla(160, 84%, 39%, 0.1);
+    --glow-secondary: 0 0 80px hsla(167, 80%, 42%, 0.08);
+  }
+
+  .dark {
+    /* Dark Mode (Premium Emerald/Black Theme) */
     --background: 0 0% 0%;
     --foreground: 0 0% 98%;
 
@@ -34,17 +78,16 @@
     --input: 160 40% 15%;
     --ring: 160 84% 39%;
 
-    --radius: 0.75rem;
-
-    /* Enhanced gradient backgrounds with vibrant colors */
+    /* Dark Mode Gradients - Deep & Immersive */
     --bg-main: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(160, 50%, 5%) 50%, hsl(167, 60%, 8%) 100%);
     --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 0%) 0%, hsl(160, 40%, 5%) 100%);
     --bg-projects: linear-gradient(135deg, hsl(0, 0%, 0%) 0%, hsl(160, 45%, 6%) 30%, hsl(167, 55%, 7%) 70%, hsl(173, 60%, 10%) 100%);
     --bg-glass: hsla(160, 50%, 10%, 0.4);
 
-    /* Enhanced glow effects with emerald/teal theme */
+    /* Dark Mode Glows */
     --glow-primary: 0 0 60px hsla(160, 84%, 39%, 0.4);
     --glow-secondary: 0 0 80px hsla(167, 80%, 42%, 0.3);
+  }
     --glow-accent: 0 0 100px hsla(173, 80%, 40%, 0.25);
   }
 
@@ -78,9 +121,8 @@
   }
 
   body {
-    @apply text-foreground font-body;
-    background: radial-gradient(ellipse at top, hsl(160, 50%, 5%) 0%, hsl(0, 0%, 0%) 50%),
-      radial-gradient(ellipse at bottom, hsl(167, 60%, 8%) 0%, hsl(0, 0%, 0%) 50%);
+    @apply text-foreground font-body bg-background;
+    background-image: var(--bg-body);
     background-attachment: fixed;
     overflow-x: hidden;
     min-height: 100vh;

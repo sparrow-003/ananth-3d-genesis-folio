@@ -161,9 +161,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
 
       closeEditor()
       loadAllPosts()
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving:', error)
-      toast.error('Failed to save')
+      toast.error(`Failed to save: ${error.message || 'Unknown error'}`)
     }
   }
 
@@ -173,8 +173,9 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
       await blogAPI.deletePost(id)
       toast.success('Post deleted')
       loadAllPosts()
-    } catch (error) {
-      toast.error('Failed to delete')
+    } catch (error: any) {
+      console.error('Error deleting:', error)
+      toast.error(`Failed to delete: ${error.message || 'Unknown error'}`)
     }
   }
 

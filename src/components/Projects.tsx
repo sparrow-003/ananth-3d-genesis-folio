@@ -169,7 +169,7 @@ const ProjectDetails = ({ project }: any) => {
 
           <div className="relative grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
             {/* Left side - Visual */}
-            <div className="relative p-8 lg:p-12 flex flex-col justify-center">
+            <div className="relative p-6 lg:p-12 flex flex-col justify-center">
               <div className={`
                 inline-flex p-4 rounded-3xl mb-6
                 bg-gradient-to-br ${project.gradient} text-white shadow-2xl
@@ -177,7 +177,7 @@ const ProjectDetails = ({ project }: any) => {
                 {project.icon}
               </div>
 
-              <h2 className="text-4xl lg:text-5xl font-bold text-white mb-3">
+              <h2 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
                 {project.title}
               </h2>
               <p className="text-xl text-gray-300 mb-6 font-medium">

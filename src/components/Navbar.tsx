@@ -86,7 +86,19 @@ const Navbar = () => {
           borderBottom: isScrolled ? '1px solid rgba(16, 185, 129, 0.1)' : '1px solid transparent',
         }}
       >
-        <div className="max-w-7xl mx-auto flex justify-center items-center">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          {/* Brand / Logo */}
+          <a 
+            href="#home" 
+            className="text-xl font-bold tracking-tighter text-white hover:text-emerald-400 transition-colors z-50 relative"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollToSection('#home');
+            }}
+          >
+            ANANTH<span className="text-emerald-500">.N</span>
+          </a>
+
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-4 lg:space-x-8">
             {navItems.map((item, index) => (
@@ -120,13 +132,19 @@ const Navbar = () => {
                 {item.name}
               </motion.a>
             ))}
+            <div className="pl-4">
+              <ThemeToggle />
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            className="md:hidden focus:outline-none text-light"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+          <div className="md:hidden flex items-center space-x-4">
+            <ThemeToggle />
+            <button
+              className="focus:outline-none text-light p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
             <svg
               className="w-6 h-6"
               fill="none"

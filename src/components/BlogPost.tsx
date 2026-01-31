@@ -184,7 +184,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
             </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 leading-tight tracking-tight text-gradient">
+          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 leading-tight tracking-tight text-gradient">
             {post.title}
           </h1>
 
