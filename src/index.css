@@ -299,6 +299,11 @@
     backface-visibility: hidden;
   }
 
+  .glow-text {
+    text-shadow: 0 0 10px hsla(160, 84%, 39%, 0.5), 0 0 20px hsla(160, 84%, 39%, 0.3);
+  }
+}
+
   .image-3d:hover {
     transform: perspective(1000px) rotateY(15deg) rotateX(-5deg) scale(1.05);
   }

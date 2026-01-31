@@ -67,10 +67,10 @@ const Blog = memo(() => {
   }, [navigate])
 
   return (
-    <div className="min-h-screen bg-background relative overflow-x-hidden">
-      {/* Background gradient matching main site */}
-      <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 -z-10" />
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent -z-10" />
+    <div className="min-h-screen relative overflow-x-hidden">
+      <Suspense fallback={null}>
+        <ParticleBackground />
+      </Suspense>
       
       <Navbar />
 

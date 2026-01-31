@@ -246,26 +246,50 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           </p>
         </motion.div>
       ) : (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
-        >
-          {filteredPosts.map((post, index) => (
+        <div className="space-y-12">
+          {/* Featured Post Section */}
+          {!searchTerm && !selectedTag && sortBy === 'newest' && filteredPosts.length > 0 && (
             <motion.div
-              key={post.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+              transition={{ duration: 0.5 }}
             >
+              <div className="flex items-center gap-4 mb-8">
+                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary glow-text">Featured Story</span>
+                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+              </div>
+              
               <BlogCard
-                post={post}
-                onClick={() => onPostSelect(post)}
+                post={filteredPosts[0]}
+                onClick={() => onPostSelect(filteredPosts[0])}
+                featured={true}
               />
             </motion.div>
-          ))}
-        </motion.div>
+          )}
+
+          {/* Regular Posts Grid */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
+          >
+            {(!searchTerm && !selectedTag && sortBy === 'newest' ? filteredPosts.slice(1) : filteredPosts).map((post, index) => (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+              >
+                <BlogCard
+                  post={post}
+                  onClick={() => onPostSelect(post)}
+                />
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       )}
     </div>
   )

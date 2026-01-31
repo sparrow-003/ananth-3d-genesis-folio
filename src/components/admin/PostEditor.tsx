@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Save, X, Send, Calendar as CalendarIcon, MapPin, 
   MessageSquare, User, Tag, Link as LinkIcon, 
   ChevronLeft, MoreVertical, Globe, Eye, Trash2,
-  Clock, FileText, Settings
+  Clock, FileText, Settings, Image as ImageIcon,
+  LayoutTemplate, Bold, Italic, Heading, Quote, 
+  List, Code
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Switch } from '@/components/ui/switch'
 import { Calendar } from '@/components/ui/calendar'
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet"
 import {
   Accordion,
   AccordionContent,
@@ -22,6 +30,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { format } from 'date-fns'
 import { BlogPost } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
@@ -52,7 +66,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   const [publishDate, setPublishDate] = useState<Date | undefined>(undefined)
   const [publishTime, setPublishTime] = useState<string>('')
   const [scheduleEnabled, setScheduleEnabled] = useState(false)
-  const [showPreview, setShowPreview] = useState(false)
+  const [activeTab, setActiveTab] = useState('write')
 
   useEffect(() => {
     if (post) {
@@ -106,6 +120,30 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     }
   }
 
+  // Markdown insert function
+  const insertMarkdown = (prefix: string, suffix: string = '') => {
+    const textarea = document.getElementById('post-content-textarea') as HTMLTextAreaElement
+    if (!textarea) return
+
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const text = formData.content
+    const before = text.substring(0, start)
+    const selection = text.substring(start, end)
+    const after = text.substring(end)
+
+    const newContent = before + prefix + (selection || '') + suffix + after
+    
+    setFormData({ ...formData, content: newContent })
+    
+    // Restore focus and selection
+    setTimeout(() => {
+      textarea.focus()
+      const newCursorPos = start + prefix.length + (selection ? selection.length : 0) + (selection ? suffix.length : 0)
+      textarea.setSelectionRange(newCursorPos, newCursorPos)
+    }, 0)
+  }
+
   // Auto-generate slug from title if empty
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value
@@ -116,32 +154,213 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     }))
   }
 
+  // Reusable Settings Render Function
+  const renderPostSettings = () => (
+    <Accordion type="multiple" defaultValue={['publish', 'meta']} className="w-full">
+      {/* Publish Settings */}
+      <AccordionItem value="publish" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <CalendarIcon className="w-4 h-4 text-primary" />
+            <span>Publishing</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Schedule</span>
+            <Switch 
+              checked={scheduleEnabled} 
+              onCheckedChange={(checked) => {
+                setScheduleEnabled(checked)
+                if (!checked) {
+                  setPublishDate(undefined)
+                  setPublishTime('')
+                }
+              }}
+            />
+          </div>
+          
+          {scheduleEnabled && (
+            <div className="space-y-3 pt-2 animate-in fade-in zoom-in-95">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start text-left font-normal">
+                    <CalendarIcon className="mr-2 h-4 h-4" />
+                    {publishDate ? format(publishDate, 'PPP') : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={publishDate}
+                    onSelect={setPublishDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Input 
+                type="time" 
+                value={publishTime}
+                onChange={e => setPublishTime(e.target.value)}
+              />
+            </div>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Meta Data */}
+      <AccordionItem value="meta" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <FileText className="w-4 h-4 text-blue-500" />
+            <span>Meta Data</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 space-y-4">
+            <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Excerpt</label>
+            <Textarea 
+              value={formData.excerpt}
+              onChange={e => setFormData({...formData, excerpt: e.target.value})}
+              placeholder="Short summary for SEO..."
+              className="h-20 text-sm resize-none"
+            />
+          </div>
+          
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Tags</label>
+            <Input 
+              value={formData.tags}
+              onChange={e => setFormData({...formData, tags: e.target.value})}
+              placeholder="Tech, Design, Life..."
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Slug</label>
+            <Input 
+              value={formData.slug}
+              onChange={e => setFormData({...formData, slug: e.target.value})}
+              placeholder="custom-url-slug"
+              className="font-mono text-xs"
+            />
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Featured Image */}
+      <AccordionItem value="media" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <ImageIcon className="w-4 h-4 text-purple-500" />
+            <span>Media</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Featured Image URL</label>
+            <Input 
+              value={formData.featured_image}
+              onChange={e => setFormData({...formData, featured_image: e.target.value})}
+              placeholder="https://..."
+              className="text-xs font-mono"
+            />
+          </div>
+          {formData.featured_image && (
+            <div className="mt-2 rounded-lg overflow-hidden border border-border">
+              <img src={formData.featured_image} alt="Preview" className="w-full h-auto" />
+            </div>
+          )}
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Advanced */}
+      <AccordionItem value="advanced" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <MoreVertical className="w-4 h-4 text-orange-500" />
+            <span>Advanced</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Allow Comments</span>
+            <Switch 
+              checked={formData.allow_comments}
+              onCheckedChange={c => setFormData({...formData, allow_comments: c})}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Author</label>
+            <Input 
+              value={formData.author_name}
+              onChange={e => setFormData({...formData, author_name: e.target.value})}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Location</label>
+            <Input 
+              value={formData.location}
+              onChange={e => setFormData({...formData, location: e.target.value})}
+              placeholder="e.g. Bangalore"
+            />
+          </div>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  )
+
   const commentCount = post?.comments_count || 0
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom-4 duration-300">
-      {/* Top Bar - Blogger Style */}
-      <div className="h-16 border-b flex items-center justify-between px-4 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Top Bar */}
+      <div className="h-16 border-b border-border bg-background/95 backdrop-blur flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={onClose}>
+          <Button variant="ghost" size="icon" onClick={onClose} className="hover:bg-muted">
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <div className="flex items-center gap-2">
-            <div className="bg-orange-600 text-white p-1.5 rounded-md">
-              <FileText className="w-5 h-5" />
-            </div>
-            <span className="font-semibold text-lg hidden sm:inline-block">
+          <div className="flex flex-col">
+            <span className="font-semibold text-sm">
               {post ? 'Edit Post' : 'New Post'}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {formData.published ? 'Published' : 'Draft'}
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
+           <Tabs value={activeTab} onValueChange={setActiveTab} className="hidden md:block mr-4">
+            <TabsList className="grid w-[200px] grid-cols-2">
+              <TabsTrigger value="write">Write</TabsTrigger>
+              <TabsTrigger value="preview">Preview</TabsTrigger>
+            </TabsList>
+          </Tabs>
+
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" size="icon" className="xl:hidden">
+                <Settings className="w-4 h-4" />
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] p-0 overflow-y-auto">
+              <SheetTitle className="sr-only">Post Settings</SheetTitle>
+              <div className="p-4 font-semibold text-sm text-muted-foreground border-b border-border flex items-center gap-2">
+                <Settings className="w-4 h-4" />
+                Post Settings
+              </div>
+              {renderPostSettings()}
+            </SheetContent>
+          </Sheet>
+
           {post && onDelete && (
             <Button 
               variant="ghost" 
               size="icon" 
-              className="text-zinc-500 hover:text-red-600"
+              className="hidden sm:flex text-muted-foreground hover:text-red-600 hover:bg-red-500/10"
               onClick={() => {
                 if(window.confirm('Delete this post?')) onDelete(post.id)
               }}
@@ -150,19 +369,14 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
             </Button>
           )}
           
-          <Button variant="outline" onClick={() => setShowPreview(!showPreview)}>
-            <Eye className="w-4 h-4 mr-2" />
-            {showPreview ? 'Edit' : 'Preview'}
-          </Button>
-          
-          <Button variant="secondary" onClick={() => handleSave(false)}>
+          <Button variant="outline" onClick={() => handleSave(false)} className="hidden sm:flex">
             <Save className="w-4 h-4 mr-2" />
             Save Draft
           </Button>
           
           <Button 
             onClick={() => handleSave(true)}
-            className="bg-orange-600 hover:bg-orange-700 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20"
           >
             <Send className="w-4 h-4 mr-2" />
             {scheduleEnabled && publishDate ? 'Schedule' : (formData.published ? 'Update' : 'Publish')}
@@ -172,215 +386,78 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
 
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto p-6 md:p-8 max-w-5xl mx-auto w-full">
-          {showPreview ? (
-            <div className="prose dark:prose-invert max-w-none">
-              <h1>{formData.title}</h1>
-              <div className="whitespace-pre-wrap font-mono text-sm bg-muted p-4 rounded-lg">
-                {formData.content}
+        <div className="flex-1 overflow-y-auto custom-scrollbar">
+          <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12">
+            {activeTab === 'write' ? (
+              <div className="space-y-8 animate-in fade-in duration-500">
+                <div className="group relative">
+                  <Input
+                    value={formData.title}
+                    onChange={handleTitleChange}
+                    placeholder="Post Title"
+                    className="text-3xl md:text-5xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/30 bg-transparent"
+                  />
+                  <div className="absolute -left-8 top-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hidden lg:block">
+                    <LayoutTemplate className="w-6 h-6" />
+                  </div>
+                </div>
+                
+                <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm py-2 border-b border-border flex gap-1 mb-4">
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('**', '**')} title="Bold">
+                     <Bold className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('*', '*')} title="Italic">
+                     <Italic className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('### ')} title="Heading">
+                     <Heading className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('> ')} title="Quote">
+                     <Quote className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('- ')} title="List">
+                     <List className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('`', '`')} title="Code">
+                     <Code className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('[', '](url)')} title="Link">
+                     <LinkIcon className="w-4 h-4" />
+                   </Button>
+                   <Button variant="ghost" size="sm" onClick={() => insertMarkdown('![alt text](', ')')} title="Image">
+                     <ImageIcon className="w-4 h-4" />
+                   </Button>
+                </div>
+
+                <Textarea
+                  id="post-content-textarea"
+                  value={formData.content}
+                  onChange={e => setFormData({...formData, content: e.target.value})}
+                  placeholder="Tell your story..."
+                  className="min-h-[calc(100vh-300px)] resize-none border-none px-0 text-lg focus-visible:ring-0 leading-relaxed bg-transparent font-mono"
+                />
               </div>
-            </div>
-          ) : (
-            <div className="space-y-6">
-              <Input
-                value={formData.title}
-                onChange={handleTitleChange}
-                placeholder="Post Title"
-                className="text-3xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/50"
-              />
-              
-              <Textarea
-                value={formData.content}
-                onChange={e => setFormData({...formData, content: e.target.value})}
-                placeholder="Write your story..."
-                className="min-h-[500px] resize-none border-none px-0 text-lg focus-visible:ring-0 font-mono leading-relaxed"
-              />
-            </div>
-          )}
+            ) : (
+              <div className="prose dark:prose-invert max-w-none animate-in fade-in duration-500">
+                <h1>{formData.title || 'Untitled Post'}</h1>
+                {formData.featured_image && (
+                  <img src={formData.featured_image} alt="Cover" className="w-full h-64 object-cover rounded-xl my-8" />
+                )}
+                <div className="whitespace-pre-wrap">
+                  {formData.content || 'Start writing to see preview...'}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Right Sidebar - Blogger Style Settings */}
-        <div className="w-80 border-l bg-muted/10 overflow-y-auto hidden lg:block">
-          <div className="p-4 font-semibold text-sm text-muted-foreground border-b flex items-center gap-2">
+        {/* Right Sidebar - Settings (Desktop) */}
+        <div className="w-80 border-l border-border bg-muted/10 overflow-y-auto custom-scrollbar hidden xl:block">
+          <div className="p-4 font-semibold text-sm text-muted-foreground border-b border-border flex items-center gap-2">
             <Settings className="w-4 h-4" />
             Post Settings
           </div>
-          
-          <Accordion type="multiple" defaultValue={['publish', 'labels']} className="w-full">
-            
-            {/* Publish Settings */}
-            <AccordionItem value="publish">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                <div className="flex items-center gap-2 text-sm">
-                  <CalendarIcon className="w-4 h-4 text-orange-600" />
-                  <span>Published on</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Automatic</span>
-                  <Switch 
-                    checked={!scheduleEnabled} 
-                    onCheckedChange={(checked) => {
-                      setScheduleEnabled(!checked)
-                      if (checked) {
-                        setPublishDate(undefined)
-                        setPublishTime('')
-                      }
-                    }}
-                  />
-                </div>
-                
-                {scheduleEnabled && (
-                  <div className="space-y-3 pt-2 animate-in fade-in zoom-in-95">
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                          <CalendarIcon className="mr-2 h-4 h-4" />
-                          {publishDate ? format(publishDate, 'PPP') : <span>Pick a date</span>}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
-                        <Calendar
-                          mode="single"
-                          selected={publishDate}
-                          onSelect={setPublishDate}
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                    <Input 
-                      type="time" 
-                      value={publishTime}
-                      onChange={e => setPublishTime(e.target.value)}
-                    />
-                  </div>
-                )}
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Labels / Tags */}
-            <AccordionItem value="labels">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                <div className="flex items-center gap-2 text-sm">
-                  <Tag className="w-4 h-4 text-blue-600" />
-                  <span>Labels</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <Textarea 
-                  value={formData.tags}
-                  onChange={e => setFormData({...formData, tags: e.target.value})}
-                  placeholder="Separate with commas (e.g. Tech, News, AI)"
-                  className="resize-none h-20 text-sm"
-                />
-                <p className="text-xs text-muted-foreground mt-2">
-                  Use commas to separate multiple labels.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Permalink */}
-            <AccordionItem value="permalink">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                <div className="flex items-center gap-2 text-sm">
-                  <LinkIcon className="w-4 h-4 text-green-600" />
-                  <span>Permalink</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Switch 
-                      checked={!formData.slug}
-                      onCheckedChange={(checked) => !checked && setFormData({...formData, slug: formData.slug})} 
-                    />
-                    <span className="text-sm text-muted-foreground">Automatic Permalink</span>
-                  </div>
-                  <Input 
-                    value={formData.slug}
-                    onChange={e => setFormData({...formData, slug: e.target.value})}
-                    placeholder="custom-url-slug"
-                    className="font-mono text-xs"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Location */}
-            <AccordionItem value="location">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="w-4 h-4 text-red-600" />
-                  <span>Location</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4">
-                <Input 
-                  value={formData.location}
-                  onChange={e => setFormData({...formData, location: e.target.value})}
-                  placeholder="e.g. Bangalore, India"
-                />
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Options */}
-            <AccordionItem value="options">
-              <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
-                <div className="flex items-center gap-2 text-sm">
-                  <MoreVertical className="w-4 h-4 text-purple-600" />
-                  <span>Options</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="px-4 pb-4 space-y-4">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">Reader Comments</label>
-                  <div className="flex items-center justify-between border p-2 rounded-md">
-                    <span className="text-sm">Allow</span>
-                    <Switch 
-                      checked={formData.allow_comments}
-                      onCheckedChange={c => setFormData({...formData, allow_comments: c})}
-                    />
-                  </div>
-                  {post && (
-                    <div className="flex items-center justify-between border p-2 rounded-md bg-muted/30">
-                       <span className="text-sm text-muted-foreground">Total Comments</span>
-                       <span className="text-sm font-bold">{commentCount}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">Author Name</label>
-                  <Input 
-                    value={formData.author_name}
-                    onChange={e => setFormData({...formData, author_name: e.target.value})}
-                    placeholder="Author Name"
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">Excerpt</label>
-                  <Textarea 
-                    value={formData.excerpt}
-                    onChange={e => setFormData({...formData, excerpt: e.target.value})}
-                    placeholder="Short summary for SEO..."
-                    className="h-20 text-sm"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-muted-foreground">Featured Image URL</label>
-                  <Input 
-                    value={formData.featured_image}
-                    onChange={e => setFormData({...formData, featured_image: e.target.value})}
-                    placeholder="https://..."
-                    className="text-xs font-mono"
-                  />
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          {renderPostSettings()}
         </div>
       </div>
     </div>

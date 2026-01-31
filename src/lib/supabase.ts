@@ -16,10 +16,10 @@ export interface BlogPost {
   content: string
   excerpt: string
   slug: string
-  featured_image?: string
+  featured_image?: string | null
   tags: string[]
   published: boolean
-  publish_at?: string
+  publish_at?: string | null
   created_at: string
   updated_at: string
   likes_count: number
@@ -27,7 +27,7 @@ export interface BlogPost {
   comments_count?: number
   allow_comments: boolean
   author_name: string
-  location?: string
+  location?: string | null
 }
 
 export interface BlogComment {

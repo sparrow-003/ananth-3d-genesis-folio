@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowLeft, Heart, Eye, Share2, Calendar, Clock, Send, MessageSquare } from 'lucide-react'
+import { ArrowLeft, Heart, Eye, Share2, Calendar, Clock, Send, MessageSquare, User, Hash } from 'lucide-react'
 import { BlogPost as BlogPostType, BlogComment, blogAPI } from '@/lib/supabase'
 import { getUserIP } from '@/lib/auth'
 import { parseMarkdown } from '@/lib/markdown'
@@ -16,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
+import { cn } from '@/lib/utils'
 
 interface BlogPostProps {
   post: BlogPostType
@@ -141,177 +142,205 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
   return (
     <motion.article
-      initial={{ opacity: 0, scale: 0.98 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12 font-sans"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 font-sans"
     >
       {/* Back Button */}
       <Button
         variant="ghost"
         onClick={onBack}
-        className="mb-6 sm:mb-8 text-muted-foreground hover:text-foreground hover:bg-muted transition-all rounded-none group"
+        className="mb-8 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-full group px-4 -ml-4"
       >
         <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
         Back to Blog
       </Button>
 
-      {/* Header */}
-      <header className="mb-8 sm:mb-12">
-        {post.tags && post.tags.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4 sm:mb-6">
-            {post.tags.map((tag, index) => (
-              <Badge
-                key={index}
-                variant="secondary"
-                className="bg-muted text-muted-foreground border-border uppercase tracking-widest text-[10px] rounded-none px-2 py-1 font-bold"
-              >
-                {tag}
-              </Badge>
-            ))}
+      <div className="glass-card p-6 md:p-10 lg:p-12 overflow-hidden relative">
+        {/* Header */}
+        <header className="mb-10 relative z-10">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            {post.tags && post.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {post.tags.map((tag, index) => (
+                  <Badge
+                    key={index}
+                    variant="secondary"
+                    className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 backdrop-blur-sm uppercase tracking-wider text-[10px] rounded-full px-3 py-1 font-bold"
+                  >
+                    <Hash className="w-3 h-3 mr-1" />
+                    {tag}
+                  </Badge>
+                ))}
+              </div>
+            )}
+            
+            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+            
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{formatDate(post.created_at)}</span>
+            </div>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 leading-tight tracking-tight text-gradient">
+            {post.title}
+          </h1>
+
+          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground border-b border-white/10 pb-8 mb-8">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
+              <span className="font-medium text-foreground">{post.author_name || 'Ananth'}</span>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-primary" />
+              <span>{estimateReadingTime(post.content)} min read</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Eye className="w-4 h-4 text-primary" />
+              <span>{post.views_count + 1} views</span>
+            </div>
+          </div>
+
+          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground leading-relaxed font-serif italic border-l-4 border-primary/50 pl-6 py-2 bg-primary/5 rounded-r-lg">
+            {post.excerpt}
+          </p>
+        </header>
+
+        {/* Featured Image */}
+        {post.featured_image && (
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl mb-12 group">
+            <div className="absolute inset-0 bg-gradient-to-t from-background/40 to-transparent z-10" />
+            <img
+              src={post.featured_image}
+              alt={post.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+            />
           </div>
         )}
 
-        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4 sm:mb-6 leading-tight tracking-tight">
-          {post.title}
-        </h1>
-
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 leading-relaxed font-serif italic border-l-2 border-primary pl-4 sm:pl-6">
-          {post.excerpt}
-        </p>
-
-        <div className="flex flex-wrap items-center gap-3 sm:gap-6 text-xs sm:text-sm text-muted-foreground mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-border uppercase tracking-widest font-medium">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4" />
-            <span>{formatDate(post.created_at)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4" />
-            <span>{estimateReadingTime(post.content)} MIN READ</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Eye className="w-4 h-4" />
-            <span>{post.views_count + 1} VIEWS</span>
-          </div>
-        </div>
-      </header>
-
-      {/* Featured Image */}
-      {post.featured_image && (
-        <div className="aspect-video overflow-hidden mb-8 sm:mb-12 border border-border bg-muted">
-          <img
-            src={post.featured_image}
-            alt={post.title}
-            className="w-full h-full object-cover"
-            loading="lazy"
+        {/* Content */}
+        <div className="prose prose-lg prose-invert max-w-none mb-12 
+          prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground 
+          prose-h1:text-gradient prose-h1:font-black
+          prose-a:text-primary hover:prose-a:text-primary/80 prose-a:no-underline hover:prose-a:underline
+          prose-p:text-muted-foreground prose-p:leading-relaxed
+          prose-strong:text-foreground prose-strong:font-bold
+          prose-blockquote:border-l-primary prose-blockquote:bg-primary/5 prose-blockquote:py-2 prose-blockquote:px-6 prose-blockquote:rounded-r-lg prose-blockquote:not-italic
+          prose-code:text-primary prose-code:bg-primary/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded-md prose-code:before:content-none prose-code:after:content-none
+          prose-pre:bg-black/50 prose-pre:backdrop-blur-sm prose-pre:border prose-pre:border-white/10 prose-pre:shadow-xl
+          prose-img:rounded-xl prose-img:shadow-2xl prose-img:border prose-img:border-white/10
+          prose-hr:border-white/10"
+        >
+          <div
+            className="blog-content"
+            dangerouslySetInnerHTML={{ __html: parseMarkdown(post.content) }}
           />
         </div>
-      )}
 
-      {/* Content */}
-      <div className="prose prose-lg prose-invert max-w-none mb-8 sm:mb-12 prose-headings:font-bold prose-headings:tracking-tight prose-a:text-primary hover:prose-a:text-primary/80 prose-img:rounded-none prose-p:text-muted-foreground prose-headings:text-foreground prose-strong:text-foreground prose-code:text-primary prose-pre:bg-card prose-pre:border prose-pre:border-border">
-        <div
-          className="blog-content leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: parseMarkdown(post.content) }}
-        />
-      </div>
+        {/* Actions */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-8 border-t border-white/10">
+          <div className="flex items-center gap-4 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              className={cn(
+                "flex-1 sm:flex-none gap-2 h-12 px-6 rounded-full transition-all border-white/10 bg-white/5 hover:bg-primary/10",
+                liked ? "text-red-500 border-red-500/50 bg-red-500/10" : "text-muted-foreground hover:text-red-500 hover:border-red-500/50"
+              )}
+              onClick={handleLike}
+              disabled={loading}
+            >
+              <Heart className={cn("w-5 h-5", liked && "fill-current")} />
+              <span className="font-bold">{likesCount}</span>
+            </Button>
 
-      {/* Actions */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 sm:gap-6 py-6 sm:py-10 border-t border-border">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <Button
-            variant="outline"
-            className={`flex-1 sm:flex-none flex items-center justify-center gap-2 rounded-none px-4 sm:px-6 py-5 sm:py-6 transition-all border-2 ${
-              liked
-                ? 'text-red-500 border-red-500 bg-red-500/10'
-                : 'text-muted-foreground border-border hover:border-foreground hover:text-foreground'
-            }`}
-            onClick={handleLike}
-            disabled={loading}
-          >
-            <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-            <span className="font-bold text-lg">{likesCount}</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            className="flex-1 sm:flex-none flex items-center justify-center gap-2 text-muted-foreground border-border border-2 hover:border-foreground hover:text-foreground rounded-none px-4 sm:px-6 py-5 sm:py-6 transition-all"
-            onClick={() => setShowShareDialog(true)}
-          >
-            <Share2 className="w-5 h-5" />
-            <span className="font-bold uppercase tracking-widest text-xs">Share</span>
-          </Button>
+            <Button
+              variant="outline"
+              className="flex-1 sm:flex-none gap-2 h-12 px-6 text-muted-foreground border-white/10 bg-white/5 hover:bg-primary/10 hover:text-primary hover:border-primary/50 rounded-full transition-all"
+              onClick={() => setShowShareDialog(true)}
+            >
+              <Share2 className="w-5 h-5" />
+              <span className="font-bold uppercase tracking-wider text-xs">Share</span>
+            </Button>
+          </div>
         </div>
-
-        <Button
-          variant="ghost"
-          onClick={onBack}
-          className="text-muted-foreground hover:text-foreground hover:bg-muted transition-all rounded-none group px-4 sm:px-6 py-5 sm:py-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-          Back to all posts
-        </Button>
       </div>
 
       {/* Comments Section */}
       {post.allow_comments && (
-        <div className="mt-8 sm:mt-12 pt-8 sm:pt-12 border-t border-border">
-          <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-6 sm:mb-8 flex items-center gap-3">
-            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
-            Comments ({comments.length})
+        <div className="mt-12">
+          <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-full">
+              <MessageSquare className="w-5 h-5 text-primary" />
+            </div>
+            Comments <span className="text-muted-foreground text-lg font-normal">({comments.length})</span>
           </h3>
 
-          <form onSubmit={handleCommentSubmit} className="mb-8 sm:mb-12 space-y-4 bg-card p-4 sm:p-8 border border-border">
-            <Input
-              placeholder="Your Name (Optional)"
-              value={commentAuthor}
-              onChange={(e) => setCommentAuthor(e.target.value)}
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-0 rounded-none"
-            />
-            <Textarea
-              placeholder="Share your thoughts..."
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
-              className="bg-background border-border text-foreground placeholder:text-muted-foreground min-h-[100px] focus:border-primary focus:ring-0 rounded-none"
-            />
-            <div className="flex justify-end">
-              <Button 
-                type="submit" 
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-6 sm:px-8 rounded-none uppercase tracking-widest text-xs h-11 sm:h-12"
-                disabled={!newComment.trim()}
-              >
-                <Send className="w-4 h-4 mr-2" />
-                Post Comment
-              </Button>
-            </div>
-          </form>
+          <div className="glass-card p-6 md:p-8 mb-8">
+            <form onSubmit={handleCommentSubmit} className="space-y-4">
+              <Input
+                placeholder="Your Name (Optional)"
+                value={commentAuthor}
+                onChange={(e) => setCommentAuthor(e.target.value)}
+                className="bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 rounded-lg h-12"
+              />
+              <Textarea
+                placeholder="Share your thoughts..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                className="bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground min-h-[120px] focus:border-primary focus:ring-primary/20 rounded-lg resize-none"
+              />
+              <div className="flex justify-end">
+                <Button 
+                  type="submit" 
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-8 rounded-full h-12 shadow-lg shadow-primary/20"
+                  disabled={!newComment.trim()}
+                >
+                  <Send className="w-4 h-4 mr-2" />
+                  Post Comment
+                </Button>
+              </div>
+            </form>
+          </div>
 
-          <div className="space-y-4 sm:space-y-6">
-            {comments.map((comment) => (
+          <div className="space-y-6">
+            {comments.map((comment, index) => (
               <motion.div
                 key={comment.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-card border-l-2 border-border p-4 sm:p-6 hover:border-primary transition-colors"
+                transition={{ delay: index * 0.1 }}
+                className="glass-card p-6 hover:border-primary/30 transition-colors"
               >
-                <div className="flex justify-between items-start mb-3 sm:mb-4">
+                <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-muted flex items-center justify-center text-muted-foreground font-bold text-sm">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-lg">
                       {comment.author.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="font-bold text-foreground text-sm uppercase tracking-wide">{comment.author}</h4>
+                      <h4 className="font-bold text-foreground text-sm uppercase tracking-wide flex items-center gap-2">
+                        {comment.author}
+                        {comment.author === post.author_name && (
+                          <Badge variant="secondary" className="text-[10px] bg-primary/20 text-primary border-none">Author</Badge>
+                        )}
+                      </h4>
                       <span className="text-xs text-muted-foreground">{formatDate(comment.created_at)}</span>
                     </div>
                   </div>
                 </div>
-                <p className="text-muted-foreground text-sm leading-relaxed font-serif">{comment.content}</p>
+                <p className="text-muted-foreground text-base leading-relaxed pl-[52px]">{comment.content}</p>
               </motion.div>
             ))}
             
             {comments.length === 0 && (
-              <div className="text-center py-8 sm:py-12 text-muted-foreground italic font-serif">
-                No comments yet. Be the first to share your thoughts!
+              <div className="text-center py-16 glass-card border-dashed border-white/10">
+                <MessageSquare className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
+                <p className="text-muted-foreground text-lg font-medium">No comments yet</p>
+                <p className="text-muted-foreground/60 text-sm">Be the first to share your thoughts!</p>
               </div>
             )}
           </div>
@@ -320,20 +349,20 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="bg-card border border-border text-foreground sm:max-w-md rounded-none">
+        <DialogContent className="glass-card border-white/10 text-foreground sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl font-bold text-center text-foreground">Share this post</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-center text-foreground">Share this post</DialogTitle>
             <DialogDescription className="text-center text-muted-foreground">
               Scan the QR code or copy the link below
             </DialogDescription>
           </DialogHeader>
           
-          <div className="flex flex-col items-center justify-center py-4 sm:py-6 space-y-4 sm:space-y-6">
-            <div className="bg-white p-3 sm:p-4 border border-border">
+          <div className="flex flex-col items-center justify-center py-6 space-y-6">
+            <div className="bg-white p-4 rounded-xl shadow-xl">
               <img 
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}&color=10B981&bgcolor=ffffff`} 
                 alt="QR Code" 
-                className="w-40 h-40 sm:w-48 sm:h-48"
+                className="w-48 h-48"
                 loading="lazy"
               />
             </div>
@@ -344,7 +373,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                 <Input 
                   readOnly 
                   value={shortUrl} 
-                  className="bg-muted border-border text-muted-foreground font-mono text-xs rounded-none"
+                  className="bg-black/20 border-white/10 text-muted-foreground font-mono text-xs rounded-lg h-10"
                 />
                 <Button 
                   onClick={() => {
@@ -352,7 +381,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                     toast.success('Link copied!')
                   }} 
                   size="icon" 
-                  className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground border-0 rounded-none"
+                  className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 w-10"
                 >
                   <Share2 className="w-4 h-4" />
                 </Button>
