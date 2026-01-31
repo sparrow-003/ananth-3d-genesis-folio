@@ -1,14 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import { mockBlogAPI } from './mockData'
 
-// For now, we'll use placeholder values - you'll need to replace these with your actual Supabase credentials
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co'
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key'
+// Supabase configuration - connected to your database
+const supabaseUrl = 'https://ahdxviaqamejzvtbsicg.supabase.co'
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoZHh2aWFxYW1lanp2dGJzaWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MjY3MDAsImV4cCI6MjA4NTEwMjcwMH0.ekoCAaOd6WVrdWT3AnTsYVsQVte2wqlsdvXGXLQ'
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 
-// Check if Supabase is properly configured
-export const isSupabaseConfigured = supabaseUrl !== 'https://your-project.supabase.co' && supabaseAnonKey !== 'your-anon-key'
+// Supabase is now configured and connected
+export const isSupabaseConfigured = true
 
 export interface BlogPost {
   id: string
