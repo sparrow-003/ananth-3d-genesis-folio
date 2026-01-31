@@ -6,6 +6,9 @@ import { toast } from 'sonner'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
+// Lazy load ParticleBackground for performance
+const ParticleBackground = lazy(() => import('@/components/ParticleBackground'))
+
 // Lazy load components for better performance
 const BlogList = lazy(() => import('@/components/BlogList'))
 const BlogPost = lazy(() => import('@/components/BlogPost'))
