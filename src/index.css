@@ -302,12 +302,10 @@
   .glow-text {
     text-shadow: 0 0 10px hsla(160, 84%, 39%, 0.5), 0 0 20px hsla(160, 84%, 39%, 0.3);
   }
-}
 
   .image-3d:hover {
     transform: perspective(1000px) rotateY(15deg) rotateX(-5deg) scale(1.05);
   }
-
   /* Flip card animations */
   .flip-card {
     background-color: transparent;
@@ -684,16 +682,6 @@
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-/* Lazy loading optimization */
-img[loading="lazy"] {
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-img[loading="lazy"].loaded {
-  opacity: 1;
 }
 
 /* Lazy loading optimization */
