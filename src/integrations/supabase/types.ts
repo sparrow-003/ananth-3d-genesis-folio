@@ -14,16 +14,163 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      blog_comments: {
+        Row: {
+          author: string
+          content: string
+          created_at: string | null
+          id: string
+          post_id: string | null
+        }
+        Insert: {
+          author: string
+          content: string
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_likes: {
+        Row: {
+          created_at: string | null
+          id: string
+          post_id: string | null
+          user_ip: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+          user_ip: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          post_id?: string | null
+          user_ip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "blog_likes_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      blog_posts: {
+        Row: {
+          allow_comments: boolean | null
+          author_name: string | null
+          content: string
+          created_at: string | null
+          excerpt: string
+          featured_image: string | null
+          id: string
+          likes_count: number | null
+          location: string | null
+          publish_at: string | null
+          published: boolean | null
+          slug: string
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          views_count: number | null
+        }
+        Insert: {
+          allow_comments?: boolean | null
+          author_name?: string | null
+          content: string
+          created_at?: string | null
+          excerpt: string
+          featured_image?: string | null
+          id?: string
+          likes_count?: number | null
+          location?: string | null
+          publish_at?: string | null
+          published?: boolean | null
+          slug: string
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Update: {
+          allow_comments?: boolean | null
+          author_name?: string | null
+          content?: string
+          created_at?: string | null
+          excerpt?: string
+          featured_image?: string | null
+          id?: string
+          likes_count?: number | null
+          location?: string | null
+          publish_at?: string | null
+          published?: boolean | null
+          slug?: string
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          views_count?: number | null
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      decrement_post_likes: { Args: { post_id: string }; Returns: undefined }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      increment_post_likes: { Args: { post_id: string }; Returns: undefined }
+      increment_post_views: { Args: { post_id: string }; Returns: undefined }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +297,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
