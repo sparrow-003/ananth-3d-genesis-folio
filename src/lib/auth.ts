@@ -1,51 +1,113 @@
-// Simple admin authentication
-const ADMIN_CREDENTIALS = {
-  ID: import.meta.env.VITE_ADMIN_ID,
-  PASS: import.meta.env.VITE_ADMIN_PASS
-}
+import { supabase } from '@/integrations/supabase/client'
 
+// Admin authentication using Supabase Auth
 export const adminAuth = {
-  login: (id: string, password: string): boolean => {
-    const isValid = id === ADMIN_CREDENTIALS.ID && password === ADMIN_CREDENTIALS.PASS
-    if (isValid) {
-      localStorage.setItem('admin_session', 'authenticated')
-      localStorage.setItem('admin_login_time', Date.now().toString())
+  // Login with email/password via Supabase Auth
+  login: async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (error) {
+        console.error('Login error:', error.message)
+        return { success: false, error: error.message }
+      }
+
+      if (!data.user) {
+        return { success: false, error: 'Login failed' }
+      }
+
+      // Check if user has admin role
+      const hasAdminRole = await adminAuth.checkAdminRole(data.user.id)
+      if (!hasAdminRole) {
+        // Sign out if not admin
+        await supabase.auth.signOut()
+        return { success: false, error: 'Access denied. Admin privileges required.' }
+      }
+
+      return { success: true }
+    } catch (err) {
+      console.error('Unexpected login error:', err)
+      return { success: false, error: 'An unexpected error occurred' }
     }
-    return isValid
   },
 
-  logout: (): void => {
-    localStorage.removeItem('admin_session')
-    localStorage.removeItem('admin_login_time')
+  // Logout via Supabase Auth
+  logout: async (): Promise<void> => {
+    await supabase.auth.signOut()
   },
 
-  isAuthenticated: (): boolean => {
-    const session = localStorage.getItem('admin_session')
-    const loginTime = localStorage.getItem('admin_login_time')
-    
-    if (!session || !loginTime) return false
-    
-    // Session expires after 24 hours
-    const sessionAge = Date.now() - parseInt(loginTime)
-    const maxAge = 24 * 60 * 60 * 1000 // 24 hours
-    
-    if (sessionAge > maxAge) {
-      adminAuth.logout()
+  // Check if user is authenticated as admin (server-verified)
+  isAuthenticated: async (): Promise<boolean> => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      
+      if (!user) return false
+      
+      // Verify admin role from database
+      return await adminAuth.checkAdminRole(user.id)
+    } catch {
       return false
     }
-    
-    return session === 'authenticated'
+  },
+
+  // Check admin role from database (secure server-side check)
+  checkAdminRole: async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await (supabase as any)
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single()
+
+      if (error || !data) return false
+      return true
+    } catch {
+      return false
+    }
+  },
+
+  // Get current session
+  getSession: async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    return session
+  },
+
+  // Get current user
+  getUser: async () => {
+    const { data: { user } } = await supabase.auth.getUser()
+    return user
+  },
+
+  // Subscribe to auth state changes
+  onAuthStateChange: (callback: (isAuthenticated: boolean) => void) => {
+    return supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session?.user) {
+        const isAdmin = await adminAuth.checkAdminRole(session.user.id)
+        callback(isAdmin)
+      } else {
+        callback(false)
+      }
+    })
   }
 }
 
-// Get user IP for like tracking
+// Get user IP for like tracking (anonymous tracking)
 export const getUserIP = async (): Promise<string> => {
   try {
     const response = await fetch('https://api.ipify.org?format=json')
     const data = await response.json()
     return data.ip
   } catch (error) {
-    // Fallback to a random identifier
-    return `user_${Math.random().toString(36).substr(2, 9)}`
+    // Fallback to a random identifier stored in localStorage
+    const storedId = localStorage.getItem('anonymous_user_id')
+    if (storedId) return storedId
+    
+    const newId = `anon_${Math.random().toString(36).substr(2, 9)}`
+    localStorage.setItem('anonymous_user_id', newId)
+    return newId
   }
 }

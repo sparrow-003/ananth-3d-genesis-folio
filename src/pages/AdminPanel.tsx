@@ -9,16 +9,37 @@ const AdminPanel = () => {
 
   useEffect(() => {
     // Check if admin is already authenticated
-    const authenticated = adminAuth.isAuthenticated()
-    setIsAuthenticated(authenticated)
-    setLoading(false)
+    const checkAuth = async () => {
+      try {
+        const authenticated = await adminAuth.isAuthenticated()
+        setIsAuthenticated(authenticated)
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        setIsAuthenticated(false)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkAuth()
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = adminAuth.onAuthStateChange((isAdmin) => {
+      setIsAuthenticated(isAdmin)
+      setLoading(false)
+    })
+
+    return () => {
+      subscription?.unsubscribe()
+    }
   }, [])
 
   const handleLogin = () => {
     setIsAuthenticated(true)
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await adminAuth.logout()
     setIsAuthenticated(false)
   }
 
