@@ -63,10 +63,9 @@ const App = memo(() => (
               </Suspense>
             </ErrorBoundary>
           </BrowserRouter>
-            <Analytics />
-          </div>
-        </TooltipProvider>
-      </ThemeProvider>
+          <Analytics />
+        </div>
+      </TooltipProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 ));
