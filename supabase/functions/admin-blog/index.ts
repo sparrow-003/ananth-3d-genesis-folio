@@ -2,12 +2,9 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.49.2'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-admin-key',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
 }
-
-// Simple admin key for fallback auth (set in secrets)
-const ADMIN_KEY = Deno.env.get('ADMIN_SECRET_KEY') || 'alex@2004'
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -16,9 +13,15 @@ Deno.serve(async (req) => {
   }
 
   try {
-    // Check admin authentication
-    const adminKey = req.headers.get('x-admin-key')
+    // Check admin authentication - JWT only (no fallback credentials)
     const authHeader = req.headers.get('authorization')
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required. Please log in with your admin account.' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     // Create Supabase client with service role for admin operations
     const supabase = createClient(
@@ -27,37 +30,29 @@ Deno.serve(async (req) => {
       { auth: { persistSession: false } }
     )
 
-    let isAuthorized = false
-
-    // Check if using admin key (fallback auth)
-    if (adminKey === ADMIN_KEY) {
-      isAuthorized = true
-    }
-
-    // Check if using Supabase JWT with admin role
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.replace('Bearer ', '')
-      const { data: { user }, error } = await supabase.auth.getUser(token)
-      
-      if (user && !error) {
-        // Check admin role
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', user.id)
-          .eq('role', 'admin')
-          .single()
-        
-        if (roleData) {
-          isAuthorized = true
-        }
-      }
-    }
-
-    if (!isAuthorized) {
+    // Verify JWT and check admin role
+    const token = authHeader.replace('Bearer ', '')
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+    
+    if (authError || !user) {
       return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
+        JSON.stringify({ error: 'Invalid or expired authentication token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Check admin role in user_roles table
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .single()
+    
+    if (roleError || !roleData) {
+      return new Response(
+        JSON.stringify({ error: 'Access denied. Admin privileges required.' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
@@ -153,7 +148,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Admin blog error:', error)
     return new Response(
-      JSON.stringify({ error: error.message || 'Internal server error' }),
+      JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

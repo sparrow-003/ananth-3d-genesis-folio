@@ -11,25 +11,15 @@ export const isSupabaseConfigured = true
 // Edge function URL for admin operations
 const EDGE_FUNCTION_URL = 'https://ahdxviaqamejzvtbsicg.supabase.co/functions/v1/admin-blog'
 
-// Admin key for fallback auth
-const ADMIN_KEY = 'alex@2004'
-
-// Helper to check if using fallback auth
-const isFallbackAuth = () => sessionStorage.getItem('admin_fallback_auth') === 'true'
-
-// Helper to get auth headers for edge function
+// Helper to get auth headers for edge function (JWT only - no fallback)
 const getAdminHeaders = async () => {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
   }
   
-  if (isFallbackAuth()) {
-    headers['x-admin-key'] = ADMIN_KEY
-  } else {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session?.access_token) {
-      headers['Authorization'] = `Bearer ${session.access_token}`
-    }
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.access_token) {
+    headers['Authorization'] = `Bearer ${session.access_token}`
   }
   
   return headers
@@ -99,35 +89,20 @@ export const blogAPI = {
     return data || []
   },
 
-  // Get ALL posts (admin) - uses edge function for fallback auth
+  // Get ALL posts (admin) - uses edge function with JWT auth
   async getAllPosts(): Promise<BlogPost[]> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.getAllPosts()
     }
 
-    // Use edge function for admin operations
-    if (isFallbackAuth()) {
-      const headers = await getAdminHeaders()
-      const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, { headers })
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Failed to fetch posts')
-      }
-      return response.json()
+    // Use edge function for admin operations with JWT auth
+    const headers = await getAdminHeaders()
+    const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, { headers })
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to fetch posts')
     }
-
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*, blog_comments(count)')
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    
-    return data?.map(post => ({
-      ...post,
-      comments_count: post.blog_comments?.[0]?.count || 0,
-      blog_comments: undefined
-    })) || []
+    return response.json()
   },
 
   // Get single blog post by slug
@@ -149,7 +124,7 @@ export const blogAPI = {
     return data
   },
 
-  // Create new blog post (admin only) - uses edge function
+  // Create new blog post (admin only) - uses edge function with JWT
   async createPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>): Promise<BlogPost> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.createPost(post)
@@ -157,7 +132,7 @@ export const blogAPI = {
 
     const cleanPost = sanitizePostData(post)
 
-    // Use edge function for admin operations
+    // Use edge function for admin operations with JWT auth
     const headers = await getAdminHeaders()
     const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, {
       method: 'POST',
@@ -174,7 +149,7 @@ export const blogAPI = {
     return response.json()
   },
 
-  // Update blog post (admin only) - uses edge function
+  // Update blog post (admin only) - uses edge function with JWT
   async updatePost(id: string, updates: Partial<BlogPost>): Promise<BlogPost> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.updatePost(id, updates)
@@ -182,7 +157,7 @@ export const blogAPI = {
 
     const cleanUpdates = sanitizePostData(updates)
 
-    // Use edge function for admin operations
+    // Use edge function for admin operations with JWT auth
     const headers = await getAdminHeaders()
     const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
       method: 'PUT',
@@ -199,13 +174,13 @@ export const blogAPI = {
     return response.json()
   },
 
-  // Delete blog post (admin only) - uses edge function
+  // Delete blog post (admin only) - uses edge function with JWT
   async deletePost(id: string): Promise<void> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.deletePost(id)
     }
 
-    // Use edge function for admin operations
+    // Use edge function for admin operations with JWT auth
     const headers = await getAdminHeaders()
     const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
       method: 'DELETE',
