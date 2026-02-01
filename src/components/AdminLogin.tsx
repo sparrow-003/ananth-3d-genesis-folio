@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { Lock, User, Eye, EyeOff } from 'lucide-react'
+import { Lock, Mail, Eye, EyeOff } from 'lucide-react'
 import { adminAuth } from '@/lib/auth'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -12,7 +12,7 @@ interface AdminLoginProps {
 }
 
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
-  const [credentials, setCredentials] = useState({ id: '', password: '' })
+  const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
@@ -21,13 +21,13 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setLoading(true)
 
     try {
-      const success = adminAuth.login(credentials.id, credentials.password)
+      const result = await adminAuth.login(credentials.email, credentials.password)
 
-      if (success) {
+      if (result.success) {
         toast.success('Welcome back, Admin!')
         onLogin()
       } else {
-        toast.error('Invalid credentials. Please try again.')
+        toast.error(result.error || 'Invalid credentials. Please try again.')
       }
     } catch (error) {
       toast.error('Login failed. Please try again.')
@@ -66,15 +66,15 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-2">
                 <label className="text-xs font-black text-emerald-400/40 uppercase tracking-[0.2em] ml-1">
-                  Access Identity
+                  Admin Email
                 </label>
                 <div className="relative group">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400/40 w-4 h-4 group-focus-within:text-emerald-400 transition-colors" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-emerald-400/40 w-4 h-4 group-focus-within:text-emerald-400 transition-colors" />
                   <Input
-                    type="text"
-                    placeholder="Admin identifier"
-                    value={credentials.id}
-                    onChange={(e) => setCredentials(prev => ({ ...prev, id: e.target.value }))}
+                    type="email"
+                    placeholder="admin@example.com"
+                    value={credentials.email}
+                    onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
                     className="pl-10 bg-black/50 border-emerald-500/10 text-white placeholder:text-gray-600 h-12 focus:border-emerald-500/40 transition-all rounded-xl"
                     required
                   />
@@ -110,13 +110,13 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                 className="w-full bg-emerald-500 hover:bg-emerald-400 text-black font-black uppercase tracking-widest h-12 rounded-xl shadow-lg shadow-emerald-500/20 transition-all active:scale-95"
                 disabled={loading}
               >
-                {loading ? 'Decrypting...' : 'Initiate Session'}
+                {loading ? 'Authenticating...' : 'Initiate Session'}
               </Button>
             </form>
 
             <div className="mt-8 text-center border-t border-emerald-500/5 pt-6">
               <p className="text-[10px] text-emerald-400/20 font-black uppercase tracking-tighter">
-                Genesis Protocol v2.0 &bull; Secure Node-X1
+                Genesis Protocol v2.0 &bull; Secure Authentication
               </p>
             </div>
           </CardContent>
