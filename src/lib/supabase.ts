@@ -1,18 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { mockBlogAPI } from './mockData'
 
-// Supabase configuration - connected to your database
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Supabase configuration - using hardcoded values since VITE_ env vars aren't supported
+const SUPABASE_URL = "https://ahdxviaqamejzvtbsicg.supabase.co"
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoZHh2aWFxYW1lanp2dGJzaWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MjY3MDAsImV4cCI6MjA4NTEwMjcwMH0.ekoCAaOd6WVrdWT3AnTsYshcPVsQVte2wqlsdvXGXLQ"
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase URL or Anon Key is missing. Check your .env.local file.')
-}
+// Create untyped client to allow dynamic table access before schema is generated
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-export const supabase = createClient(supabaseUrl || '', supabaseAnonKey || '')
-
-// Supabase is now configured and connected
-export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey
+// Supabase is always configured
+export const isSupabaseConfigured = true
 
 // Helper to sanitize post data before sending to Supabase
 const sanitizePostData = (post: any) => {
