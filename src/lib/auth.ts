@@ -1,42 +1,33 @@
 import { supabase } from '@/integrations/supabase/client'
 
-// Fallback admin credentials (for development when Supabase user doesn't exist)
-const FALLBACK_ADMIN = {
-  email: 'alex@socia.com',
-  password: 'alex@2004'
-}
-
-// Admin authentication using Supabase Auth with fallback
+// Admin authentication using Supabase Auth exclusively (secure approach)
 export const adminAuth = {
-  // Login with email/password via Supabase Auth (with fallback)
+  // Login with email/password via Supabase Auth
   login: async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      // First try Supabase Auth
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (!error && data.user) {
-        // Check if user has admin role
-        const hasAdminRole = await adminAuth.checkAdminRole(data.user.id)
-        if (!hasAdminRole) {
-          // Sign out if not admin
-          await supabase.auth.signOut()
-          return { success: false, error: 'Access denied. Admin privileges required.' }
-        }
-        return { success: true }
+      if (error) {
+        console.error('Login error:', error.message)
+        return { success: false, error: error.message }
       }
 
-      // If Supabase auth fails, check fallback credentials
-      if (email === FALLBACK_ADMIN.email && password === FALLBACK_ADMIN.password) {
-        // Store fallback auth state in sessionStorage (more secure than localStorage)
-        sessionStorage.setItem('admin_fallback_auth', 'true')
-        return { success: true }
+      if (!data.user) {
+        return { success: false, error: 'Login failed' }
       }
 
-      console.error('Login error:', error?.message || 'Invalid credentials')
-      return { success: false, error: error?.message || 'Invalid credentials' }
+      // Check if user has admin role
+      const hasAdminRole = await adminAuth.checkAdminRole(data.user.id)
+      if (!hasAdminRole) {
+        // Sign out if not admin
+        await supabase.auth.signOut()
+        return { success: false, error: 'Access denied. Admin privileges required.' }
+      }
+      
+      return { success: true }
     } catch (err) {
       console.error('Unexpected login error:', err)
       return { success: false, error: 'An unexpected error occurred' }
@@ -45,18 +36,12 @@ export const adminAuth = {
 
   // Logout via Supabase Auth
   logout: async (): Promise<void> => {
-    sessionStorage.removeItem('admin_fallback_auth')
     await supabase.auth.signOut()
   },
 
-  // Check if user is authenticated as admin (server-verified or fallback)
+  // Check if user is authenticated as admin (server-verified)
   isAuthenticated: async (): Promise<boolean> => {
     try {
-      // Check fallback auth first
-      if (sessionStorage.getItem('admin_fallback_auth') === 'true') {
-        return true
-      }
-
       const { data: { user } } = await supabase.auth.getUser()
       
       if (!user) return false

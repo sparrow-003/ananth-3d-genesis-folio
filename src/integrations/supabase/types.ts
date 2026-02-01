@@ -170,6 +170,7 @@ export type Database = {
         Args: { p_post_id: string; p_user_ip: string }
         Returns: boolean
       }
+      hash_user_identifier: { Args: { identifier: string }; Returns: string }
       increment_post_likes: { Args: { post_id: string }; Returns: undefined }
       increment_post_views: { Args: { post_id: string }; Returns: undefined }
       like_post: {
