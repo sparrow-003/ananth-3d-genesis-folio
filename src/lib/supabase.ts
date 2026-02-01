@@ -1,12 +1,9 @@
-import { createClient } from '@supabase/supabase-js'
+// Use the single Supabase client from integrations to avoid duplicate instances
+import { supabase } from '@/integrations/supabase/client'
 import { mockBlogAPI } from './mockData'
 
-// Supabase configuration - using hardcoded values since VITE_ env vars aren't supported
-const SUPABASE_URL = "https://ahdxviaqamejzvtbsicg.supabase.co"
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoZHh2aWFxYW1lanp2dGJzaWNnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk1MjY3MDAsImV4cCI6MjA4NTEwMjcwMH0.ekoCAaOd6WVrdWT3AnTsYshcPVsQVte2wqlsdvXGXLQ"
-
-// Create untyped client to allow dynamic table access before schema is generated
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+// Re-export the supabase client for backward compatibility
+export { supabase }
 
 // Supabase is always configured
 export const isSupabaseConfigured = true

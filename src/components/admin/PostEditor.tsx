@@ -389,13 +389,13 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         <div className="flex-1 overflow-y-auto custom-scrollbar">
           <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12">
             {activeTab === 'write' ? (
-              <div className="space-y-8 animate-in fade-in duration-500">
+            <div className="space-y-8 animate-in fade-in duration-500">
                 <div className="group relative">
                   <Input
                     value={formData.title}
                     onChange={handleTitleChange}
                     placeholder="Post Title"
-                    className="text-3xl md:text-5xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/30 bg-transparent"
+                    className="text-3xl md:text-5xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/30 bg-transparent text-foreground"
                   />
                   <div className="absolute -left-8 top-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hidden lg:block">
                     <LayoutTemplate className="w-6 h-6" />
@@ -434,7 +434,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                   value={formData.content}
                   onChange={e => setFormData({...formData, content: e.target.value})}
                   placeholder="Tell your story..."
-                  className="min-h-[calc(100vh-300px)] resize-none border-none px-0 text-lg focus-visible:ring-0 leading-relaxed bg-transparent font-mono"
+                  className="min-h-[calc(100vh-300px)] resize-none border-none px-0 text-lg focus-visible:ring-0 leading-relaxed bg-transparent font-mono text-foreground"
                 />
               </div>
             ) : (
