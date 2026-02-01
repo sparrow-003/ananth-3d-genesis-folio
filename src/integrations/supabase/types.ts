@@ -166,8 +166,20 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_user_liked: {
+        Args: { p_post_id: string; p_user_ip: string }
+        Returns: boolean
+      }
       increment_post_likes: { Args: { post_id: string }; Returns: undefined }
       increment_post_views: { Args: { post_id: string }; Returns: undefined }
+      like_post: {
+        Args: { p_post_id: string; p_user_ip: string }
+        Returns: boolean
+      }
+      unlike_post: {
+        Args: { p_post_id: string; p_user_ip: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

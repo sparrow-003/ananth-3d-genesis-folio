@@ -187,52 +187,45 @@ export const blogAPI = {
     if (error) console.error('Error incrementing views:', error)
   },
 
-  // Like/unlike post
+  // Like/unlike post (uses secure RPC functions)
   async toggleLike(postId: string, userIp: string): Promise<boolean> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.toggleLike(postId, userIp)
     }
 
-    // Check if user already liked this post
-    const { data: existingLike } = await supabase
-      .from('blog_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_ip', userIp)
-      .single()
+    // Check if user already liked this post using secure RPC
+    const { data: hasLiked } = await supabase.rpc('has_user_liked', { 
+      p_post_id: postId, 
+      p_user_ip: userIp 
+    })
 
-    if (existingLike) {
-      // Unlike
-      await supabase
-        .from('blog_likes')
-        .delete()
-        .eq('id', existingLike.id)
-      
-      await supabase.rpc('decrement_post_likes', { post_id: postId })
+    if (hasLiked) {
+      // Unlike using secure RPC
+      await supabase.rpc('unlike_post', { 
+        p_post_id: postId, 
+        p_user_ip: userIp 
+      })
       return false
     } else {
-      // Like
-      await supabase
-        .from('blog_likes')
-        .insert([{ post_id: postId, user_ip: userIp }])
-      
-      await supabase.rpc('increment_post_likes', { post_id: postId })
+      // Like using secure RPC
+      await supabase.rpc('like_post', { 
+        p_post_id: postId, 
+        p_user_ip: userIp 
+      })
       return true
     }
   },
 
-  // Check if user liked post
+  // Check if user liked post (uses secure RPC - no IP exposure)
   async hasUserLiked(postId: string, userIp: string): Promise<boolean> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.hasUserLiked(postId, userIp)
     }
 
-    const { data } = await supabase
-      .from('blog_likes')
-      .select('id')
-      .eq('post_id', postId)
-      .eq('user_ip', userIp)
-      .single()
+    const { data } = await supabase.rpc('has_user_liked', { 
+      p_post_id: postId, 
+      p_user_ip: userIp 
+    })
     
     return !!data
   },
