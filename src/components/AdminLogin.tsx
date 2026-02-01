@@ -12,7 +12,7 @@ interface AdminLoginProps {
 }
 
 const AdminLogin = ({ onLogin }: AdminLoginProps) => {
-  const [credentials, setCredentials] = useState({ email: 'alex@socia.com', password: 'alex@2004' })
+  const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
 
