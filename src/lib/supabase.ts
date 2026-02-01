@@ -8,6 +8,33 @@ export { supabase }
 // Supabase is always configured
 export const isSupabaseConfigured = true
 
+// Edge function URL for admin operations
+const EDGE_FUNCTION_URL = 'https://ahdxviaqamejzvtbsicg.supabase.co/functions/v1/admin-blog'
+
+// Admin key for fallback auth
+const ADMIN_KEY = 'alex@2004'
+
+// Helper to check if using fallback auth
+const isFallbackAuth = () => sessionStorage.getItem('admin_fallback_auth') === 'true'
+
+// Helper to get auth headers for edge function
+const getAdminHeaders = async () => {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+  
+  if (isFallbackAuth()) {
+    headers['x-admin-key'] = ADMIN_KEY
+  } else {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session?.access_token) {
+      headers['Authorization'] = `Bearer ${session.access_token}`
+    }
+  }
+  
+  return headers
+}
+
 // Helper to sanitize post data before sending to Supabase
 const sanitizePostData = (post: any) => {
   const { 
@@ -72,10 +99,21 @@ export const blogAPI = {
     return data || []
   },
 
-  // Get ALL posts (admin)
+  // Get ALL posts (admin) - uses edge function for fallback auth
   async getAllPosts(): Promise<BlogPost[]> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.getAllPosts()
+    }
+
+    // Use edge function for admin operations
+    if (isFallbackAuth()) {
+      const headers = await getAdminHeaders()
+      const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, { headers })
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to fetch posts')
+      }
+      return response.json()
     }
 
     const { data, error } = await supabase
@@ -88,7 +126,7 @@ export const blogAPI = {
     return data?.map(post => ({
       ...post,
       comments_count: post.blog_comments?.[0]?.count || 0,
-      blog_comments: undefined // Remove the raw response
+      blog_comments: undefined
     })) || []
   },
 
@@ -111,34 +149,32 @@ export const blogAPI = {
     return data
   },
 
-  // Create new blog post (admin only)
+  // Create new blog post (admin only) - uses edge function
   async createPost(post: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>): Promise<BlogPost> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.createPost(post)
     }
 
-    // Ensure slug is unique-ish or handle error later
-    // Sanitize data to remove any unknown fields
     const cleanPost = sanitizePostData(post)
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .insert([{
-        ...cleanPost,
-        likes_count: 0,
-        views_count: 0
-      }])
-      .select()
-      .single()
+    // Use edge function for admin operations
+    const headers = await getAdminHeaders()
+    const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(cleanPost)
+    })
     
-    if (error) {
-      console.error('Supabase createPost error:', error)
-      throw new Error(error.message)
+    if (!response.ok) {
+      const error = await response.json()
+      console.error('Edge function createPost error:', error)
+      throw new Error(error.error || 'Failed to create post')
     }
-    return data
+    
+    return response.json()
   },
 
-  // Update blog post (admin only)
+  // Update blog post (admin only) - uses edge function
   async updatePost(id: string, updates: Partial<BlogPost>): Promise<BlogPost> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.updatePost(id, updates)
@@ -146,32 +182,40 @@ export const blogAPI = {
 
     const cleanUpdates = sanitizePostData(updates)
 
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .update({ ...cleanUpdates, updated_at: new Date().toISOString() })
-      .eq('id', id)
-      .select()
-      .single()
+    // Use edge function for admin operations
+    const headers = await getAdminHeaders()
+    const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
+      method: 'PUT',
+      headers,
+      body: JSON.stringify(cleanUpdates)
+    })
     
-    if (error) {
-      console.error('Supabase updatePost error:', error)
-      throw new Error(error.message)
+    if (!response.ok) {
+      const error = await response.json()
+      console.error('Edge function updatePost error:', error)
+      throw new Error(error.error || 'Failed to update post')
     }
-    return data
+    
+    return response.json()
   },
 
-  // Delete blog post (admin only)
+  // Delete blog post (admin only) - uses edge function
   async deletePost(id: string): Promise<void> {
     if (!isSupabaseConfigured) {
       return mockBlogAPI.deletePost(id)
     }
 
-    const { error } = await supabase
-      .from('blog_posts')
-      .delete()
-      .eq('id', id)
+    // Use edge function for admin operations
+    const headers = await getAdminHeaders()
+    const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
+      method: 'DELETE',
+      headers
+    })
     
-    if (error) throw error
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Failed to delete post')
+    }
   },
 
   // Increment view count
