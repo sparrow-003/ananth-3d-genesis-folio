@@ -46,8 +46,10 @@ const Blog = memo(() => {
     queryKey: ['post', slug],
     queryFn: () => blogAPI.getPostBySlug(slug!),
     enabled: !!slug,
-    retry: 2,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
+    staleTime: 1000 * 60 * 5, // Stay fresh for 5 minutes
+    gcTime: 1000 * 60 * 15, // Cache for 15 minutes
+    retry: 1,
+    retryDelay: 1000
   })
 
   // Handle post data and view tracking

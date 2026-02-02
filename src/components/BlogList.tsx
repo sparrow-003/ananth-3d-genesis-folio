@@ -40,9 +40,12 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
   } = useQuery({
     queryKey: ['posts'],
     queryFn: blogAPI.getPosts,
-    refetchInterval: 60000, // Refetch every minute for new posts
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+    staleTime: 1000 * 60 * 2, // Data stays fresh for 2 minutes
+    gcTime: 1000 * 60 * 10, // Cache for 10 minutes
+    refetchOnMount: false, // Don't refetch if data is fresh
+    refetchOnWindowFocus: false, // Don't refetch on focus
+    retry: 2,
+    retryDelay: 1000
   })
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -314,18 +317,13 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           )}
 
           {/* Regular Posts Grid */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.3 }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8"
-          >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
             {(!searchTerm && !selectedTag && sortBy === 'newest' ? filteredPosts.slice(1) : filteredPosts).map((post, index) => (
               <motion.div
                 key={post.id}
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+                transition={{ duration: 0.2, delay: index < 6 ? index * 0.03 : 0 }}
               >
                 <BlogCard
                   post={post}
@@ -333,7 +331,7 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
                 />
               </motion.div>
             ))}
-          </motion.div>
+          </div>
         </div>
       )}
     </div>
