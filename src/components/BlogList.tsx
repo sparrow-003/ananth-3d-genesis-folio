@@ -1,12 +1,13 @@
 import React, { useState, useMemo, useCallback, memo } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
-import { Search, Filter, Calendar, Tag } from 'lucide-react'
+import { Search, Filter, Calendar, Tag, RefreshCw, AlertCircle } from 'lucide-react'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import BlogCard from './BlogCard'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import {
   Select,
   SelectContent,
@@ -31,9 +32,17 @@ const LoadingSpinner = memo(() => (
 LoadingSpinner.displayName = 'LoadingSpinner'
 
 const BlogList = memo(({ onPostSelect }: BlogListProps) => {
-  const { data: posts = [], isLoading: loading } = useQuery({
+  const { 
+    data: posts = [], 
+    isLoading: loading, 
+    error,
+    refetch 
+  } = useQuery({
     queryKey: ['posts'],
-    queryFn: blogAPI.getPosts
+    queryFn: blogAPI.getPosts,
+    refetchInterval: 60000, // Refetch every minute for new posts
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
   })
 
   const [searchTerm, setSearchTerm] = useState('')
@@ -57,7 +66,8 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
       const term = searchTerm.toLowerCase()
       filtered = filtered.filter(post =>
         post.title.toLowerCase().includes(term) ||
-        post.excerpt.toLowerCase().includes(term)
+        post.excerpt.toLowerCase().includes(term) ||
+        (post.tags && post.tags.some(tag => tag.toLowerCase().includes(term)))
       )
     }
 
@@ -99,6 +109,10 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
     setSortBy(value)
   }, [])
 
+  const handleRefresh = useCallback(() => {
+    refetch()
+  }, [refetch])
+
   if (loading) {
     return <LoadingSpinner />
   }
@@ -122,6 +136,19 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           Thoughts, ideas, and updates from the digital frontier.
         </p>
       </motion.div>
+
+      {/* Error Alert */}
+      {error && (
+        <Alert className="mb-8 border-red-200 bg-red-50 text-red-800">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Failed to load blog posts. Please try refreshing the page.
+            <Button variant="link" className="p-0 h-auto ml-2 text-red-800" onClick={handleRefresh}>
+              Refresh
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* Filters */}
       <motion.div
@@ -188,6 +215,17 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
               </SelectContent>
             </Select>
 
+            {/* Refresh Button */}
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={handleRefresh}
+              className="border-border text-muted-foreground hover:text-primary hover:border-primary rounded-none hover:bg-primary/10 h-11 w-11"
+              title="Refresh posts"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </Button>
+
             {/* Clear Filters */}
             {(searchTerm || selectedTag || sortBy !== 'newest') && (
               <Button
@@ -217,6 +255,16 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
             )}
           </div>
         )}
+
+        {/* Results Count */}
+        {posts.length > 0 && (
+          <div className="text-sm text-muted-foreground">
+            {filteredPosts.length === posts.length 
+              ? `Showing all ${posts.length} posts`
+              : `Showing ${filteredPosts.length} of ${posts.length} posts`
+            }
+          </div>
+        )}
       </motion.div>
 
       {/* Posts Grid */}
@@ -232,6 +280,15 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
               : "No posts match your filters."
             }
           </p>
+          {posts.length > 0 && (
+            <Button 
+              variant="outline" 
+              onClick={clearFilters}
+              className="mt-4"
+            >
+              Clear filters
+            </Button>
+          )}
         </motion.div>
       ) : (
         <div className="space-y-12">

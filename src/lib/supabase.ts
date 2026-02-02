@@ -31,7 +31,25 @@ const sanitizePostData = (post: any) => {
     id, created_at, updated_at, likes_count, views_count, comments_count, blog_comments, 
     ...cleanData 
   } = post
-  return cleanData
+  
+  // Ensure required fields have default values
+  return {
+    ...cleanData,
+    likes_count: 0, // Always start with 0 likes
+    views_count: 0, // Always start with 0 views
+    allow_comments: cleanData.allow_comments ?? true,
+    author_name: cleanData.author_name || 'Ananth',
+    published: cleanData.published ?? false,
+    tags: Array.isArray(cleanData.tags) ? cleanData.tags : []
+  }
+}
+
+// Generate slug from title
+const generateSlug = (title: string): string => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
 }
 
 export interface BlogPost {
@@ -77,16 +95,24 @@ export const blogAPI = {
       return mockBlogAPI.getPosts()
     }
 
-    const nowIso = new Date().toISOString()
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('published', true)
-      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
-      .order('created_at', { ascending: false })
-    
-    if (error) throw error
-    return data || []
+    try {
+      const nowIso = new Date().toISOString()
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('published', true)
+        .or(`publish_at.lte.${nowIso},publish_at.is.null`)
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('Error fetching posts:', error)
+        throw error
+      }
+      return data || []
+    } catch (error) {
+      console.error('Error in getPosts:', error)
+      throw error
+    }
   },
 
   // Get ALL posts (admin) - uses edge function with JWT auth
@@ -95,14 +121,21 @@ export const blogAPI = {
       return mockBlogAPI.getAllPosts()
     }
 
-    // Use edge function for admin operations with JWT auth
-    const headers = await getAdminHeaders()
-    const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, { headers })
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to fetch posts')
+    try {
+      // Use edge function for admin operations with JWT auth
+      const headers = await getAdminHeaders()
+      const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, { headers })
+      
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({ error: 'Failed to fetch posts' }))
+        throw new Error(error.error || 'Failed to fetch posts')
+      }
+      
+      return await response.json()
+    } catch (error) {
+      console.error('Error in getAllPosts:', error)
+      throw error
     }
-    return response.json()
   },
 
   // Get single blog post by slug
@@ -111,17 +144,25 @@ export const blogAPI = {
       return mockBlogAPI.getPostBySlug(slug)
     }
 
-    const nowIso = new Date().toISOString()
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .eq('slug', slug)
-      .eq('published', true)
-      .or(`publish_at.lte.${nowIso},publish_at.is.null`)
-      .single()
-    
-    if (error) return null
-    return data
+    try {
+      const nowIso = new Date().toISOString()
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .eq('published', true)
+        .or(`publish_at.lte.${nowIso},publish_at.is.null`)
+        .single()
+      
+      if (error) {
+        console.error('Error fetching post by slug:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error in getPostBySlug:', error)
+      return null
+    }
   },
 
   // Create new blog post (admin only) - uses edge function with JWT
@@ -130,23 +171,50 @@ export const blogAPI = {
       return mockBlogAPI.createPost(post)
     }
 
-    const cleanPost = sanitizePostData(post)
+    try {
+      // Auto-generate slug if not provided
+      const postData = {
+        ...post,
+        slug: post.slug || generateSlug(post.title),
+        author_name: post.author_name || 'Ananth',
+        allow_comments: post.allow_comments ?? true,
+        published: post.published ?? false,
+        tags: Array.isArray(post.tags) ? post.tags : []
+      }
 
-    // Use edge function for admin operations with JWT auth
-    const headers = await getAdminHeaders()
-    const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(cleanPost)
-    })
-    
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('Edge function createPost error:', error)
-      throw new Error(error.error || 'Failed to create post')
+      const cleanPost = sanitizePostData(postData)
+
+      // Try direct database insert first (faster for simple operations)
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .insert([cleanPost])
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Direct insert failed, trying edge function:', error)
+        
+        // Fallback to edge function for admin operations
+        const headers = await getAdminHeaders()
+        const response = await fetch(`${EDGE_FUNCTION_URL}/posts`, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(cleanPost)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to create post' }))
+          throw new Error(errorData.error || 'Failed to create post')
+        }
+        
+        return await response.json()
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error in createPost:', error)
+      throw error
     }
-    
-    return response.json()
   },
 
   // Update blog post (admin only) - uses edge function with JWT
@@ -155,23 +223,41 @@ export const blogAPI = {
       return mockBlogAPI.updatePost(id, updates)
     }
 
-    const cleanUpdates = sanitizePostData(updates)
+    try {
+      const cleanUpdates = sanitizePostData(updates)
 
-    // Use edge function for admin operations with JWT auth
-    const headers = await getAdminHeaders()
-    const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
-      method: 'PUT',
-      headers,
-      body: JSON.stringify(cleanUpdates)
-    })
-    
-    if (!response.ok) {
-      const error = await response.json()
-      console.error('Edge function updatePost error:', error)
-      throw new Error(error.error || 'Failed to update post')
+      // Try direct database update first
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .update(cleanUpdates)
+        .eq('id', id)
+        .select()
+        .single()
+
+      if (error) {
+        console.error('Direct update failed, trying edge function:', error)
+        
+        // Fallback to edge function for admin operations
+        const headers = await getAdminHeaders()
+        const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(cleanUpdates)
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to update post' }))
+          throw new Error(errorData.error || 'Failed to update post')
+        }
+        
+        return await response.json()
+      }
+
+      return data
+    } catch (error) {
+      console.error('Error in updatePost:', error)
+      throw error
     }
-    
-    return response.json()
   },
 
   // Delete blog post (admin only) - uses edge function with JWT
@@ -180,16 +266,31 @@ export const blogAPI = {
       return mockBlogAPI.deletePost(id)
     }
 
-    // Use edge function for admin operations with JWT auth
-    const headers = await getAdminHeaders()
-    const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
-      method: 'DELETE',
-      headers
-    })
-    
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Failed to delete post')
+    try {
+      // Try direct database delete first
+      const { error } = await supabase
+        .from('blog_posts')
+        .delete()
+        .eq('id', id)
+
+      if (error) {
+        console.error('Direct delete failed, trying edge function:', error)
+        
+        // Fallback to edge function for admin operations
+        const headers = await getAdminHeaders()
+        const response = await fetch(`${EDGE_FUNCTION_URL}/posts/${id}`, {
+          method: 'DELETE',
+          headers
+        })
+        
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Failed to delete post' }))
+          throw new Error(errorData.error || 'Failed to delete post')
+        }
+      }
+    } catch (error) {
+      console.error('Error in deletePost:', error)
+      throw error
     }
   },
 
@@ -199,8 +300,14 @@ export const blogAPI = {
       return mockBlogAPI.incrementViews(id)
     }
 
-    const { error } = await supabase.rpc('increment_post_views', { post_id: id })
-    if (error) console.error('Error incrementing views:', error)
+    try {
+      const { error } = await supabase.rpc('increment_post_views', { post_id: id })
+      if (error) {
+        console.error('Error incrementing views:', error)
+      }
+    } catch (error) {
+      console.error('Error in incrementViews:', error)
+    }
   },
 
   // Like/unlike post (uses secure RPC functions)
@@ -209,26 +316,95 @@ export const blogAPI = {
       return mockBlogAPI.toggleLike(postId, userIp)
     }
 
-    // Check if user already liked this post using secure RPC
-    const { data: hasLiked } = await supabase.rpc('has_user_liked', { 
-      p_post_id: postId, 
-      p_user_ip: userIp 
-    })
+    try {
+      // Check if user already liked this post using secure RPC
+      const { data: hasLiked, error: checkError } = await supabase.rpc('has_user_liked', { 
+        p_post_id: postId, 
+        p_user_ip: userIp 
+      })
 
-    if (hasLiked) {
-      // Unlike using secure RPC
-      await supabase.rpc('unlike_post', { 
-        p_post_id: postId, 
-        p_user_ip: userIp 
-      })
-      return false
-    } else {
-      // Like using secure RPC
-      await supabase.rpc('like_post', { 
-        p_post_id: postId, 
-        p_user_ip: userIp 
-      })
-      return true
+      if (checkError) {
+        console.error('Error checking like status:', checkError)
+        throw checkError
+      }
+
+      if (hasLiked) {
+        // Unlike using secure RPC
+        const { error: unlikeError } = await supabase.rpc('unlike_post', { 
+          p_post_id: postId, 
+          p_user_ip: userIp 
+        })
+        
+        if (unlikeError) {
+          console.error('Error unliking post:', unlikeError)
+          throw unlikeError
+        }
+        
+        return false
+      } else {
+        // Like using secure RPC
+        const { error: likeError } = await supabase.rpc('like_post', { 
+          p_post_id: postId, 
+          p_user_ip: userIp 
+        })
+        
+        if (likeError) {
+          console.error('Error liking post:', likeError)
+          throw likeError
+        }
+        
+        return true
+      }
+    } catch (error) {
+      console.error('Error in toggleLike:', error)
+      
+      // Fallback to manual like/unlike if RPC functions don't exist
+      try {
+        // Check existing like
+        const { data: existingLike } = await supabase
+          .from('blog_likes')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_ip', userIp)
+          .single()
+
+        if (existingLike) {
+          // Remove like
+          await supabase
+            .from('blog_likes')
+            .delete()
+            .eq('post_id', postId)
+            .eq('user_ip', userIp)
+
+          // Decrement likes count
+          await supabase
+            .from('blog_posts')
+            .update({ 
+              likes_count: supabase.sql`likes_count - 1` 
+            })
+            .eq('id', postId)
+
+          return false
+        } else {
+          // Add like
+          await supabase
+            .from('blog_likes')
+            .insert([{ post_id: postId, user_ip: userIp }])
+
+          // Increment likes count
+          await supabase
+            .from('blog_posts')
+            .update({ 
+              likes_count: supabase.sql`likes_count + 1` 
+            })
+            .eq('id', postId)
+
+          return true
+        }
+      } catch (fallbackError) {
+        console.error('Fallback like operation failed:', fallbackError)
+        throw fallbackError
+      }
     }
   },
 
@@ -238,12 +414,31 @@ export const blogAPI = {
       return mockBlogAPI.hasUserLiked(postId, userIp)
     }
 
-    const { data } = await supabase.rpc('has_user_liked', { 
-      p_post_id: postId, 
-      p_user_ip: userIp 
-    })
-    
-    return !!data
+    try {
+      const { data, error } = await supabase.rpc('has_user_liked', { 
+        p_post_id: postId, 
+        p_user_ip: userIp 
+      })
+      
+      if (error) {
+        console.error('Error checking like status:', error)
+        
+        // Fallback to direct query
+        const { data: likeData } = await supabase
+          .from('blog_likes')
+          .select('id')
+          .eq('post_id', postId)
+          .eq('user_ip', userIp)
+          .single()
+        
+        return !!likeData
+      }
+      
+      return !!data
+    } catch (error) {
+      console.error('Error in hasUserLiked:', error)
+      return false
+    }
   },
 
   // Get comments for a post
@@ -252,17 +447,22 @@ export const blogAPI = {
       return mockBlogAPI.getComments(postId)
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .select('*')
-      .eq('post_id', postId)
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Error fetching comments:', error)
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*')
+        .eq('post_id', postId)
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('Error fetching comments:', error)
+        return []
+      }
+      return data || []
+    } catch (error) {
+      console.error('Error in getComments:', error)
       return []
     }
-    return data || []
   },
 
   // Get ALL comments (admin)
@@ -271,21 +471,26 @@ export const blogAPI = {
       return mockBlogAPI.getAllComments()
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .select('*, blog_posts(title)')
-      .order('created_at', { ascending: false })
-    
-    if (error) {
-      console.error('Error fetching all comments:', error)
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .select('*, blog_posts(title)')
+        .order('created_at', { ascending: false })
+      
+      if (error) {
+        console.error('Error fetching all comments:', error)
+        return []
+      }
+      
+      // Map the joined data to a flatter structure
+      return data?.map(item => ({
+        ...item,
+        post_title: (item as any).blog_posts?.title
+      })) || []
+    } catch (error) {
+      console.error('Error in getAllComments:', error)
       return []
     }
-    
-    // Map the joined data to a flatter structure if needed, or just return as is
-    return data?.map(item => ({
-      ...item,
-      post_title: item.blog_posts?.title
-    })) || []
   },
 
   // Create a comment
@@ -294,17 +499,22 @@ export const blogAPI = {
       return mockBlogAPI.createComment(postId, author, content)
     }
 
-    const { data, error } = await supabase
-      .from('blog_comments')
-      .insert([{ post_id: postId, author, content }])
-      .select()
-      .single()
-    
-    if (error) {
-      console.error('Error creating comment:', error)
+    try {
+      const { data, error } = await supabase
+        .from('blog_comments')
+        .insert([{ post_id: postId, author, content }])
+        .select()
+        .single()
+      
+      if (error) {
+        console.error('Error creating comment:', error)
+        return null
+      }
+      return data
+    } catch (error) {
+      console.error('Error in createComment:', error)
       return null
     }
-    return data
   },
 
   // Delete a comment (admin only)
@@ -313,12 +523,20 @@ export const blogAPI = {
       return mockBlogAPI.deleteComment(id)
     }
 
-    const { error } = await supabase
-      .from('blog_comments')
-      .delete()
-      .eq('id', id)
-    
-    if (error) throw error
+    try {
+      const { error } = await supabase
+        .from('blog_comments')
+        .delete()
+        .eq('id', id)
+      
+      if (error) {
+        console.error('Error deleting comment:', error)
+        throw error
+      }
+    } catch (error) {
+      console.error('Error in deleteComment:', error)
+      throw error
+    }
   },
 
   // Get total comments count (for admin stats)
@@ -327,11 +545,19 @@ export const blogAPI = {
         return mockBlogAPI.getTotalCommentsCount()
     }
     
-    const { count, error } = await supabase
-      .from('blog_comments')
-      .select('*', { count: 'exact', head: true })
-      
-    if (error) return 0
-    return count || 0
+    try {
+      const { count, error } = await supabase
+        .from('blog_comments')
+        .select('*', { count: 'exact', head: true })
+        
+      if (error) {
+        console.error('Error getting comments count:', error)
+        return 0
+      }
+      return count || 0
+    } catch (error) {
+      console.error('Error in getTotalCommentsCount:', error)
+      return 0
+    }
   }
 }

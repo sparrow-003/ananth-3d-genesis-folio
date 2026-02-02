@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { BlogPost as BlogPostType, BlogComment, blogAPI, isSupabaseConfigured } from '@/lib/supabase'
 import { adminAuth } from '@/lib/auth'
+import { useBlogOperations } from '@/hooks/useBlogOperations'
 import { toast } from 'sonner'
 import { PostEditor } from './admin/PostEditor'
 import { AdminSidebar } from './admin/AdminSidebar'
@@ -9,7 +11,8 @@ import { AdminHeader } from './admin/AdminHeader'
 import { DashboardStats } from './admin/DashboardStats'
 import { PostsTable } from './admin/PostsTable'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Plus, RefreshCw, AlertCircle, Loader2 } from 'lucide-react'
 
 interface AdminDashboardProps {
   onLogout: () => void
@@ -18,9 +21,6 @@ interface AdminDashboardProps {
 const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [activeView, setActiveView] = useState('dashboard')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [posts, setPosts] = useState<BlogPostType[]>([])
-  const [comments, setComments] = useState<(BlogComment & { post_title?: string })[]>([])
-  const [loading, setLoading] = useState(true)
   const [showEditor, setShowEditor] = useState(false)
   const [editingPost, setEditingPost] = useState<BlogPostType | null>(null)
 
@@ -29,10 +29,34 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
   const [terminalInput, setTerminalInput] = useState('')
   const terminalRef = useRef<HTMLDivElement>(null)
 
-  useEffect(() => {
-    loadAllPosts()
-    loadAllComments()
-  }, [])
+  const queryClient = useQueryClient()
+  const { createPost, updatePost, deletePost, isLoading: operationLoading } = useBlogOperations()
+
+  // Fetch posts with React Query
+  const { 
+    data: posts = [], 
+    isLoading: postsLoading, 
+    error: postsError,
+    refetch: refetchPosts 
+  } = useQuery({
+    queryKey: ['admin-posts'],
+    queryFn: blogAPI.getAllPosts,
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    retry: 3,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+  })
+
+  // Fetch comments with React Query
+  const { 
+    data: comments = [], 
+    isLoading: commentsLoading,
+    error: commentsError 
+  } = useQuery({
+    queryKey: ['admin-comments'],
+    queryFn: blogAPI.getAllComments,
+    refetchInterval: 60000, // Refetch every minute
+    retry: 2
+  })
 
   useEffect(() => {
     if (activeView === 'cli' && terminalRef.current) {
@@ -40,27 +64,18 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     }
   }, [terminalOutput, activeView])
 
-  const loadAllPosts = async () => {
+  // Manual refresh function
+  const handleRefresh = useCallback(async () => {
     try {
-      setLoading(true)
-      const data = await blogAPI.getAllPosts()
-      setPosts(data)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['admin-posts'] }),
+        queryClient.invalidateQueries({ queryKey: ['admin-comments'] })
+      ])
+      toast.success('Data refreshed successfully')
     } catch (error) {
-      console.error('Error loading posts:', error)
-      toast.error('Failed to load posts')
-    } finally {
-      setLoading(false)
+      toast.error('Failed to refresh data')
     }
-  }
-
-  const loadAllComments = async () => {
-    try {
-      const data = await blogAPI.getAllComments()
-      setComments(data)
-    } catch (error) {
-      console.error('Error loading comments:', error)
-    }
-  }
+  }, [queryClient])
 
   // --- CLI Logic ---
   const handleCommand = async (e: React.FormEvent) => {
@@ -94,6 +109,7 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
           '  edit <id>          - Open post in editor',
           '  publish <id>       - Publish a post',
           '  delete <id>        - Delete a post',
+          '  refresh            - Refresh data',
           '  clear              - Clear terminal',
           '  gui                - Switch to Dashboard',
           '  exit               - Exit CLI mode'
@@ -111,12 +127,27 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
          addOutput([
            '> System Statistics:',
            `  Total Posts: ${posts.length}`,
-           `  Total Views: ${totalViews}`
+           `  Total Views: ${totalViews}`,
+           `  Total Comments: ${comments.length}`
          ])
          break
       case 'status':
-         addOutput([`> System: Genesis v4.2.0`, `> Connection: ${isSupabaseConfigured ? 'Supabase' : 'Mock Mode'}`])
+         addOutput([
+           `> System: Genesis v4.2.0`, 
+           `> Connection: ${isSupabaseConfigured ? 'Supabase Connected' : 'Mock Mode'}`,
+           `> Posts Loaded: ${posts.length}`,
+           `> Comments Loaded: ${comments.length}`
+         ])
          break
+      case 'refresh':
+        addOutput('> Refreshing data...')
+        try {
+          await handleRefresh()
+          addOutput('> Data refreshed successfully')
+        } catch (error) {
+          addOutput('> Error: Failed to refresh data')
+        }
+        break
       case 'gui':
       case 'exit':
         setActiveView('dashboard')
@@ -131,53 +162,87 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
            } else addOutput(`> Error: Post "${args[1]}" not found.`)
         } else addOutput('> Usage: edit <id>')
         break
+      case 'publish':
+        if (args[1]) {
+          const post = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+          if (post && !post.published) {
+            try {
+              await updatePost(post.id, { published: true })
+              addOutput(`> Published "${post.title}"`)
+            } catch (error) {
+              addOutput(`> Error: Failed to publish post`)
+            }
+          } else if (post?.published) {
+            addOutput(`> Error: Post is already published`)
+          } else {
+            addOutput(`> Error: Post "${args[1]}" not found`)
+          }
+        } else addOutput('> Usage: publish <id>')
+        break
+      case 'delete':
+        if (args[1]) {
+          const post = posts.find(p => p.id.startsWith(args[1]) || p.id === args[1])
+          if (post) {
+            try {
+              await deletePost(post.id)
+              addOutput(`> Deleted "${post.title}"`)
+            } catch (error) {
+              addOutput(`> Error: Failed to delete post`)
+            }
+          } else {
+            addOutput(`> Error: Post "${args[1]}" not found`)
+          }
+        } else addOutput('> Usage: delete <id>')
+        break
       default:
         addOutput(`> Command not found: ${command}`)
     }
   }
 
   // --- Editor Logic ---
-  const openEditor = (post?: BlogPostType) => {
+  const openEditor = useCallback((post?: BlogPostType) => {
     setEditingPost(post || null)
     setShowEditor(true)
-  }
+  }, [])
 
-  const closeEditor = () => {
+  const closeEditor = useCallback(() => {
     setShowEditor(false)
     setEditingPost(null)
-  }
+  }, [])
 
   const handleSave = async (data: any, shouldPublish: boolean) => {
     try {
       const isScheduled = data.published && data.publish_at && new Date(data.publish_at) > new Date()
       
       if (editingPost) {
-        await blogAPI.updatePost(editingPost.id, data)
+        await updatePost(editingPost.id, data)
         toast.success(isScheduled ? 'Post scheduled!' : (data.published ? 'Post updated!' : 'Draft saved'))
       } else {
-        await blogAPI.createPost(data)
+        await createPost(data)
         toast.success(isScheduled ? 'Post scheduled!' : (data.published ? 'Post created!' : 'Draft saved'))
       }
 
       closeEditor()
-      loadAllPosts()
     } catch (error: any) {
       console.error('Error saving:', error)
-      toast.error(`Failed to save: ${error.message || 'Unknown error'}`)
+      throw error // Let PostEditor handle the error display
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this post?')) return
+    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) return
+    
     try {
-      await blogAPI.deletePost(id)
-      toast.success('Post deleted')
-      loadAllPosts()
+      await deletePost(id)
     } catch (error: any) {
       console.error('Error deleting:', error)
-      toast.error(`Failed to delete: ${error.message || 'Unknown error'}`)
+      // Error is handled by the hook
     }
   }
+
+  const handleViewPost = useCallback((post: BlogPostType) => {
+    window.open(`/blog/${post.slug}`, '_blank')
+  }, [])
 
   if (showEditor) {
     return (
@@ -251,10 +316,38 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                    Welcome back, Admin. Here's what's happening today.
                  </p>
                </div>
-               <Button onClick={() => openEditor()} className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20">
-                 <Plus className="w-4 h-4 mr-2" /> Create Post
-               </Button>
+               <div className="flex items-center gap-3">
+                 <Button 
+                   variant="outline" 
+                   size="icon"
+                   onClick={handleRefresh}
+                   disabled={postsLoading || commentsLoading || operationLoading}
+                   className="hover:bg-muted"
+                 >
+                   <RefreshCw className={`w-4 h-4 ${(postsLoading || commentsLoading || operationLoading) ? 'animate-spin' : ''}`} />
+                 </Button>
+                 <Button 
+                   onClick={() => openEditor()} 
+                   disabled={operationLoading}
+                   className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
+                 >
+                   <Plus className="w-4 h-4 mr-2" /> Create Post
+                 </Button>
+               </div>
              </div>
+
+             {/* Error Alerts */}
+             {(postsError || commentsError) && (
+               <Alert className="border-red-200 bg-red-50 text-red-800">
+                 <AlertCircle className="h-4 w-4" />
+                 <AlertDescription>
+                   {postsError ? `Failed to load posts: ${postsError.message}` : `Failed to load comments: ${commentsError?.message}`}
+                   <Button variant="link" className="p-0 h-auto ml-2 text-red-800" onClick={handleRefresh}>
+                     Try again
+                   </Button>
+                 </AlertDescription>
+               </Alert>
+             )}
 
              {/* Content */}
              <AnimatePresence mode="wait">
@@ -266,32 +359,55 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                    transition={{ duration: 0.3 }}
                    className="space-y-8"
                  >
-                   <DashboardStats 
-                     stats={{
-                       totalPosts: posts.length,
-                       totalViews: posts.reduce((acc, p) => acc + p.views_count, 0),
-                       totalComments: comments.length,
-                       activeNow: 12 // Mock value
-                     }}
-                   />
-                   
-                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                     <div className="lg:col-span-2 space-y-4">
-                       <h2 className="text-lg font-semibold">Recent Posts</h2>
-                       <PostsTable 
-                         posts={posts.slice(0, 5)} 
-                         onEdit={openEditor}
-                         onDelete={handleDelete}
-                         onView={(post) => window.open(`/blog/${post.slug}`, '_blank')}
+                   {postsLoading ? (
+                     <div className="flex items-center justify-center py-12">
+                       <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                       <span className="ml-2 text-muted-foreground">Loading dashboard...</span>
+                     </div>
+                   ) : (
+                     <>
+                       <DashboardStats 
+                         stats={{
+                           totalPosts: posts.length,
+                           totalViews: posts.reduce((acc, p) => acc + p.views_count, 0),
+                           totalComments: comments.length,
+                           activeNow: 12 // Mock value - could be enhanced with real analytics
+                         }}
                        />
-                     </div>
-                     <div className="space-y-4">
-                       <h2 className="text-lg font-semibold">Recent Activity</h2>
-                       <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4 h-[400px]">
-                          <p className="text-muted-foreground text-sm">No recent activity to display.</p>
+                       
+                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                         <div className="lg:col-span-2 space-y-4">
+                           <h2 className="text-lg font-semibold">Recent Posts</h2>
+                           <PostsTable 
+                             posts={posts.slice(0, 5)} 
+                             onEdit={openEditor}
+                             onDelete={handleDelete}
+                             onView={handleViewPost}
+                           />
+                         </div>
+                         <div className="space-y-4">
+                           <h2 className="text-lg font-semibold">Recent Activity</h2>
+                           <div className="rounded-xl border border-border/50 bg-card/50 backdrop-blur-sm p-4 h-[400px] overflow-y-auto">
+                             {comments.length > 0 ? (
+                               <div className="space-y-3">
+                                 {comments.slice(0, 10).map((comment) => (
+                                   <div key={comment.id} className="text-sm border-b border-border/30 pb-2">
+                                     <p className="font-medium text-foreground">{comment.author}</p>
+                                     <p className="text-muted-foreground text-xs truncate">{comment.content}</p>
+                                     <p className="text-xs text-muted-foreground mt-1">
+                                       on {comment.post_title || 'Unknown Post'}
+                                     </p>
+                                   </div>
+                                 ))}
+                               </div>
+                             ) : (
+                               <p className="text-muted-foreground text-sm">No recent activity to display.</p>
+                             )}
+                           </div>
+                         </div>
                        </div>
-                     </div>
-                   </div>
+                     </>
+                   )}
                  </motion.div>
                )}
 
@@ -302,12 +418,19 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
                    exit={{ opacity: 0, y: -20 }}
                    transition={{ duration: 0.3 }}
                  >
-                    <PostsTable 
+                   {postsLoading ? (
+                     <div className="flex items-center justify-center py-12">
+                       <Loader2 className="w-8 h-8 animate-spin text-primary" />
+                       <span className="ml-2 text-muted-foreground">Loading posts...</span>
+                     </div>
+                   ) : (
+                     <PostsTable 
                        posts={posts} 
                        onEdit={openEditor}
                        onDelete={handleDelete}
-                       onView={(post) => window.open(`/blog/${post.slug}`, '_blank')}
-                    />
+                       onView={handleViewPost}
+                     />
+                   )}
                  </motion.div>
                )}
              </AnimatePresence>

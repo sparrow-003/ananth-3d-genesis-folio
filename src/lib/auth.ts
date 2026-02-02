@@ -98,16 +98,79 @@ export const adminAuth = {
 // Get user IP for like tracking (anonymous tracking)
 export const getUserIP = async (): Promise<string> => {
   try {
-    const response = await fetch('https://api.ipify.org?format=json')
-    const data = await response.json()
-    return data.ip
-  } catch (error) {
-    // Fallback to a random identifier stored in localStorage
+    // Try multiple IP services for reliability
+    const ipServices = [
+      'https://api.ipify.org?format=json',
+      'https://ipapi.co/json/',
+      'https://api.ip.sb/jsonip'
+    ]
+    
+    for (const service of ipServices) {
+      try {
+        const response = await fetch(service, { 
+          timeout: 5000,
+          headers: {
+            'Accept': 'application/json'
+          }
+        })
+        
+        if (response.ok) {
+          const data = await response.json()
+          const ip = data.ip || data.query
+          
+          if (ip && ip !== '127.0.0.1' && ip !== 'localhost') {
+            // Hash the IP for privacy
+            const hashedIP = await hashString(ip)
+            return hashedIP
+          }
+        }
+      } catch (error) {
+        console.warn(`IP service ${service} failed:`, error)
+        continue
+      }
+    }
+    
+    // Fallback to stored anonymous ID
     const storedId = localStorage.getItem('anonymous_user_id')
     if (storedId) return storedId
     
-    const newId = `anon_${Math.random().toString(36).substr(2, 9)}`
+    // Generate new anonymous ID
+    const newId = `anon_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`
     localStorage.setItem('anonymous_user_id', newId)
     return newId
+    
+  } catch (error) {
+    console.error('Error getting user IP:', error)
+    
+    // Final fallback
+    const fallbackId = localStorage.getItem('anonymous_user_id') || 
+                      `fallback_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`
+    localStorage.setItem('anonymous_user_id', fallbackId)
+    return fallbackId
   }
+}
+
+// Simple hash function for IP privacy
+const hashString = async (str: string): Promise<string> => {
+  try {
+    if (crypto.subtle) {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(str + 'blog_salt_2024')
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+      const hashArray = Array.from(new Uint8Array(hashBuffer))
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+    }
+  } catch (error) {
+    console.warn('Crypto API not available, using simple hash')
+  }
+  
+  // Fallback simple hash
+  let hash = 0
+  const saltedStr = str + 'blog_salt_2024'
+  for (let i = 0; i < saltedStr.length; i++) {
+    const char = saltedStr.charCodeAt(i)
+    hash = ((hash << 5) - hash) + char
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(16)
 }

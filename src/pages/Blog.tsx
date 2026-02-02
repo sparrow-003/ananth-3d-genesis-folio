@@ -1,11 +1,14 @@
 import { useState, useEffect, Suspense, lazy, memo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { BlogPost as BlogPostType, blogAPI } from '@/lib/supabase'
 import { toast } from 'sonner'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
+import { AlertCircle, RefreshCw } from 'lucide-react'
 
 // Lazy load ParticleBackground for performance
 const ParticleBackground = lazy(() => import('@/components/ParticleBackground'))
@@ -29,35 +32,47 @@ LoadingSpinner.displayName = 'LoadingSpinner'
 const Blog = memo(() => {
   const { slug } = useParams()
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [selectedPost, setSelectedPost] = useState<BlogPostType | null>(null)
 
-  const { data: fetchedPost, isLoading, isError } = useQuery({
+  // Fetch single post when slug is provided
+  const { 
+    data: fetchedPost, 
+    isLoading, 
+    isError, 
+    error,
+    refetch 
+  } = useQuery({
     queryKey: ['post', slug],
     queryFn: () => blogAPI.getPostBySlug(slug!),
     enabled: !!slug,
-    retry: 1
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000)
   })
 
+  // Handle post data and view tracking
   useEffect(() => {
     if (slug && fetchedPost) {
       setSelectedPost(fetchedPost)
-      blogAPI.incrementViews(fetchedPost.id)
+      // Track view asynchronously
+      blogAPI.incrementViews(fetchedPost.id).catch(console.error)
     } else if (!slug) {
       setSelectedPost(null)
     }
   }, [slug, fetchedPost])
 
+  // Handle errors and not found cases
   useEffect(() => {
-    if (isError) {
-      toast.error('Failed to load post')
-      navigate('/blog')
+    if (isError && slug) {
+      console.error('Error loading post:', error)
+      // Don't navigate away immediately, let user try to refresh
     }
     if (slug && !isLoading && !fetchedPost && !isError) {
-       // Post not found
-       // toast.error('Post not found') // Optional: might be double toast if isError also triggers
+      // Post not found after loading completed
+      toast.error('Post not found')
+      navigate('/blog')
     }
-  }, [isError, slug, isLoading, fetchedPost, navigate])
-
+  }, [isError, slug, isLoading, fetchedPost, navigate, error])
 
   const handlePostSelect = useCallback((post: BlogPostType) => {
     setSelectedPost(post)
@@ -68,6 +83,15 @@ const Blog = memo(() => {
     setSelectedPost(null)
     navigate('/blog')
   }, [navigate])
+
+  const handleRetry = useCallback(() => {
+    if (slug) {
+      refetch()
+    } else {
+      // Refresh the posts list
+      queryClient.invalidateQueries({ queryKey: ['posts'] })
+    }
+  }, [slug, refetch, queryClient])
 
   return (
     <div className="min-h-screen relative overflow-x-hidden">
@@ -87,6 +111,42 @@ const Blog = memo(() => {
               exit={{ opacity: 0 }}
             >
               <LoadingSpinner />
+            </motion.div>
+          ) : isError ? (
+            <motion.div
+              key="error"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="max-w-2xl mx-auto px-4 py-12"
+            >
+              <Alert className="border-red-200 bg-red-50 text-red-800">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription className="flex flex-col gap-3">
+                  <span>
+                    Failed to load the blog post. This might be due to a network issue or the post may not exist.
+                  </span>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={handleRetry}
+                      className="text-red-800 border-red-300 hover:bg-red-100"
+                    >
+                      <RefreshCw className="w-4 h-4 mr-2" />
+                      Try Again
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => navigate('/blog')}
+                      className="text-red-800 border-red-300 hover:bg-red-100"
+                    >
+                      Back to Blog
+                    </Button>
+                  </div>
+                </AlertDescription>
+              </Alert>
             </motion.div>
           ) : (
             <motion.div

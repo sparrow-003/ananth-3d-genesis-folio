@@ -13,6 +13,7 @@ import AdminPanel from "./pages/AdminPanel"; // Eager load AdminPanel to prevent
 
 // Lazy load blog components for better performance
 const Blog = lazy(() => import("./pages/Blog"));
+const BlogSystemTest = lazy(() => import("./components/BlogSystemTest"));
 
 // Optimized query client with better caching
 const queryClient = new QueryClient({
@@ -58,6 +59,7 @@ const App = memo(() => (
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<Blog />} />
                   <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
+                  <Route path="/blog-system-test" element={<BlogSystemTest />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
