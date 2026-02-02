@@ -53,7 +53,17 @@ export const adminAuth = {
     }
   },
 
-  // Check admin role from database (secure server-side check)
+  /**
+   * Check admin role from database.
+   * 
+   * SECURITY NOTE: This is a UI hint only, not a security boundary.
+   * Actual security is enforced by:
+   * 1. RLS policies on all tables (blog_posts, user_roles, etc.)
+   * 2. The admin-blog edge function which verifies JWT and admin role server-side
+   * 3. Database functions that validate permissions before operations
+   * 
+   * Never rely on this client-side check for authorization decisions.
+   */
   checkAdminRole: async (userId: string): Promise<boolean> => {
     try {
       const { data, error } = await (supabase as any)
@@ -95,87 +105,42 @@ export const adminAuth = {
   }
 }
 
-// Get user IP for like tracking (anonymous tracking)
-export const getUserIP = async (): Promise<string> => {
+/**
+ * Get anonymous user identifier for like tracking.
+ * 
+ * PRIVACY: Uses localStorage-only anonymous IDs to avoid:
+ * - Third-party IP service calls that could track users
+ * - Privacy concerns with sending IPs to external services
+ * - GDPR/privacy law compliance issues
+ * 
+ * The identifier is hashed server-side before storage in the database.
+ */
+export const getUserIdentifier = async (): Promise<string> => {
   try {
-    // Try multiple IP services for reliability
-    const ipServices = [
-      'https://api.ipify.org?format=json',
-      'https://ipapi.co/json/',
-      'https://api.ip.sb/jsonip'
-    ]
-    
-    for (const service of ipServices) {
-      try {
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 5000)
-        
-        const response = await fetch(service, { 
-          signal: controller.signal,
-          headers: {
-            'Accept': 'application/json'
-          }
-        })
-        
-        clearTimeout(timeoutId)
-        
-        if (response.ok) {
-          const data = await response.json()
-          const ip = data.ip || data.query
-          
-          if (ip && ip !== '127.0.0.1' && ip !== 'localhost') {
-            // Hash the IP for privacy
-            const hashedIP = await hashString(ip)
-            return hashedIP
-          }
-        }
-      } catch (error) {
-        console.warn(`IP service ${service} failed:`, error)
-        continue
-      }
-    }
-    
-    // Fallback to stored anonymous ID
+    // Check for existing anonymous ID
     const storedId = localStorage.getItem('anonymous_user_id')
     if (storedId) return storedId
     
-    // Generate new anonymous ID
-    const newId = `anon_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`
+    // Generate new anonymous ID using crypto API if available
+    let newId: string
+    if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      newId = `anon_${crypto.randomUUID()}`
+    } else {
+      // Fallback for older browsers
+      newId = `anon_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`
+    }
+    
     localStorage.setItem('anonymous_user_id', newId)
     return newId
-    
   } catch (error) {
-    console.error('Error getting user IP:', error)
-    
-    // Final fallback
-    const fallbackId = localStorage.getItem('anonymous_user_id') || 
-                      `fallback_${Math.random().toString(36).substr(2, 9)}_${Date.now()}`
-    localStorage.setItem('anonymous_user_id', fallbackId)
-    return fallbackId
+    // Handle private browsing or storage disabled
+    console.warn('localStorage unavailable, using session-only ID')
+    return `session_${Math.random().toString(36).substr(2, 12)}`
   }
 }
 
-// Simple hash function for IP privacy
-const hashString = async (str: string): Promise<string> => {
-  try {
-    if (crypto.subtle) {
-      const encoder = new TextEncoder()
-      const data = encoder.encode(str + 'blog_salt_2024')
-      const hashBuffer = await crypto.subtle.digest('SHA-256', data)
-      const hashArray = Array.from(new Uint8Array(hashBuffer))
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
-    }
-  } catch (error) {
-    console.warn('Crypto API not available, using simple hash')
-  }
-  
-  // Fallback simple hash
-  let hash = 0
-  const saltedStr = str + 'blog_salt_2024'
-  for (let i = 0; i < saltedStr.length; i++) {
-    const char = saltedStr.charCodeAt(i)
-    hash = ((hash << 5) - hash) + char
-    hash = hash & hash // Convert to 32-bit integer
-  }
-  return Math.abs(hash).toString(16)
-}
+// Alias for backward compatibility
+export const getUserIP = getUserIdentifier
+
+// Hash function removed - no longer needed since we use localStorage IDs
+// Server-side hashing is done by the database function hash_user_identifier()
