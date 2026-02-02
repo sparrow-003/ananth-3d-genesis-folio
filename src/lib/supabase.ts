@@ -358,53 +358,9 @@ export const blogAPI = {
     } catch (error) {
       console.error('Error in toggleLike:', error)
       
-      // Fallback to manual like/unlike if RPC functions don't exist
-      try {
-        // Check existing like
-        const { data: existingLike } = await supabase
-          .from('blog_likes')
-          .select('id')
-          .eq('post_id', postId)
-          .eq('user_ip', userIp)
-          .single()
-
-        if (existingLike) {
-          // Remove like
-          await supabase
-            .from('blog_likes')
-            .delete()
-            .eq('post_id', postId)
-            .eq('user_ip', userIp)
-
-          // Decrement likes count
-          await supabase
-            .from('blog_posts')
-            .update({ 
-              likes_count: supabase.sql`likes_count - 1` 
-            })
-            .eq('id', postId)
-
-          return false
-        } else {
-          // Add like
-          await supabase
-            .from('blog_likes')
-            .insert([{ post_id: postId, user_ip: userIp }])
-
-          // Increment likes count
-          await supabase
-            .from('blog_posts')
-            .update({ 
-              likes_count: supabase.sql`likes_count + 1` 
-            })
-            .eq('id', postId)
-
-          return true
-        }
-      } catch (fallbackError) {
-        console.error('Fallback like operation failed:', fallbackError)
-        throw fallbackError
-      }
+      // RPC functions should always be used - no fallback to direct table access
+      // This ensures IP hashing is always applied server-side
+      throw error
     }
   },
 
