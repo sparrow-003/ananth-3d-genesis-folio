@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import { adminAuth } from '@/lib/auth'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase } from '@/integrations/supabase/client'
 import AdminLogin from '@/components/AdminLogin'
 import AdminDashboard from '@/components/AdminDashboard'
 
@@ -7,41 +7,93 @@ const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    // Check if admin is already authenticated
-    const checkAuth = async () => {
-      try {
-        const authenticated = await adminAuth.isAuthenticated()
-        setIsAuthenticated(authenticated)
-      } catch (error) {
-        console.error('Auth check failed:', error)
-        setIsAuthenticated(false)
-      } finally {
-        setLoading(false)
-      }
-    }
+  const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle()
 
-    checkAuth()
-
-    // Subscribe to auth state changes
-    const { data: { subscription } } = adminAuth.onAuthStateChange((isAdmin) => {
-      setIsAuthenticated(isAdmin)
-      setLoading(false)
-    })
-
-    return () => {
-      subscription?.unsubscribe()
+      return !error && !!data
+    } catch {
+      return false
     }
   }, [])
 
-  const handleLogin = () => {
-    setIsAuthenticated(true)
-  }
+  useEffect(() => {
+    let mounted = true
 
-  const handleLogout = async () => {
-    await adminAuth.logout()
+    const checkAuth = async () => {
+      try {
+        // First get session (faster than getUser)
+        const { data: { session } } = await supabase.auth.getSession()
+        
+        if (!session?.user) {
+          if (mounted) {
+            setIsAuthenticated(false)
+            setLoading(false)
+          }
+          return
+        }
+
+        // Check admin role
+        const isAdmin = await checkAdminRole(session.user.id)
+        
+        if (mounted) {
+          setIsAuthenticated(isAdmin)
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error)
+        if (mounted) {
+          setIsAuthenticated(false)
+          setLoading(false)
+        }
+      }
+    }
+
+    // Initial auth check
+    checkAuth()
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted) return
+
+      if (event === 'SIGNED_OUT') {
+        setIsAuthenticated(false)
+        setLoading(false)
+        return
+      }
+
+      if (session?.user) {
+        setLoading(true)
+        const isAdmin = await checkAdminRole(session.user.id)
+        if (mounted) {
+          setIsAuthenticated(isAdmin)
+          setLoading(false)
+        }
+      } else {
+        setIsAuthenticated(false)
+        setLoading(false)
+      }
+    })
+
+    return () => {
+      mounted = false
+      subscription?.unsubscribe()
+    }
+  }, [checkAdminRole])
+
+  const handleLogin = useCallback(() => {
+    setIsAuthenticated(true)
+  }, [])
+
+  const handleLogout = useCallback(async () => {
+    await supabase.auth.signOut()
     setIsAuthenticated(false)
-  }
+  }, [])
 
   if (loading) {
     return (
