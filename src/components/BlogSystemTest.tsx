@@ -142,11 +142,11 @@ This post can be safely deleted from the admin panel.`,
   const getStatusBadge = (status: TestResult['status']) => {
     switch (status) {
       case 'success':
-        return <Badge className="bg-green-500/10 text-green-500 border-green-500/20">Passed</Badge>
+        return <Badge variant="secondary" className="bg-green-500/10 text-green-500 border-green-500/20">Passed</Badge>
       case 'error':
-        return <Badge className="bg-red-500/10 text-red-500 border-red-500/20">Failed</Badge>
+        return <Badge variant="secondary" className="bg-red-500/10 text-red-500 border-red-500/20">Failed</Badge>
       default:
-        return <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20">Running</Badge>
+        return <Badge variant="secondary" className="bg-blue-500/10 text-blue-500 border-blue-500/20">Running</Badge>
     }
   }
 
