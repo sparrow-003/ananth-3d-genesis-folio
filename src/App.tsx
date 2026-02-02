@@ -55,12 +55,14 @@ const App = memo(() => (
             <ErrorBoundary>
               <Suspense fallback={<LoadingSpinner />}>
                 <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:slug" element={<Blog />} />
+                  <Route element={<Layout />}>
+                    <Route path="/" element={<Index />} />
+                    <Route path="/blog" element={<Blog />} />
+                    <Route path="/blog/:slug" element={<Blog />} />
+                    <Route path="/blog-system-test" element={<BlogSystemTest />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Route>
                   <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
-                  <Route path="/blog-system-test" element={<BlogSystemTest />} />
-                  <Route path="*" element={<NotFound />} />
                 </Routes>
               </Suspense>
             </ErrorBoundary>

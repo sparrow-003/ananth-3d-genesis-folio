@@ -120,7 +120,13 @@ export const AdminSidebar = ({ activeView, setActiveView, onLogout, isCollapsed,
                 icon={item.icon}
                 label={item.label}
                 isActive={activeView === item.id}
-                onClick={() => setActiveView(item.id)}
+                onClick={() => {
+                  if (item.id === 'view-site') {
+                    window.open('/', '_blank');
+                  } else {
+                    setActiveView(item.id);
+                  }
+                }}
                 isCollapsed={isCollapsed}
               />
             ))}

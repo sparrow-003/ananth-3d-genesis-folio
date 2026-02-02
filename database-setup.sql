@@ -151,6 +151,17 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to check user role (MISSING IN ORIGINAL SETUP)
+CREATE OR REPLACE FUNCTION has_role(_user_id UUID, _role TEXT)
+RETURNS BOOLEAN AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM user_roles
+    WHERE user_id = _user_id AND role = _role
+  );
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Enable Row Level Security
 ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_comments ENABLE ROW LEVEL SECURITY;

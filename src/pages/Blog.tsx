@@ -169,8 +169,6 @@ const Blog = memo(() => {
           )}
         </AnimatePresence>
       </main>
-
-      <Footer />
     </div>
   )
 })

@@ -154,7 +154,7 @@ This post can be safely deleted from the admin panel.`,
   const hasErrors = tests.some(test => test.status === 'error')
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-4xl mx-auto p-6 space-y-6 pt-24 min-h-screen">
       <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
         <CardHeader>
           <CardTitle className="flex items-center gap-3">

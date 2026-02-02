@@ -104,8 +104,6 @@ const Index = memo(() => {
           </Suspense>
         </SmoothScroll>
       </main>
-
-      <Footer />
     </div>
   );
 });

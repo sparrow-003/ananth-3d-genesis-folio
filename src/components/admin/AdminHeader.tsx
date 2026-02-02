@@ -35,6 +35,10 @@ export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed }: AdminHeaderPr
       </div>
 
       <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={() => window.open('/', '_blank')} className="text-muted-foreground hover:text-foreground" title="View Live Site">
+          <Globe className="w-5 h-5" />
+        </Button>
+
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative">
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse" />

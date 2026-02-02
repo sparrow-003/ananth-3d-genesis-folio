@@ -66,15 +66,34 @@ export const adminAuth = {
    */
   checkAdminRole: async (userId: string): Promise<boolean> => {
     try {
-      // Prefer RPC over direct table access to avoid RLS recursion / missing policies.
+      // 1. Try RPC first (most secure/efficient if function exists)
       const { data, error } = await supabase.rpc('has_role', {
         _user_id: userId,
         _role: 'admin',
       })
 
-      if (error) return false
-      return Boolean(data)
-    } catch {
+      if (!error) {
+        return Boolean(data)
+      }
+
+      console.warn('RPC has_role check failed, falling back to direct table query:', error.message)
+
+      // 2. Fallback to direct table query (works if RLS allows user to see own roles)
+      const { data: roles, error: tableError } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .maybeSingle()
+
+      if (tableError) {
+        console.error('Table check failed:', tableError.message)
+        return false
+      }
+
+      return !!roles
+    } catch (err) {
+      console.error('Unexpected error in checkAdminRole:', err)
       return false
     }
   },
