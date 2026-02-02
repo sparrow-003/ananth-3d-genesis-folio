@@ -1,5 +1,5 @@
 import React from 'react'
-import { Search, Bell, Maximize2, Minimize2, Menu } from 'lucide-react'
+import { Search, Bell, Maximize2, Minimize2, Menu, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
