@@ -377,17 +377,10 @@ export const blogAPI = {
       })
       
       if (error) {
-        console.error('Error checking like status:', error)
-        
-        // Fallback to direct query
-        const { data: likeData } = await supabase
-          .from('blog_likes')
-          .select('id')
-          .eq('post_id', postId)
-          .eq('user_ip', userIp)
-          .single()
-        
-        return !!likeData
+        console.error('Error checking like status via RPC:', error)
+        // No fallback - RPC functions must be used to protect IP privacy
+        // Direct table access is blocked by RLS policies
+        return false
       }
       
       return !!data
