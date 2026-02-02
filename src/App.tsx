@@ -9,7 +9,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import AdminPanel from "./pages/AdminPanel"; // Eager load AdminPanel to prevent 404s
+import AdminPanel from "./pages/AdminPanel";
+import Layout from "./components/Layout";
 
 // Lazy load blog components for better performance
 const Blog = lazy(() => import("./pages/Blog"));
