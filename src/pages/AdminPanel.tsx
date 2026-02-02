@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
+import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
 import AdminLogin from '@/components/AdminLogin'
 import AdminDashboard from '@/components/AdminDashboard'
@@ -6,17 +7,16 @@ import AdminDashboard from '@/components/AdminDashboard'
 const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const lastUserIdRef = useRef<string | null>(null)
 
   const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
     try {
-      const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .maybeSingle()
-
-      return !error && !!data
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin',
+      })
+      if (error) return false
+      return Boolean(data)
     } catch {
       return false
     }
@@ -25,26 +25,45 @@ const AdminPanel = () => {
   useEffect(() => {
     let mounted = true
 
+    const resolveFromSession = async (
+      session: Session | null,
+      options?: { force?: boolean; showLoader?: boolean }
+    ) => {
+      const { force = false, showLoader = false } = options ?? {}
+
+      if (!mounted) return
+
+      const userId = session?.user?.id ?? null
+
+      if (!userId) {
+        lastUserIdRef.current = null
+        setIsAuthenticated(false)
+        setLoading(false)
+        return
+      }
+
+      const userUnchanged = lastUserIdRef.current === userId
+      if (userUnchanged && !force) {
+        // Avoid a loading flicker/loop on events like TOKEN_REFRESHED.
+        setLoading(false)
+        return
+      }
+
+      if (showLoader) setLoading(true)
+      const isAdmin = await checkAdminRole(userId)
+
+      if (!mounted) return
+
+      lastUserIdRef.current = userId
+      setIsAuthenticated(isAdmin)
+      setLoading(false)
+    }
+
     const checkAuth = async () => {
       try {
         // First get session (faster than getUser)
         const { data: { session } } = await supabase.auth.getSession()
-        
-        if (!session?.user) {
-          if (mounted) {
-            setIsAuthenticated(false)
-            setLoading(false)
-          }
-          return
-        }
-
-        // Check admin role
-        const isAdmin = await checkAdminRole(session.user.id)
-        
-        if (mounted) {
-          setIsAuthenticated(isAdmin)
-          setLoading(false)
-        }
+        await resolveFromSession(session, { force: true, showLoader: true })
       } catch (error) {
         console.error('Auth check failed:', error)
         if (mounted) {
@@ -64,20 +83,19 @@ const AdminPanel = () => {
       if (event === 'SIGNED_OUT') {
         setIsAuthenticated(false)
         setLoading(false)
+        lastUserIdRef.current = null
         return
       }
 
-      if (session?.user) {
-        setLoading(true)
-        const isAdmin = await checkAdminRole(session.user.id)
-        if (mounted) {
-          setIsAuthenticated(isAdmin)
-          setLoading(false)
-        }
-      } else {
-        setIsAuthenticated(false)
-        setLoading(false)
+      // Prevent continuous loading loops caused by periodic token refreshes.
+      if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
+        return
       }
+
+      await resolveFromSession(session, {
+        force: event === 'USER_UPDATED',
+        showLoader: event === 'SIGNED_IN' || event === 'USER_UPDATED',
+      })
     })
 
     return () => {
