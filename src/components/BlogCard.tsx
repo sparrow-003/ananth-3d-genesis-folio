@@ -18,20 +18,26 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
   const [liked, setLiked] = useState(false)
   const [likesCount, setLikesCount] = useState(post.likes_count)
   const [loading, setLoading] = useState(false)
+  const [hasCheckedLike, setHasCheckedLike] = useState(false)
 
-  useEffect(() => {
-    checkIfLiked()
-  }, [post.id])
-
+  // Lazy check like status only when user interacts or card is visible for a while
   const checkIfLiked = useCallback(async () => {
+    if (hasCheckedLike) return
     try {
       const userIP = await getUserIP()
       const hasLiked = await blogAPI.hasUserLiked(post.id, userIP)
       setLiked(hasLiked)
+      setHasCheckedLike(true)
     } catch (error) {
       console.error('Error checking like status:', error)
     }
-  }, [post.id])
+  }, [post.id, hasCheckedLike])
+
+  // Defer like check to after initial render for performance
+  useEffect(() => {
+    const timer = setTimeout(checkIfLiked, 500)
+    return () => clearTimeout(timer)
+  }, [checkIfLiked])
 
   const handleLike = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation()
