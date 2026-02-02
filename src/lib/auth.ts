@@ -66,15 +66,14 @@ export const adminAuth = {
    */
   checkAdminRole: async (userId: string): Promise<boolean> => {
     try {
-      const { data, error } = await (supabase as any)
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', userId)
-        .eq('role', 'admin')
-        .single()
+      // Prefer RPC over direct table access to avoid RLS recursion / missing policies.
+      const { data, error } = await supabase.rpc('has_role', {
+        _user_id: userId,
+        _role: 'admin',
+      })
 
-      if (error || !data) return false
-      return true
+      if (error) return false
+      return Boolean(data)
     } catch {
       return false
     }

@@ -95,8 +95,11 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
+      // Scale instead of translate to avoid “jumping/moving” feel on hover.
+      whileHover={{ scale: 1.01 }}
+      whileTap={{ scale: 0.99 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 26 }}
+      style={{ willChange: 'transform' }}
       className={cn(
         "group/card relative overflow-hidden glass-card cursor-pointer border border-white/10 hover:border-primary/50",
         featured ? "md:grid md:grid-cols-2 gap-0" : "flex flex-col h-full"
