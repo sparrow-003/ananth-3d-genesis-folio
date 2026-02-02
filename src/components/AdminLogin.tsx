@@ -21,7 +21,16 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
     setLoading(true)
 
     try {
-      const result = await adminAuth.login(credentials.email, credentials.password)
+      // Create a timeout promise
+      const timeoutPromise = new Promise<{ success: boolean; error?: string }>((_, reject) => {
+        setTimeout(() => reject(new Error('Request timed out')), 10000)
+      })
+
+      // Race between login and timeout
+      const result = await Promise.race([
+        adminAuth.login(credentials.email, credentials.password),
+        timeoutPromise
+      ])
 
       if (result.success) {
         toast.success('Welcome back, Admin!')
@@ -29,8 +38,9 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
       } else {
         toast.error(result.error || 'Invalid credentials. Please try again.')
       }
-    } catch (error) {
-      toast.error('Login failed. Please try again.')
+    } catch (error: any) {
+      console.error('Login error:', error)
+      toast.error(error.message === 'Request timed out' ? 'Login timed out. Please check your connection.' : 'Login failed. Please try again.')
     } finally {
       setLoading(false)
     }

@@ -100,6 +100,7 @@ const AdminPanel = () => {
 
     return () => {
       mounted = false
+      clearTimeout(safetyTimeout)
       subscription?.unsubscribe()
     }
   }, [checkAdminRole])

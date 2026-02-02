@@ -42,8 +42,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     queryKey: ['admin-posts'],
     queryFn: blogAPI.getAllPosts,
     refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000)
+    retry: 1, // Reduced retry to prevent long loading times
+    retryDelay: 1000
   })
 
   // Fetch comments with React Query
@@ -55,7 +55,8 @@ const AdminDashboard = ({ onLogout }: AdminDashboardProps) => {
     queryKey: ['admin-comments'],
     queryFn: blogAPI.getAllComments,
     refetchInterval: 60000, // Refetch every minute
-    retry: 2
+    retry: 1,
+    retryDelay: 1000
   })
 
   useEffect(() => {
