@@ -81,7 +81,7 @@ const Navbar = () => {
           stiffness: 100,
           damping: 15
         }}
-        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-emerald-500/10' : 'py-4 bg-black/20 backdrop-blur-sm'
+        className={`fixed top-0 left-0 right-0 w-full z-50 px-4 sm:px-6 transition-all duration-500 ${isScrolled ? 'glass-nav py-3 backdrop-blur-xl shadow-xl shadow-emerald-500/10 bg-background/80' : 'py-4 bg-background/20 backdrop-blur-sm'
           }`}
         style={{
           borderBottom: isScrolled ? '1px solid rgba(16, 185, 129, 0.1)' : '1px solid transparent',
@@ -91,7 +91,7 @@ const Navbar = () => {
           {/* Brand / Logo */}
           <a 
             href="#home" 
-            className="text-xl font-bold tracking-tighter text-white hover:text-emerald-400 transition-colors z-50 relative"
+            className="text-xl font-bold tracking-tighter text-foreground hover:text-emerald-400 transition-colors z-50 relative"
             onClick={(e) => {
               e.preventDefault();
               scrollToSection('#home');
@@ -106,7 +106,7 @@ const Navbar = () => {
               <motion.a
                 key={item.name}
                 href={item.href}
-                className="text-sm lg:text-base text-light opacity-80 hover:opacity-100 hover:text-emerald-400 font-medium transition-all"
+                className="text-sm lg:text-base text-foreground opacity-80 hover:opacity-100 hover:text-emerald-400 font-medium transition-all"
                 whileHover={{ scale: 1.1, y: -2 }}
                 whileTap={{ scale: 0.95 }}
                 initial={{ opacity: 0, y: -20 }}
@@ -142,7 +142,7 @@ const Navbar = () => {
           <div className="md:hidden flex items-center space-x-4">
             <ThemeToggle />
           <button
-            className="focus:outline-none text-light p-2"
+            className="focus:outline-none text-foreground p-2"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
           >
@@ -182,14 +182,14 @@ const Navbar = () => {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="fixed top-14 sm:top-16 left-0 right-0 z-40 glass-nav py-4 md:hidden"
+            className="fixed top-14 sm:top-16 left-0 right-0 z-40 glass-nav py-4 md:hidden bg-background/95 backdrop-blur-xl"
           >
             <div className="flex flex-col items-center space-y-4 px-6">
               {navItems.map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-light text-lg py-2"
+                  className="text-foreground text-lg py-2"
                   onClick={(e) => {
                     e.preventDefault();
                     if ((item as any).isHireMe) {
