@@ -86,9 +86,9 @@ Best regards,
   }, [scrollY]);
 
   return (
-    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full overflow-hidden">
-      {/* Enhanced gradient background with emerald theme */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-black to-teal-950/20" />
+    <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full overflow-hidden bg-background">
+      {/* Enhanced gradient background with emerald theme - respects light/dark */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-background to-teal-950/20 dark:from-emerald-950/30 dark:via-black dark:to-teal-950/20" />
 
       {/* Animated background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -187,7 +187,7 @@ Best regards,
             I'm a <AnimatedText texts={[...ROLES]} className="text-emerald-500" interval={2500} />
           </motion.div>
           <motion.p
-            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-gray-300 leading-relaxed font-light"
+            className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-muted-foreground leading-relaxed font-light"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.8 }}
@@ -208,7 +208,7 @@ Best regards,
 
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
             <motion.button
-              className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 rounded-full font-bold text-white shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all group overflow-hidden relative"
+              className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 rounded-full font-bold text-primary-foreground shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all group overflow-hidden relative"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleHireMe}
@@ -223,7 +223,7 @@ Best regards,
 
             <motion.a
               href="#projects"
-              className="px-8 py-3 border border-emerald-500/30 rounded-full font-bold text-white hover:bg-emerald-500/10 transition-all flex items-center justify-center gap-2 group"
+              className="px-8 py-3 border border-emerald-500/30 rounded-full font-bold text-foreground hover:bg-emerald-500/10 transition-all flex items-center justify-center gap-2 group"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -245,15 +245,15 @@ Best regards,
             ].map((card, i) => (
               <motion.div
                 key={i}
-                className="bg-white/5 backdrop-blur-sm p-4 rounded-2xl border border-white/10 flex items-center gap-3 hover:border-white/20 transition-colors"
+                className="bg-card/50 backdrop-blur-sm p-4 rounded-2xl border border-border flex items-center gap-3 hover:border-primary/30 transition-colors"
                 whileHover={{ y: -5 }}
               >
                 <div className={`w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center ${card.color}`}>
                   <card.icon size={20} />
                 </div>
                 <div className="text-left">
-                  <p className="text-xs text-gray-400 uppercase tracking-widest">{card.label}</p>
-                  <p className="text-sm font-bold text-white">{card.value}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-widest">{card.label}</p>
+                  <p className="text-sm font-bold text-foreground">{card.value}</p>
                 </div>
               </motion.div>
             ))}

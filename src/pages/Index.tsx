@@ -74,7 +74,7 @@ const Index = memo(() => {
   }, [isReady]);
 
   return (
-    <div className="w-full min-h-screen relative overflow-x-hidden">
+    <div className="w-full min-h-screen relative overflow-x-hidden bg-background text-foreground">
       <AnimatePresence>
         {isLoading && <MatrixLoader onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
