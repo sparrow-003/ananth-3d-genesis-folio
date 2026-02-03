@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, memo } from "react";
 import { Analytics } from "@vercel/analytics/react";
+import { ThemeProvider } from "@/components/theme-provider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
 import Index from "./pages/Index";
@@ -47,30 +48,32 @@ LoadingSpinner.displayName = 'LoadingSpinner';
 const App = memo(() => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <div className="w-full min-h-screen bg-black text-white selection:bg-emerald-500/30 selection:text-emerald-200">
-          <Toaster />
-          <Sonner position="top-center" richColors theme="dark" closeButton />
-          <BrowserRouter>
-            <ScrollToTop />
-            <ErrorBoundary>
-              <Suspense fallback={<LoadingSpinner />}>
-                <Routes>
-                  <Route element={<Layout />}>
-                    <Route path="/" element={<Index />} />
-                    <Route path="/blog" element={<Blog />} />
-                    <Route path="/blog/:slug" element={<Blog />} />
-                    <Route path="/blog-system-test" element={<BlogSystemTest />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Route>
-                  <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
-                </Routes>
-              </Suspense>
-            </ErrorBoundary>
-          </BrowserRouter>
-          <Analytics />
-        </div>
-      </TooltipProvider>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+        <TooltipProvider>
+          <div className="w-full min-h-screen bg-background text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
+            <Toaster />
+            <Sonner position="top-center" richColors closeButton />
+            <BrowserRouter>
+              <ScrollToTop />
+              <ErrorBoundary>
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Routes>
+                    <Route element={<Layout />}>
+                      <Route path="/" element={<Index />} />
+                      <Route path="/blog" element={<Blog />} />
+                      <Route path="/blog/:slug" element={<Blog />} />
+                      <Route path="/blog-system-test" element={<BlogSystemTest />} />
+                      <Route path="*" element={<NotFound />} />
+                    </Route>
+                    <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
+                  </Routes>
+                </Suspense>
+              </ErrorBoundary>
+            </BrowserRouter>
+            <Analytics />
+          </div>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 ));
