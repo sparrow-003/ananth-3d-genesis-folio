@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
   Save, X, Send, Calendar as CalendarIcon, MapPin, 
@@ -6,7 +6,9 @@ import {
   ChevronLeft, MoreVertical, Globe, Eye, Trash2,
   Clock, FileText, Settings, Image as ImageIcon,
   LayoutTemplate, Bold, Italic, Heading, Quote, 
-  List, Code, AlertCircle, CheckCircle2, Loader2
+  List, Code, AlertCircle, CheckCircle2, Loader2,
+  Maximize2, Minimize2, Type, ListOrdered, Minus, 
+  Table as TableIcon, Strikethrough, Split
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -41,6 +43,7 @@ import { format } from 'date-fns'
 import { BlogPost } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
+import { parseMarkdown } from '@/lib/markdown'
 
 interface PostEditorProps {
   post: BlogPost | null
@@ -92,6 +95,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   const [isSaving, setIsSaving] = useState(false)
   const [validationErrors, setValidationErrors] = useState<ValidationErrors>({})
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [showPreviewSplit, setShowPreviewSplit] = useState(false)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   // Initialize form data when post changes
   useEffect(() => {
@@ -125,6 +131,26 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
       setHasUnsavedChanges(true)
     }
   }, [formData, publishDate, publishTime, scheduleEnabled])
+
+  // Keyboard Shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault()
+        handleSave(false)
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
+        e.preventDefault()
+        insertMarkdown('**', '**')
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'i') {
+        e.preventDefault()
+        insertMarkdown('*', '*')
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [formData])
 
   // Validation function
   const validateForm = useCallback((): ValidationErrors => {
@@ -234,7 +260,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
 
   // Markdown insert function
   const insertMarkdown = useCallback((prefix: string, suffix: string = '') => {
-    const textarea = document.getElementById('post-content-textarea') as HTMLTextAreaElement
+    const textarea = textareaRef.current
     if (!textarea) return
 
     const start = textarea.selectionStart
@@ -251,10 +277,17 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     // Restore focus and selection
     setTimeout(() => {
       textarea.focus()
-      const newCursorPos = start + prefix.length + (selection ? selection.length : 0) + (selection ? suffix.length : 0)
-      textarea.setSelectionRange(newCursorPos, newCursorPos)
+      const newCursorPos = start + prefix.length + (selection ? selection.length : 0) + (selection ? suffix.length : 0) // Place cursor after prefix+selection
+      // Ideally if no selection, place cursor between tags
+      const finalPos = selection ? newCursorPos + suffix.length : start + prefix.length
+      textarea.setSelectionRange(finalPos, finalPos)
     }, 0)
   }, [formData.content])
+
+  // Statistics
+  const wordCount = formData.content.trim().split(/\s+/).filter(Boolean).length
+  const charCount = formData.content.length
+  const readTime = Math.ceil(wordCount / 200)
 
   // Render post settings
   const renderPostSettings = () => (
@@ -349,15 +382,25 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
 
           <div className="space-y-2">
             <label className="text-xs font-medium text-muted-foreground">Slug *</label>
-            <Input 
-              value={formData.slug}
-              onChange={e => handleFieldChange('slug', e.target.value)}
-              placeholder="custom-url-slug"
-              className={cn(
-                "font-mono text-xs",
-                validationErrors.slug && "border-red-500 focus:border-red-500"
-              )}
-            />
+            <div className="flex gap-2">
+              <Input 
+                value={formData.slug}
+                onChange={e => handleFieldChange('slug', e.target.value)}
+                placeholder="custom-url-slug"
+                className={cn(
+                  "font-mono text-xs",
+                  validationErrors.slug && "border-red-500 focus:border-red-500"
+                )}
+              />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                onClick={() => handleFieldChange('slug', generateSlug(formData.title))}
+                title="Regenerate Slug"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
             {validationErrors.slug && (
               <p className="text-xs text-red-500 flex items-center gap-1">
                 <AlertCircle className="w-3 h-3" />
@@ -439,8 +482,78 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     </Accordion>
   )
 
+  const EditorToolbar = () => (
+    <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm py-2 border-b border-border flex flex-wrap gap-1 mb-4">
+      <div className="flex items-center border-r border-border pr-2 mr-2 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('# ')} title="H1">
+          <Heading className="w-4 h-4" />
+          <span className="text-[10px] ml-1">1</span>
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('## ')} title="H2">
+          <Heading className="w-4 h-4" />
+          <span className="text-[10px] ml-1">2</span>
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('### ')} title="H3">
+          <Heading className="w-4 h-4" />
+          <span className="text-[10px] ml-1">3</span>
+        </Button>
+      </div>
+
+      <div className="flex items-center border-r border-border pr-2 mr-2 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('**', '**')} title="Bold (Ctrl+B)">
+          <Bold className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('*', '*')} title="Italic (Ctrl+I)">
+          <Italic className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('~~', '~~')} title="Strikethrough">
+          <Strikethrough className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center border-r border-border pr-2 mr-2 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('> ')} title="Quote">
+          <Quote className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('```\n', '\n```')} title="Code Block">
+          <Code className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('`', '`')} title="Inline Code">
+          <Type className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center border-r border-border pr-2 mr-2 gap-1">
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('- ')} title="Bulleted List">
+          <List className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('1. ')} title="Ordered List">
+          <ListOrdered className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <div className="flex items-center gap-1">
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('[', '](url)')} title="Link">
+          <LinkIcon className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('![alt](', ')')} title="Image">
+          <ImageIcon className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('\n---\n')} title="Divider">
+          <Minus className="w-4 h-4" />
+        </Button>
+        <Button variant="ghost" size="sm" onClick={() => insertMarkdown('| Header | Header |\n| --- | --- |\n| Cell | Cell |')} title="Table">
+          <TableIcon className="w-4 h-4" />
+        </Button>
+      </div>
+    </div>
+  )
+
   return (
-    <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+    <div className={cn(
+      "fixed inset-0 z-50 bg-background flex flex-col animate-in slide-in-from-bottom-4 duration-300",
+      isFullscreen ? "z-[100]" : ""
+    )}>
       {/* Top Bar */}
       <div className="h-16 border-b border-border bg-background/95 backdrop-blur flex items-center justify-between px-4 lg:px-6 sticky top-0 z-10">
         <div className="flex items-center gap-4">
@@ -452,13 +565,16 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
               {post ? 'Edit Post' : 'New Post'}
             </span>
             <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">
+              <span className={cn(
+                "text-xs px-2 py-0.5 rounded-full",
+                formData.published ? "bg-green-500/10 text-green-500" : "bg-orange-500/10 text-orange-500"
+              )}>
                 {formData.published ? 'Published' : 'Draft'}
               </span>
               {hasUnsavedChanges && (
-                <span className="text-xs text-orange-500 flex items-center gap-1">
+                <span className="text-xs text-orange-500 flex items-center gap-1 animate-pulse">
                   <AlertCircle className="w-3 h-3" />
-                  Unsaved changes
+                  Unsaved
                 </span>
               )}
             </div>
@@ -466,12 +582,43 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         </div>
 
         <div className="flex items-center gap-2">
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="hidden md:block mr-4">
-            <TabsList className="grid w-[200px] grid-cols-2">
-              <TabsTrigger value="write">Write</TabsTrigger>
-              <TabsTrigger value="preview">Preview</TabsTrigger>
-            </TabsList>
-          </Tabs>
+          <div className="hidden md:flex items-center border rounded-lg overflow-hidden mr-4">
+             <Button 
+              variant={activeTab === 'write' && !showPreviewSplit ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => { setActiveTab('write'); setShowPreviewSplit(false) }}
+              className="rounded-none h-8"
+             >
+               Write
+             </Button>
+             <Button 
+              variant={showPreviewSplit ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => { setActiveTab('write'); setShowPreviewSplit(true) }}
+              className="rounded-none h-8"
+              title="Split View"
+             >
+               <Split className="w-4 h-4" />
+             </Button>
+             <Button 
+              variant={activeTab === 'preview' ? "secondary" : "ghost"} 
+              size="sm" 
+              onClick={() => { setActiveTab('preview'); setShowPreviewSplit(false) }}
+              className="rounded-none h-8"
+             >
+               Preview
+             </Button>
+          </div>
+
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            className="hidden sm:flex"
+            title={isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}
+          >
+            {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+          </Button>
 
           <Sheet>
             <SheetTrigger asChild>
@@ -509,6 +656,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
             onClick={() => handleSave(false)} 
             disabled={isSaving}
             className="hidden sm:flex"
+            title="Ctrl+S"
           >
             {isSaving ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -545,88 +693,72 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
 
       <div className="flex-1 flex overflow-hidden">
         {/* Main Content Area */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="max-w-4xl mx-auto p-4 md:p-8 lg:p-12">
-            {activeTab === 'write' ? (
-              <div className="space-y-8 animate-in fade-in duration-500">
-                <div className="group relative">
-                  <Input
-                    value={formData.title}
-                    onChange={handleTitleChange}
-                    placeholder="Post Title"
-                    className={cn(
-                      "text-3xl md:text-5xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/30 bg-transparent text-foreground",
-                      validationErrors.title && "border-red-500"
+        <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+          <div className="max-w-6xl mx-auto p-4 md:p-8 lg:p-12 h-full flex flex-col">
+            <div className={cn(
+              "flex-1 grid gap-8 h-full",
+              showPreviewSplit ? "grid-cols-2" : "grid-cols-1"
+            )}>
+              {/* Editor Column */}
+              {(activeTab === 'write' || showPreviewSplit) && (
+                <div className="flex flex-col h-full animate-in fade-in duration-500">
+                  <div className="group relative mb-6">
+                    <Input
+                      value={formData.title}
+                      onChange={handleTitleChange}
+                      placeholder="Post Title"
+                      className={cn(
+                        "text-3xl md:text-5xl font-bold border-none px-0 h-auto focus-visible:ring-0 placeholder:text-muted-foreground/30 bg-transparent text-foreground",
+                        validationErrors.title && "border-red-500"
+                      )}
+                    />
+                    {validationErrors.title && (
+                      <p className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {validationErrors.title}
+                      </p>
                     )}
-                  />
-                  {validationErrors.title && (
-                    <p className="text-sm text-red-500 mt-2 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {validationErrors.title}
-                    </p>
-                  )}
-                  <div className="absolute -left-8 top-4 opacity-0 group-hover:opacity-100 transition-opacity text-muted-foreground hidden lg:block">
-                    <LayoutTemplate className="w-6 h-6" />
+                  </div>
+                  
+                  <EditorToolbar />
+
+                  <div className="flex-1 relative">
+                    <Textarea
+                      ref={textareaRef}
+                      value={formData.content}
+                      onChange={e => handleFieldChange('content', e.target.value)}
+                      placeholder="Tell your story..."
+                      className={cn(
+                        "w-full h-full min-h-[50vh] resize-none border-none px-0 text-lg focus-visible:ring-0 leading-relaxed bg-transparent font-mono text-foreground",
+                        validationErrors.content && "border-red-500"
+                      )}
+                    />
                   </div>
                 </div>
-                
-                <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm py-2 border-b border-border flex gap-1 mb-4">
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('**', '**')} title="Bold">
-                    <Bold className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('*', '*')} title="Italic">
-                    <Italic className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('### ')} title="Heading">
-                    <Heading className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('> ')} title="Quote">
-                    <Quote className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('- ')} title="List">
-                    <List className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('`', '`')} title="Code">
-                    <Code className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('[', '](url)')} title="Link">
-                    <LinkIcon className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('![alt text](', ')')} title="Image">
-                    <ImageIcon className="w-4 h-4" />
-                  </Button>
-                </div>
+              )}
 
-                <div className="space-y-2">
-                  <Textarea
-                    id="post-content-textarea"
-                    value={formData.content}
-                    onChange={e => handleFieldChange('content', e.target.value)}
-                    placeholder="Tell your story..."
-                    className={cn(
-                      "min-h-[calc(100vh-300px)] resize-none border-none px-0 text-lg focus-visible:ring-0 leading-relaxed bg-transparent font-mono text-foreground",
-                      validationErrors.content && "border-red-500"
-                    )}
-                  />
-                  {validationErrors.content && (
-                    <p className="text-sm text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {validationErrors.content}
-                    </p>
+              {/* Preview Column */}
+              {(activeTab === 'preview' || showPreviewSplit) && (
+                <div className={cn(
+                  "prose dark:prose-invert max-w-none animate-in fade-in duration-500 overflow-y-auto h-full pr-4",
+                  showPreviewSplit ? "border-l border-border pl-8" : ""
+                )}>
+                  {activeTab === 'preview' && (
+                    <>
+                      <h1>{formData.title || 'Untitled Post'}</h1>
+                      {formData.featured_image && (
+                        <img src={formData.featured_image} alt="Cover" className="w-full h-64 object-cover rounded-xl my-8" />
+                      )}
+                    </>
                   )}
+                  
+                  <div 
+                    className="min-h-[200px]"
+                    dangerouslySetInnerHTML={{ __html: parseMarkdown(formData.content || (showPreviewSplit ? '' : '*Start writing to see preview...*')) }} 
+                  />
                 </div>
-              </div>
-            ) : (
-              <div className="prose dark:prose-invert max-w-none animate-in fade-in duration-500">
-                <h1>{formData.title || 'Untitled Post'}</h1>
-                {formData.featured_image && (
-                  <img src={formData.featured_image} alt="Cover" className="w-full h-64 object-cover rounded-xl my-8" />
-                )}
-                <div className="whitespace-pre-wrap">
-                  {formData.content || 'Start writing to see preview...'}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
@@ -637,6 +769,19 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
             Post Settings
           </div>
           {renderPostSettings()}
+        </div>
+      </div>
+
+      {/* Footer Status Bar */}
+      <div className="h-8 border-t border-border bg-background flex items-center justify-between px-4 text-xs text-muted-foreground select-none">
+        <div className="flex items-center gap-4">
+          <span>{wordCount} words</span>
+          <span>{charCount} chars</span>
+          <span>{readTime} min read</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span>Last saved: {format(new Date(), 'HH:mm')}</span>
+          <span className="hidden sm:inline text-muted-foreground/50">Markdown supported</span>
         </div>
       </div>
     </div>

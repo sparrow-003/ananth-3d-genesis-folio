@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, memo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useScroll, useSpring } from 'framer-motion'
 import { ArrowLeft, Heart, Eye, Share2, Calendar, Clock, Send, MessageSquare, User, Hash } from 'lucide-react'
 import { BlogPost as BlogPostType, BlogComment, blogAPI } from '@/lib/supabase'
 import { getUserIP } from '@/lib/auth'
@@ -140,75 +140,106 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
     return Math.ceil(wordCount / 200) || 1
   }, [])
 
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001
+  })
+
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 font-sans"
-    >
-      {/* Back Button */}
-      <Button
-        variant="ghost"
-        onClick={onBack}
-        className="mb-8 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-full group px-4 -ml-4"
+    <>
+      {/* Reading Progress Bar */}
+      <motion.div
+        className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-50"
+        style={{ scaleX }}
+      />
+
+      <motion.article
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: { 
+            opacity: 1,
+            transition: { 
+              staggerChildren: 0.1,
+              delayChildren: 0.2
+            }
+          }
+        }}
+        className="max-w-5xl mx-auto px-4 sm:px-6 pb-12 font-sans relative"
       >
-        <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
-        Back to Blog
-      </Button>
+        {/* Back Button */}
+        <motion.div variants={{ hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0 } }}>
+          <Button
+            variant="ghost"
+            onClick={onBack}
+            className="mb-8 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all rounded-full group px-4 -ml-4"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
+            Back to Blog
+          </Button>
+        </motion.div>
 
-      <div className="glass-card p-6 md:p-10 lg:p-12 overflow-hidden relative">
-        {/* Header */}
-        <header className="mb-10 relative z-10">
-          <div className="flex flex-wrap items-center gap-4 mb-6">
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map((tag, index) => (
-                  <Badge
-                    key={index}
-                    variant="secondary"
-                    className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 backdrop-blur-sm uppercase tracking-wider text-[10px] rounded-full px-3 py-1 font-bold"
-                  >
-                    <Hash className="w-3 h-3 mr-1" />
-                    {tag}
-                  </Badge>
-                ))}
+        <motion.div 
+          variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+          className="glass-card p-6 md:p-10 lg:p-12 overflow-hidden relative border border-white/10 shadow-2xl shadow-black/50"
+        >
+          {/* Ambient Background Glow */}
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+          
+          {/* Header */}
+          <header className="mb-12 relative z-10 border-b border-white/5 pb-8">
+            <div className="flex flex-wrap items-center gap-4 mb-6">
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map((tag, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/20 backdrop-blur-sm uppercase tracking-wider text-[10px] rounded-full px-3 py-1 font-bold"
+                    >
+                      <Hash className="w-3 h-3 mr-1" />
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+              
+              <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
+              
+              <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                <Calendar className="w-3.5 h-3.5" />
+                <span>{formatDate(post.created_at)}</span>
               </div>
-            )}
-            
-            <span className="w-1 h-1 rounded-full bg-muted-foreground/30" />
-            
-            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider">
-              <Calendar className="w-3.5 h-3.5" />
-              <span>{formatDate(post.created_at)}</span>
-            </div>
-          </div>
-
-          <h1 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-6 leading-tight tracking-tight text-gradient">
-            {post.title}
-          </h1>
-
-          <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground border-b border-white/10 pb-8 mb-8">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-primary" />
-              <span className="font-medium text-foreground">{post.author_name || 'Ananth'}</span>
-            </div>
-            
-            <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              <span>{estimateReadingTime(post.content)} min read</span>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Eye className="w-4 h-4 text-primary" />
-              <span>{post.views_count + 1} views</span>
-            </div>
-          </div>
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-foreground mb-8 leading-tight tracking-tighter">
+              {post.title}
+            </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground leading-relaxed font-serif italic border-l-4 border-primary/50 pl-6 py-2 bg-primary/5 rounded-r-lg">
-            {post.excerpt}
-          </p>
-        </header>
+            <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary p-[1px]">
+                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
+                    <User className="w-5 h-5 text-primary" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-xs uppercase tracking-wider opacity-70">Written by</div>
+                  <div className="font-bold text-foreground">{post.author_name || 'Ananth'}</div>
+                </div>
+              </div>
+              
+              <div className="w-px h-10 bg-white/10" />
+
+              <div className="flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <span>{estimateReadingTime(post.content)} min read</span>
+              </div>
+            </div>
+          </header>
 
         {/* Featured Image */}
         {post.featured_image && (

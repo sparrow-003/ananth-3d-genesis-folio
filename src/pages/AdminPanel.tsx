@@ -3,10 +3,13 @@ import type { Session } from '@supabase/supabase-js'
 import { supabase } from '@/integrations/supabase/client'
 import AdminLogin from '@/components/AdminLogin'
 import AdminDashboard from '@/components/AdminDashboard'
+import MatrixLoader from '@/components/MatrixLoader'
+import { AnimatePresence } from 'framer-motion'
 
 const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [showMatrix, setShowMatrix] = useState(true)
   const lastUserIdRef = useRef<string | null>(null)
 
   const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
@@ -113,34 +116,34 @@ const AdminPanel = () => {
     setIsAuthenticated(false)
   }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-4">
-        <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
-        <div className="relative w-12 h-12">
-          <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-          <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
-        </div>
-        <p className="text-emerald-500/50 text-sm animate-pulse">Verifying Access Protocols...</p>
-        
-        {/* Fail-safe button if loading gets stuck */}
-        <button 
-          onClick={() => {
-            setLoading(false)
-            setIsAuthenticated(false)
-          }}
-          className="mt-8 text-xs text-red-500/50 hover:text-red-400 underline cursor-pointer"
-        >
-          Taking too long? Click here to reset.
-        </button>
-      </div>
-    )
-  }
+  return (
+    <>
+      <AnimatePresence>
+        {showMatrix && (
+          <MatrixLoader 
+            duration={10000} 
+            onComplete={() => setShowMatrix(false)} 
+          />
+        )}
+      </AnimatePresence>
 
-  return isAuthenticated ? (
-    <AdminDashboard onLogout={handleLogout} />
-  ) : (
-    <AdminLogin onLogin={handleLogin} />
+      <div className={showMatrix ? "fixed inset-0 -z-10 opacity-0 pointer-events-none" : "animate-in fade-in duration-500"}>
+        {loading ? (
+          <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-4">
+            <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+            <div className="relative w-12 h-12">
+              <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
+              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+            </div>
+            <p className="text-emerald-500/50 text-sm animate-pulse">Verifying Access Protocols...</p>
+          </div>
+        ) : isAuthenticated ? (
+          <AdminDashboard onLogout={handleLogout} />
+        ) : (
+          <AdminLogin onLogin={handleLogin} />
+        )}
+      </div>
+    </>
   )
 }
 

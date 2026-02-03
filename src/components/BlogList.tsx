@@ -126,17 +126,20 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-12 md:mb-16"
+        transition={{ duration: 0.7, ease: "easeOut" }}
+        className="text-center mb-16 md:mb-24 relative"
       >
-        <div className="flex items-center justify-center gap-2 mb-4">
-          <span className="text-primary font-bold uppercase tracking-[0.3em] text-xs">The Journal</span>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] bg-primary/5 blur-[100px] rounded-full -z-10" />
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <span className="h-[1px] w-12 bg-gradient-to-r from-transparent to-primary/50" />
+          <span className="text-primary font-bold uppercase tracking-[0.4em] text-xs glow-text">The Journal</span>
+          <span className="h-[1px] w-12 bg-gradient-to-l from-transparent to-primary/50" />
         </div>
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 text-foreground tracking-tighter uppercase">
-          Blog
+        <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black mb-6 sm:mb-8 text-foreground tracking-tighter uppercase relative z-10">
+          <span className="bg-clip-text text-transparent bg-gradient-to-b from-foreground to-foreground/50">Blog</span>
         </h1>
-        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-serif px-4">
-          Thoughts, ideas, and updates from the digital frontier.
+        <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-light tracking-wide px-4">
+          Insights from the <span className="text-primary font-medium">Digital Frontier</span>.
         </p>
       </motion.div>
 
@@ -277,7 +280,7 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           animate={{ opacity: 1 }}
           className="text-center py-12"
         >
-          <p className="text-muted-foreground text-lg font-serif italic">
+          <p className="text-muted-foreground text-lg font-light italic">
             {posts.length === 0
               ? "No blog posts yet. Check back soon!"
               : "No posts match your filters."
@@ -298,40 +301,52 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           {/* Featured Post Section */}
           {!searchTerm && !selectedTag && sortBy === 'newest' && filteredPosts.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6 }}
+              className="mb-16"
             >
-              <div className="flex items-center gap-4 mb-8">
-                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
-                 <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary glow-text">Featured Story</span>
-                 <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/50 to-transparent"></div>
+              <div className="relative group">
+                <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-secondary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
+                <BlogCard 
+                  post={filteredPosts[0]} 
+                  onClick={() => onPostSelect(filteredPosts[0])} 
+                  featured={true} 
+                />
               </div>
-              
-              <BlogCard
-                post={filteredPosts[0]}
-                onClick={() => onPostSelect(filteredPosts[0])}
-                featured={true}
-              />
             </motion.div>
           )}
 
-          {/* Regular Posts Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {(!searchTerm && !selectedTag && sortBy === 'newest' ? filteredPosts.slice(1) : filteredPosts).map((post, index) => (
+          {/* Grid Layout */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            variants={{
+              hidden: { opacity: 0 },
+              show: {
+                opacity: 1,
+                transition: {
+                  staggerChildren: 0.1
+                }
+              }
+            }}
+            initial="hidden"
+            animate="show"
+          >
+            {filteredPosts.slice(!searchTerm && !selectedTag && sortBy === 'newest' ? 1 : 0).map((post) => (
               <motion.div
                 key={post.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2, delay: index < 6 ? index * 0.03 : 0 }}
+                variants={{
+                  hidden: { opacity: 0, y: 30 },
+                  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 20 } }
+                }}
               >
-                <BlogCard
-                  post={post}
-                  onClick={() => onPostSelect(post)}
+                <BlogCard 
+                  post={post} 
+                  onClick={() => onPostSelect(post)} 
                 />
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       )}
     </div>

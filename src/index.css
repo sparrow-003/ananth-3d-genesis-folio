@@ -6,46 +6,46 @@
 
 @layer base {
   :root {
-    /* Light Mode (Pure White + Blue Theme) */
-    --background: 0 0% 100%;
+    /* Light Mode (Cyber/Tech Light Theme) */
+    --background: 210 20% 98%; /* Light Silver/Gray background, not pure white */
     --foreground: 222 47% 11%;
 
-    --card: 0 0% 100%;
+    --card: 0 0% 100%; /* Pure white cards for contrast */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 217 91% 60%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 221 83% 53%; /* Sharper Blue */
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 214 32% 91%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222 47% 11.2%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 214 32% 91%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222 47% 11.2%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 217 91% 60%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221 83% 53%;
 
     --radius: 0.75rem;
 
-    /* Light Mode Gradients - Clean & Modern */
-    --bg-main: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(214, 40%, 98%) 50%, hsl(217, 45%, 97%) 100%);
-    --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(214, 32%, 98%) 100%);
-    --bg-projects: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(214, 35%, 97%) 30%, hsl(217, 40%, 96%) 70%, hsl(220, 45%, 95%) 100%);
-    --bg-glass: hsla(217, 40%, 98%, 0.8);
+    /* Light Mode Gradients - distinct from dark mode */
+    --bg-main: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(220, 30%, 96%) 100%);
+    --bg-secondary: linear-gradient(180deg, hsl(210, 20%, 98%) 0%, hsl(215, 25%, 95%) 100%);
+    --bg-projects: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(215, 25%, 95%) 50%, hsl(220, 30%, 92%) 100%);
+    --bg-glass: hsla(0, 0%, 100%, 0.9); /* Higher opacity for light mode glass */
 
-    /* Light Mode Glows */
-    --glow-primary: 0 0 60px hsla(217, 91%, 60%, 0.15);
-    --glow-secondary: 0 0 80px hsla(220, 85%, 55%, 0.1);
+    /* Light Mode Glows - softer, more subtle */
+    --glow-primary: 0 0 40px hsla(221, 83%, 53%, 0.1);
+    --glow-secondary: 0 0 60px hsla(210, 50%, 50%, 0.05);
   }
 
   .dark {
@@ -179,6 +179,10 @@
   .text-gradient-yellow {
     @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400;
     animation: gradient-shift 3s ease infinite;
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px hsla(221, 83%, 53%, 0.5), 0 0 20px hsla(221, 83%, 53%, 0.3);
   }
 
   @keyframes gradient-shift {

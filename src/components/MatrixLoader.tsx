@@ -1,7 +1,7 @@
 import { useRef, useEffect, memo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const MatrixLoader = memo(({ onComplete }: { onComplete?: () => void }) => {
+const MatrixLoader = memo(({ onComplete, duration = 5000 }: { onComplete?: () => void, duration?: number }) => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useEffect(() => {
@@ -69,14 +69,14 @@ const MatrixLoader = memo(({ onComplete }: { onComplete?: () => void }) => {
         // Timer for completion
         const timer = setTimeout(() => {
             if (onComplete) onComplete();
-        }, 5000);
+        }, duration);
 
         return () => {
             window.removeEventListener('resize', resize);
             cancelAnimationFrame(animationFrameId);
             clearTimeout(timer);
         };
-    }, [onComplete]);
+    }, [onComplete, duration]);
 
     return (
         <motion.div

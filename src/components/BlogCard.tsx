@@ -96,16 +96,18 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
   return (
     <motion.div
       // Scale instead of translate to avoid “jumping/moving” feel on hover.
-      whileHover={{ scale: 1.01 }}
-      whileTap={{ scale: 0.99 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 26 }}
-      style={{ willChange: 'transform' }}
+      whileHover={{ y: -5 }}
+      whileTap={{ scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
       className={cn(
-        "group/card relative overflow-hidden glass-card cursor-pointer border border-white/10 hover:border-primary/50",
+        "group/card relative overflow-hidden glass-card cursor-pointer border border-white/10 hover:border-primary/50 transition-colors duration-500",
         featured ? "md:grid md:grid-cols-2 gap-0" : "flex flex-col h-full"
       )}
       onClick={onClick}
     >
+      {/* Glow Effect */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none" />
+      
       {/* Image Section */}
       <div className={cn(
         "relative overflow-hidden bg-muted",
@@ -115,7 +117,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           <img
             src={post.featured_image}
             alt={post.title}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
+            className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
             loading="lazy"
             onError={(e) => {
               const target = e.target as HTMLImageElement
@@ -123,18 +125,19 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
             }}
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-            <span className="text-4xl">✨</span>
+          <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center relative overflow-hidden">
+             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary),0.2),transparent_50%)]" />
+             <div className="w-full h-full absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
           </div>
         )}
         
         {/* Overlay Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent opacity-60" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent opacity-80" />
         
         {/* Category Badge over Image */}
         {post.tags && post.tags.length > 0 && (
           <div className="absolute top-4 left-4 z-10">
-            <Badge className="bg-primary/90 hover:bg-primary text-primary-foreground backdrop-blur-md border-none px-3 py-1 shadow-lg shadow-primary/20">
+            <Badge className="bg-background/50 hover:bg-background/80 text-foreground backdrop-blur-md border border-white/10 px-3 py-1 shadow-lg uppercase tracking-wider text-[10px]">
               {post.tags[0]}
             </Badge>
           </div>
@@ -144,10 +147,10 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
       {/* Content Section */}
       <div className={cn(
         "relative flex flex-col p-6 z-10",
-        featured ? "justify-center md:p-8 lg:p-12 bg-background/30 backdrop-blur-sm" : "flex-1 bg-transparent"
+        featured ? "justify-center md:p-10 lg:p-14 bg-background/30 backdrop-blur-sm" : "flex-1 bg-transparent"
       )}>
         {/* Meta Header */}
-        <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground mb-3">
+        <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground mb-4 uppercase tracking-wider">
           <div className="flex items-center gap-1.5">
             <Calendar className="w-3.5 h-3.5 text-primary" />
             <span>{formatDate(post.created_at)}</span>
@@ -161,15 +164,15 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
 
         {/* Title */}
         <h3 className={cn(
-          "font-bold text-foreground mb-3 leading-tight group-hover/card:text-primary transition-colors duration-300",
-          featured ? "text-2xl sm:text-3xl md:text-4xl" : "text-xl line-clamp-2"
+          "font-bold text-foreground mb-4 leading-tight group-hover/card:text-primary transition-colors duration-300",
+          featured ? "text-3xl sm:text-4xl md:text-5xl" : "text-xl line-clamp-2"
         )}>
           {post.title}
         </h3>
 
         {/* Excerpt */}
         <p className={cn(
-          "text-muted-foreground font-serif leading-relaxed mb-6",
+          "text-muted-foreground font-light leading-relaxed mb-8 tracking-wide",
           featured ? "text-base sm:text-lg line-clamp-3 md:line-clamp-4" : "text-sm line-clamp-3 flex-1"
         )}>
           {post.excerpt}
@@ -182,7 +185,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
               variant="ghost"
               size="sm"
               className={cn(
-                "h-8 px-2 gap-1.5 hover:bg-primary/10 transition-colors",
+                "h-8 px-2 gap-1.5 hover:bg-primary/10 transition-colors rounded-full",
                 liked ? "text-red-500" : "text-muted-foreground hover:text-red-500"
               )}
               onClick={handleLike}

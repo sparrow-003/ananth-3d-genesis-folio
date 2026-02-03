@@ -19,6 +19,12 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ["Inter", "sans-serif"],
+				serif: ["Playfair Display", "serif"],
+				display: ["Playfair Display", "serif"],
+				body: ["Inter", "sans-serif"],
+			},
 			maxWidth: {
 				'8xl': '88rem',
 				'9xl': '96rem'
