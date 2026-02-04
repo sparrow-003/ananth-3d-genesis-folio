@@ -184,13 +184,13 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
         <motion.div 
           variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
-          className="glass-card p-6 md:p-10 lg:p-12 overflow-hidden relative border border-white/10 shadow-2xl shadow-black/50"
+          className="glass-card p-6 md:p-10 lg:p-12 overflow-hidden relative shadow-xl"
         >
           {/* Ambient Background Glow */}
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 blur-[120px] rounded-full pointer-events-none -z-10" />
           
           {/* Header */}
-          <header className="mb-12 relative z-10 border-b border-white/5 pb-8">
+          <header className="mb-12 relative z-10 border-b border-border pb-8">
             <div className="flex flex-wrap items-center gap-4 mb-6">
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
@@ -222,7 +222,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
             <div className="flex flex-wrap items-center gap-6 text-sm text-muted-foreground">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary p-[1px]">
-                  <div className="w-full h-full rounded-full bg-black flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
                     <User className="w-5 h-5 text-primary" />
                   </div>
                 </div>
@@ -232,7 +232,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                 </div>
               </div>
               
-              <div className="w-px h-10 bg-white/10" />
+              <div className="w-px h-10 bg-border" />
 
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
@@ -274,12 +274,12 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
         </div>
 
         {/* Actions */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-8 border-t border-white/10">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6 py-8 border-t border-border">
           <div className="flex items-center gap-4 w-full sm:w-auto">
             <Button
               variant="outline"
               className={cn(
-                "flex-1 sm:flex-none gap-2 h-12 px-6 rounded-full transition-all border-white/10 bg-white/5 hover:bg-primary/10",
+                "flex-1 sm:flex-none gap-2 h-12 px-6 rounded-full transition-all border-border bg-card hover:bg-primary/10",
                 liked ? "text-red-500 border-red-500/50 bg-red-500/10" : "text-muted-foreground hover:text-red-500 hover:border-red-500/50"
               )}
               onClick={handleLike}
@@ -291,7 +291,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
             <Button
               variant="outline"
-              className="flex-1 sm:flex-none gap-2 h-12 px-6 text-muted-foreground border-white/10 bg-white/5 hover:bg-primary/10 hover:text-primary hover:border-primary/50 rounded-full transition-all"
+              className="flex-1 sm:flex-none gap-2 h-12 px-6 text-muted-foreground border-border bg-card hover:bg-primary/10 hover:text-primary hover:border-primary/50 rounded-full transition-all"
               onClick={() => setShowShareDialog(true)}
             >
               <Share2 className="w-5 h-5" />
@@ -299,10 +299,10 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
             </Button>
           </div>
         </div>
-      </div>
+        </motion.div>
 
-      {/* Comments Section */}
-      {post.allow_comments && (
+        {/* Comments Section */}
+        {post.allow_comments && (
         <div className="mt-12">
           <h3 className="text-2xl font-bold text-foreground mb-8 flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full">
@@ -317,13 +317,13 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                 placeholder="Your Name (Optional)"
                 value={commentAuthor}
                 onChange={(e) => setCommentAuthor(e.target.value)}
-                className="bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 rounded-lg h-12"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground focus:border-primary focus:ring-primary/20 rounded-lg h-12"
               />
               <Textarea
                 placeholder="Share your thoughts..."
                 value={newComment}
                 onChange={(e) => setNewComment(e.target.value)}
-                className="bg-black/20 border-white/10 text-foreground placeholder:text-muted-foreground min-h-[120px] focus:border-primary focus:ring-primary/20 rounded-lg resize-none"
+                className="bg-card border-border text-foreground placeholder:text-muted-foreground min-h-[120px] focus:border-primary focus:ring-primary/20 rounded-lg resize-none"
               />
               <div className="flex justify-end">
                 <Button 
@@ -349,7 +349,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
               >
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg shadow-lg">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-primary-foreground font-bold text-lg shadow-lg">
                       {comment.author.charAt(0).toUpperCase()}
                     </div>
                     <div>
@@ -368,7 +368,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
             ))}
             
             {comments.length === 0 && (
-              <div className="text-center py-16 glass-card border-dashed border-white/10">
+              <div className="text-center py-16 glass-card border-dashed border-border">
                 <MessageSquare className="w-12 h-12 text-muted-foreground/20 mx-auto mb-4" />
                 <p className="text-muted-foreground text-lg font-medium">No comments yet</p>
                 <p className="text-muted-foreground/60 text-sm">Be the first to share your thoughts!</p>
@@ -380,7 +380,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="glass-card border-white/10 text-foreground sm:max-w-md">
+        <DialogContent className="glass-card text-foreground sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-foreground">Share this post</DialogTitle>
             <DialogDescription className="text-center text-muted-foreground">
@@ -404,7 +404,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                 <Input 
                   readOnly 
                   value={shortUrl} 
-                  className="bg-black/20 border-white/10 text-muted-foreground font-mono text-xs rounded-lg h-10"
+                  className="bg-card border-border text-muted-foreground font-mono text-xs rounded-lg h-10"
                 />
                 <Button 
                   onClick={() => {
@@ -422,6 +422,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
         </DialogContent>
       </Dialog>
     </motion.article>
+    </>
   )
 })
 

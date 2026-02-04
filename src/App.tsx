@@ -30,14 +30,14 @@ const queryClient = new QueryClient({
 });
 
 const LoadingSpinner = memo(() => (
-  <div className="flex items-center justify-center min-h-screen bg-black relative overflow-hidden">
-    <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+  <div className="flex items-center justify-center min-h-screen bg-background relative overflow-hidden">
+    <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10 -z-10" />
     <div className="relative">
-      <div className="w-16 h-16 rounded-full border-2 border-emerald-500/10" />
-      <div className="absolute inset-0 w-16 h-16 rounded-full border-t-2 border-emerald-500 animate-spin" />
-      <div className="absolute inset-2 w-12 h-12 rounded-full border-b-2 border-teal-500/50 animate-reverse-spin" />
+      <div className="w-16 h-16 rounded-full border-2 border-primary/10" />
+      <div className="absolute inset-0 w-16 h-16 rounded-full border-t-2 border-primary animate-spin" />
+      <div className="absolute inset-2 w-12 h-12 rounded-full border-b-2 border-primary/50 animate-reverse-spin" />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-1 h-1 bg-emerald-500 rounded-full animate-ping" />
+        <div className="w-1 h-1 bg-primary rounded-full animate-ping" />
       </div>
     </div>
   </div>

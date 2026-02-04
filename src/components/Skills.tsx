@@ -10,7 +10,7 @@ const Skills = () => {
   const skillCategories = [
     {
       title: "Vibe Coding Skills",
-      icon: <BrainCircuit className="text-emerald-400" size={28} />,
+      icon: <BrainCircuit className="text-primary" size={28} />,
       skills: [
         { name: "Flow State Programming", icon: "https://img.icons8.com/color/48/meditation.png" },
         { name: "Creative Problem Solving", icon: "https://img.icons8.com/color/48/creative-thinking.png" },
@@ -20,7 +20,7 @@ const Skills = () => {
     },
     {
       title: "Programming Languages",
-      icon: <Code className="text-yellow-400" size={28} />,
+      icon: <Code className="text-primary" size={28} />,
       skills: [
         { name: "Python", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg" },
         { name: "JavaScript", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" },
@@ -29,7 +29,7 @@ const Skills = () => {
     },
     {
       title: "Web Development",
-      icon: <Globe className="text-green-400" size={28} />,
+      icon: <Globe className="text-primary" size={28} />,
       skills: [
         { name: "React", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" },
         { name: "Node.js", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" },
@@ -41,7 +41,7 @@ const Skills = () => {
     },
     {
       title: "AI & Machine Learning",
-      icon: <BrainCircuit className="text-emerald-400" size={28} />,
+      icon: <BrainCircuit className="text-primary" size={28} />,
       skills: [
         { name: "Prompt Engineering", icon: "https://img.icons8.com/external-flaticons-flat-flat-icons/64/external-ai-industry-4-flaticons-flat-flat-icons.png" },
         { name: "LLM", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
@@ -53,7 +53,7 @@ const Skills = () => {
     },
     {
       title: "Databases",
-      icon: <Database className="text-teal-400" size={28} />,
+      icon: <Database className="text-primary" size={28} />,
       skills: [
         { name: "MongoDB", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" },
         { name: "SQL", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg" },
@@ -62,7 +62,7 @@ const Skills = () => {
     },
     {
       title: "DevOps & Cloud",
-      icon: <Layers className="text-emerald-400" size={28} />,
+      icon: <Layers className="text-primary" size={28} />,
       skills: [
         { name: "Docker", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" },
         { name: "GitHub Actions", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/github/github-original.svg" },
@@ -70,7 +70,7 @@ const Skills = () => {
     },
     {
       title: "Frameworks & Libraries",
-      icon: <Cpu className="text-green-400" size={28} />,
+      icon: <Cpu className="text-primary" size={28} />,
       skills: [
         { name: "Express", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" },
         { name: "Django", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg" },
@@ -79,7 +79,7 @@ const Skills = () => {
     },
     {
       title: "Design & UI/UX",
-      icon: <PencilRuler className="text-teal-400" size={28} />,
+      icon: <PencilRuler className="text-primary" size={28} />,
       skills: [
         { name: "Figma", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg" },
         { name: "UI/UX Research", icon: "https://img.icons8.com/fluency/48/test-lab.png" },
@@ -87,7 +87,7 @@ const Skills = () => {
     },
     {
       title: "Teaching & Leadership",
-      icon: <CheckCircle className="text-emerald-400" size={28} />,
+      icon: <CheckCircle className="text-primary" size={28} />,
       skills: [
         { name: "AI/BI Training", icon: "https://img.icons8.com/color/48/artificial-intelligence.png" },
         { name: "Campus Ambassador", icon: "https://img.icons8.com/color/48/ambassador.png" },
@@ -116,23 +116,23 @@ const Skills = () => {
 
   return (
     <section id="skills" className="py-24 relative overflow-hidden" ref={ref}>
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-primary/10 -z-10" />
       {/* 3D Background Elements */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-emerald-400/10 to-emerald-600/5 rounded-full blur-2xl"></div>
-        <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-br from-teal-400/10 to-teal-600/5 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-cyan-400/10 to-cyan-600/5 rounded-full blur-2xl"></div>
+        <div className="absolute top-10 left-10 w-32 h-32 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-2xl"></div>
+        <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-2xl"></div>
 
         {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#10B98111_1px,transparent_1px),linear-gradient(to_bottom,#10B98111_1px,transparent_1px)] bg-[size:44px_44px]"></div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--primary)/0.05)_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--primary)/0.05)_1px,transparent_1px)] bg-[size:44px_44px]"></div>
 
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-emerald-400/10 rounded-full animate-pulse-slow opacity-20"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-teal-400/10 rounded-full animate-reverse-pulse opacity-20"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-primary/10 rounded-full animate-pulse-slow opacity-20"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-primary/10 rounded-full animate-reverse-pulse opacity-20"></div>
       </div>
 
       <div className="section-container relative z-10">
         <motion.h2
-          className="section-title text-3xl md:text-5xl text-center bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-400"
+          className="section-title text-3xl md:text-5xl text-center text-gradient"
           initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           transition={{ duration: 0.5 }}

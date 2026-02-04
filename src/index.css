@@ -6,88 +6,89 @@
 
 @layer base {
   :root {
-    /* Light Mode (Cyber/Tech Light Theme) */
-    --background: 210 20% 98%; /* Light Silver/Gray background, not pure white */
-    --foreground: 222 47% 11%;
+    /* Light Mode - Pure White & Blue with High Contrast */
+    --background: 0 0% 100%; /* Pure white background */
+    --foreground: 222 47% 8%; /* Very dark blue-black text */
 
-    --card: 0 0% 100%; /* Pure white cards for contrast */
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 222 47% 8%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 222 47% 8%;
 
-    --primary: 221 83% 53%; /* Sharper Blue */
-    --primary-foreground: 210 40% 98%;
+    --primary: 217 91% 50%; /* Vibrant blue */
+    --primary-foreground: 0 0% 100%; /* White text on blue */
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222 47% 11.2%;
+    --secondary: 214 32% 91%; /* Light gray-blue */
+    --secondary-foreground: 222 47% 11%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 20% 40%; /* Darker for better readability */
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222 47% 11.2%;
+    --accent: 217 91% 95%; /* Very light blue accent */
+    --accent-foreground: 217 91% 40%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221 83% 53%;
+    --border: 214 32% 85%; /* Visible borders */
+    --input: 214 32% 91%;
+    --ring: 217 91% 50%;
 
     --radius: 0.75rem;
 
-    /* Light Mode Gradients - distinct from dark mode */
-    --bg-main: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(220, 30%, 96%) 100%);
-    --bg-secondary: linear-gradient(180deg, hsl(210, 20%, 98%) 0%, hsl(215, 25%, 95%) 100%);
-    --bg-projects: linear-gradient(135deg, hsl(210, 20%, 98%) 0%, hsl(215, 25%, 95%) 50%, hsl(220, 30%, 92%) 100%);
-    --bg-glass: hsla(0, 0%, 100%, 0.9); /* Higher opacity for light mode glass */
+    /* Light Mode Gradients - Clean & Bright */
+    --bg-main: linear-gradient(135deg, hsl(0, 0%, 100%) 0%, hsl(214, 32%, 98%) 100%);
+    --bg-secondary: linear-gradient(180deg, hsl(0, 0%, 100%) 0%, hsl(214, 40%, 97%) 100%);
+    --bg-projects: linear-gradient(135deg, hsl(214, 40%, 98%) 0%, hsl(214, 50%, 96%) 50%, hsl(214, 60%, 94%) 100%);
+    --bg-glass: hsla(0, 0%, 100%, 0.95);
 
-    /* Light Mode Glows - softer, more subtle */
-    --glow-primary: 0 0 40px hsla(221, 83%, 53%, 0.1);
-    --glow-secondary: 0 0 60px hsla(210, 50%, 50%, 0.05);
+    /* Light Mode Glows - Subtle blue */
+    --glow-primary: 0 0 30px hsla(217, 91%, 50%, 0.12);
+    --glow-secondary: 0 0 50px hsla(217, 91%, 50%, 0.08);
+    --glow-accent: 0 0 40px hsla(217, 91%, 50%, 0.06);
   }
 
   .dark {
-    /* Dark Mode (Deep Blue/Black Theme) */
-    --background: 222 47% 5%;
-    --foreground: 210 40% 98%;
+    /* Dark Mode - Deep Blue/Black with Cyan Accents */
+    --background: 222 47% 4%; /* Very deep blue-black */
+    --foreground: 210 40% 98%; /* Almost white text */
 
-    --card: 222 47% 7%;
+    --card: 222 47% 6%; /* Slightly lighter than bg */
     --card-foreground: 210 40% 96%;
 
     --popover: 222 47% 5%;
     --popover-foreground: 210 40% 96%;
 
-    --primary: 217 91% 60%;
+    --primary: 199 89% 48%; /* Cyan-blue primary */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 80% 50%;
-    --secondary-foreground: 210 40% 96%;
+    --secondary: 217 33% 17%; /* Dark blue-gray */
+    --secondary-foreground: 210 40% 90%;
 
-    --muted: 222 40% 10%;
+    --muted: 222 40% 12%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 220 80% 55%;
-    --accent-foreground: 210 40% 96%;
+    --accent: 199 89% 48%; /* Matching cyan accent */
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 63% 45%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 217 40% 18%;
-    --input: 217 40% 18%;
-    --ring: 217 91% 60%;
+    --border: 217 33% 20%;
+    --input: 217 33% 17%;
+    --ring: 199 89% 48%;
 
     /* Dark Mode Gradients - Deep & Immersive */
-    --bg-main: linear-gradient(135deg, hsl(222, 47%, 5%) 0%, hsl(220, 50%, 8%) 50%, hsl(217, 55%, 10%) 100%);
-    --bg-secondary: linear-gradient(180deg, hsl(222, 47%, 5%) 0%, hsl(220, 45%, 7%) 100%);
-    --bg-projects: linear-gradient(135deg, hsl(222, 47%, 5%) 0%, hsl(220, 50%, 8%) 30%, hsl(217, 55%, 10%) 70%, hsl(215, 60%, 12%) 100%);
-    --bg-glass: hsla(217, 50%, 12%, 0.6);
+    --bg-main: linear-gradient(135deg, hsl(222, 47%, 4%) 0%, hsl(220, 50%, 7%) 50%, hsl(217, 55%, 9%) 100%);
+    --bg-secondary: linear-gradient(180deg, hsl(222, 47%, 4%) 0%, hsl(220, 45%, 6%) 100%);
+    --bg-projects: linear-gradient(135deg, hsl(222, 47%, 4%) 0%, hsl(220, 50%, 7%) 30%, hsl(217, 55%, 9%) 70%, hsl(215, 60%, 11%) 100%);
+    --bg-glass: hsla(217, 50%, 10%, 0.7);
 
-    /* Dark Mode Glows */
-    --glow-primary: 0 0 60px hsla(217, 91%, 60%, 0.4);
-    --glow-secondary: 0 0 80px hsla(220, 85%, 55%, 0.3);
-    --glow-accent: 0 0 100px hsla(215, 80%, 50%, 0.25);
+    /* Dark Mode Glows - Cyan accents */
+    --glow-primary: 0 0 60px hsla(199, 89%, 48%, 0.35);
+    --glow-secondary: 0 0 80px hsla(199, 89%, 48%, 0.25);
+    --glow-accent: 0 0 100px hsla(199, 89%, 48%, 0.2);
   }
 
   * {
@@ -148,41 +149,64 @@
   .glass-card {
     background: var(--bg-glass);
     backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid hsla(217, 91%, 60%, 0.2);
+    border: 1px solid hsl(var(--border));
     border-radius: 20px;
-    box-shadow: var(--glow-primary), 0 8px 32px hsla(217, 91%, 60%, 0.1);
+    box-shadow: var(--glow-primary), 0 8px 32px hsla(217, 91%, 50%, 0.08);
     transform-style: preserve-3d;
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   .glass-card:hover {
-    transform: translateY(-16px) rotateX(5deg);
-    box-shadow: var(--glow-secondary), 0 30px 60px hsla(220, 85%, 55%, 0.2);
-    border-color: hsla(217, 91%, 60%, 0.5);
-    background: hsla(217, 50%, 12%, 0.6);
+    transform: translateY(-8px) rotateX(2deg);
+    box-shadow: var(--glow-secondary), 0 20px 40px hsla(217, 91%, 50%, 0.12);
+    border-color: hsl(var(--primary) / 0.4);
+  }
+
+  /* Light mode specific glass card hover */
+  :root .glass-card:hover {
+    background: hsla(0, 0%, 100%, 0.98);
+  }
+
+  /* Dark mode specific glass card hover */
+  .dark .glass-card:hover {
+    background: hsla(217, 50%, 10%, 0.8);
   }
 
   .glass-nav {
-    @apply bg-glass/5 backdrop-blur-md border-b border-gray-300/20;
+    @apply backdrop-blur-md border-b;
+    background: hsl(var(--background) / 0.85);
+    border-color: hsl(var(--border));
   }
 
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-sky-400 to-cyan-400;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, hsl(217, 91%, 50%), hsl(199, 89%, 48%), hsl(187, 85%, 43%));
     animation: gradient-shift 3s ease infinite;
   }
 
+  .dark .text-gradient {
+    background-image: linear-gradient(90deg, hsl(199, 89%, 48%), hsl(187, 85%, 53%), hsl(175, 80%, 50%));
+  }
+
   .text-gradient-green {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-300 via-sky-300 to-cyan-400;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, hsl(217, 91%, 60%), hsl(199, 89%, 55%), hsl(187, 85%, 50%));
     animation: gradient-shift 3s ease infinite;
   }
 
   .text-gradient-yellow {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400;
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(90deg, hsl(217, 91%, 50%), hsl(240, 70%, 55%), hsl(280, 65%, 50%));
     animation: gradient-shift 3s ease infinite;
   }
 
   .glow-text {
-    text-shadow: 0 0 10px hsla(221, 83%, 53%, 0.5), 0 0 20px hsla(221, 83%, 53%, 0.3);
+    text-shadow: 0 0 10px hsl(var(--primary) / 0.5), 0 0 20px hsl(var(--primary) / 0.3);
+  }
+
+  /* Light mode: no glow text */
+  :root .glow-text {
+    text-shadow: none;
   }
 
   @keyframes gradient-shift {

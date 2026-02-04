@@ -8,7 +8,7 @@ import {
   LayoutTemplate, Bold, Italic, Heading, Quote, 
   List, Code, AlertCircle, CheckCircle2, Loader2,
   Maximize2, Minimize2, Type, ListOrdered, Minus, 
-  Table as TableIcon, Strikethrough, Split
+  Table as TableIcon, Strikethrough, Split, RefreshCw
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'

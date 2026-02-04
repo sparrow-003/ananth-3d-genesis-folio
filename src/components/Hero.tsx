@@ -184,7 +184,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            I'm a <AnimatedText texts={[...ROLES]} className="text-emerald-500" interval={2500} />
+            I'm a <AnimatedText texts={[...ROLES]} className="text-primary" interval={2500} />
           </motion.div>
           <motion.p
             className="text-base sm:text-lg md:text-xl lg:text-2xl max-w-2xl mx-auto lg:mx-0 mb-6 text-muted-foreground leading-relaxed font-light"
@@ -197,18 +197,18 @@ Best regards,
 
           {/* Cinematic HR pickup line */}
           <motion.div
-            className="glass-card p-4 mb-12 border border-emerald-500/10 relative overflow-hidden inline-block"
+            className="glass-card p-4 mb-12 relative overflow-hidden inline-block"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-teal-500/5"></div>
-            <p className="text-emerald-300/80 italic font-medium tracking-wide">"{currentPickupLine}"</p>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/10"></div>
+            <p className="text-primary/80 italic font-medium tracking-wide">"{currentPickupLine}"</p>
           </motion.div>
 
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
             <motion.button
-              className="px-8 py-3 bg-gradient-to-r from-emerald-600 to-teal-700 rounded-full font-bold text-primary-foreground shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition-all group overflow-hidden relative"
+              className="px-8 py-3 bg-primary hover:bg-primary/90 rounded-full font-bold text-primary-foreground shadow-lg transition-all group overflow-hidden relative"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleHireMe}
@@ -223,7 +223,7 @@ Best regards,
 
             <motion.a
               href="#projects"
-              className="px-8 py-3 border border-emerald-500/30 rounded-full font-bold text-foreground hover:bg-emerald-500/10 transition-all flex items-center justify-center gap-2 group"
+              className="px-8 py-3 border border-primary/30 rounded-full font-bold text-foreground hover:bg-primary/10 transition-all flex items-center justify-center gap-2 group"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={(e) => {
@@ -239,16 +239,16 @@ Best regards,
           {/* Information cards */}
           <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { label: "Experience", value: "Teaching 150+ Students", icon: Briefcase, color: "text-emerald-400" },
-              { label: "Location", value: "Madurai, Tamil Nadu", icon: MapPin, color: "text-teal-400" },
-              { label: "Vibe Skills", value: "AI, Python, React", icon: Code, color: "text-cyan-400" }
+              { label: "Experience", value: "Teaching 150+ Students", icon: Briefcase, color: "text-primary" },
+              { label: "Location", value: "Madurai, Tamil Nadu", icon: MapPin, color: "text-primary" },
+              { label: "Vibe Skills", value: "AI, Python, React", icon: Code, color: "text-primary" }
             ].map((card, i) => (
               <motion.div
                 key={i}
                 className="bg-card/50 backdrop-blur-sm p-4 rounded-2xl border border-border flex items-center gap-3 hover:border-primary/30 transition-colors"
                 whileHover={{ y: -5 }}
               >
-                <div className={`w-10 h-10 bg-emerald-500/10 rounded-full flex items-center justify-center ${card.color}`}>
+                <div className={`w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ${card.color}`}>
                   <card.icon size={20} />
                 </div>
                 <div className="text-left">
@@ -268,11 +268,11 @@ Best regards,
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
       >
-        <span className="text-[10px] text-gray-500 uppercase tracking-[0.3em]">Examine Depth</span>
+        <span className="text-[10px] text-muted-foreground uppercase tracking-[0.3em]">Examine Depth</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 2, repeat: Infinity }}
-          className="w-px h-12 bg-gradient-to-b from-emerald-500 to-transparent"
+          className="w-px h-12 bg-gradient-to-b from-primary to-transparent"
         />
       </motion.div>
     </section>
