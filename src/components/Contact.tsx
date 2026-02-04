@@ -69,19 +69,19 @@ Best regards,
         animate={{ opacity: 0.15 }}
         transition={{ duration: 2 }}
       >
-        <div className="absolute inset-0 bg-gradient-radial from-emerald-500/5 to-transparent shadow-inner" />
+        <div className="absolute inset-0 bg-gradient-radial from-primary/5 to-transparent shadow-inner" />
 
         {/* Animated grid */}
         <div className="grid grid-cols-6 grid-rows-8 h-full w-full">
           {Array.from({ length: 48 }).map((_, i) => (
-            <div key={i} className="border-[0.5px] border-white/5" />
+            <div key={i} className="border-[0.5px] border-border/30" />
           ))}
         </div>
 
         {/* 3D floating elements */}
-        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-white/10 rounded-full animate-float"></div>
-        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-white/10 rounded-full animate-float-delay"></div>
-        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-white/10 rounded-full animate-float-slow"></div>
+        <div className="absolute top-1/4 left-1/4 w-16 h-16 border-2 border-border/30 rounded-full animate-float"></div>
+        <div className="absolute bottom-1/4 right-1/3 w-24 h-24 border-2 border-border/30 rounded-full animate-float-delay"></div>
+        <div className="absolute top-1/2 right-1/4 w-20 h-20 border-2 border-border/30 rounded-full animate-float-slow"></div>
       </motion.div>
 
       <div className="section-container relative z-10">
@@ -105,7 +105,7 @@ Best regards,
             transition={{ duration: 0.5 }}
           >
             <h2
-              className="section-title text-3xl md:text-5xl bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 uppercase italic tracking-tighter"
+              className="section-title text-3xl md:text-5xl text-gradient uppercase italic tracking-tighter"
             >
               Get In Touch
             </h2>
@@ -126,21 +126,17 @@ Best regards,
         >
           <motion.button
             onClick={handleHireMe}
-            className="px-10 py-5 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-700 rounded-3xl text-xl font-black text-white shadow-[0_0_30px_rgba(16,185,129,0.3)] hover:shadow-[0_0_60px_rgba(16,185,129,0.5)] transition-all duration-300 relative overflow-hidden group uppercase tracking-widest"
-            whileHover={{
-              scale: 1.05,
-              boxShadow: "0 0 70px rgba(16, 185, 129, 0.6), 0 0 100px rgba(20, 184, 166, 0.3)"
-            }}
+            className="px-10 py-5 bg-primary hover:bg-primary/90 rounded-3xl text-xl font-black text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-300 relative overflow-hidden group uppercase tracking-widest"
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.98 }}
           >
             <span className="relative z-10 flex items-center justify-center gap-3">
               <Send className="h-5 w-5" />
               Hire Me Now
             </span>
-            <span className="absolute inset-0 rounded-3xl bg-white/10 blur-md animate-pulse" />
           </motion.button>
           <motion.p
-            className="text-gray-400 mt-4 italic"
+            className="text-muted-foreground mt-4 italic"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
             transition={{ delay: 0.8 }}
@@ -152,18 +148,18 @@ Best regards,
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Contact Form with enhanced animations */}
           <motion.div
-            className="bg-black/40 backdrop-blur-xl rounded-2xl p-6 md:p-8 lg:col-span-3 border border-emerald-500/10 shadow-2xl"
+            className="bg-card/80 backdrop-blur-xl rounded-2xl p-6 md:p-8 lg:col-span-3 border border-border shadow-xl"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -50 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            <h3 className="text-2xl font-bold mb-6 text-white">Send Me a Message</h3>
+            <h3 className="text-2xl font-bold mb-6 text-foreground">Send Me a Message</h3>
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-light block">Your Name</label>
+                  <label htmlFor="name" className="text-foreground block">Your Name</label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <User size={18} />
                     </div>
                     <input
@@ -171,15 +167,15 @@ Best regards,
                       id="name"
                       name="name"
                       required
-                      className="w-full bg-black/50 border border-emerald-500/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 text-white transition-all"
+                      className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 text-foreground transition-all"
                       placeholder="John Doe"
                     />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-light block">Email Address</label>
+                  <label htmlFor="email" className="text-foreground block">Email Address</label>
                   <div className="relative">
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                       <Mail size={18} />
                     </div>
                     <input
@@ -187,16 +183,16 @@ Best regards,
                       id="email"
                       name="email"
                       required
-                      className="w-full bg-black/50 border border-emerald-500/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 text-white transition-all"
+                      className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 text-foreground transition-all"
                       placeholder="john@example.com"
                     />
                   </div>
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="subject" className="text-light block">Subject</label>
+                <label htmlFor="subject" className="text-foreground block">Subject</label>
                 <div className="relative">
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     <MessageSquare size={18} />
                   </div>
                   <input
@@ -204,25 +200,25 @@ Best regards,
                     id="subject"
                     name="subject"
                     required
-                    className="w-full bg-black/50 border border-emerald-500/10 rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 text-white transition-all"
+                    className="w-full bg-background border border-border rounded-xl pl-10 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 text-foreground transition-all"
                     placeholder="Project Inquiry"
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <label htmlFor="message" className="text-light block">Message</label>
+                <label htmlFor="message" className="text-foreground block">Message</label>
                 <textarea
                   id="message"
                   name="message"
                   rows={6}
                   required
-                  className="w-full bg-black/50 border border-emerald-500/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500/30 text-white resize-none transition-all"
+                  className="w-full bg-background border border-border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/30 text-foreground resize-none transition-all"
                   placeholder="Tell me about your project..."
                 ></textarea>
               </div>
               <motion.button
                 type="submit"
-                className="px-8 py-3 bg-emerald-500/20 rounded-xl font-bold text-white border border-emerald-500/30 hover:bg-emerald-500/30 transition-all w-full md:w-auto relative overflow-hidden group uppercase tracking-widest shadow-lg shadow-emerald-500/10"
+                className="px-8 py-3 bg-primary/10 rounded-xl font-bold text-foreground border border-primary/30 hover:bg-primary/20 transition-all w-full md:w-auto relative overflow-hidden group uppercase tracking-widest shadow-lg"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 disabled={formStatus === 'submitting'}
@@ -238,12 +234,11 @@ Best regards,
                   {formStatus === 'success' && 'Message Sent!'}
                   {formStatus === 'error' && 'Please Try Again'}
                 </span>
-                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-white/10 transition-opacity"></span>
               </motion.button>
 
               {formStatus === 'success' && (
                 <motion.div
-                  className="text-green-400 mt-4"
+                  className="text-primary mt-4"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
