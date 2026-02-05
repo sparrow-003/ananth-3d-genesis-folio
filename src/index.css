@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
 
+/* Premium Theme & Animation System */
+@import './styles/theme.css';
+@import './styles/animations-3d.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,31 +11,40 @@
 @layer base {
   :root {
     /* Light Mode - Pure White & Blue with High Contrast */
-    --background: 0 0% 100%; /* Pure white background */
-    --foreground: 222 47% 8%; /* Very dark blue-black text */
+    --background: 0 0% 100%;
+    /* Pure white background */
+    --foreground: 222 47% 8%;
+    /* Very dark blue-black text */
 
-    --card: 0 0% 100%; /* Pure white cards */
+    --card: 0 0% 100%;
+    /* Pure white cards */
     --card-foreground: 222 47% 8%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 8%;
 
-    --primary: 217 91% 50%; /* Vibrant blue */
-    --primary-foreground: 0 0% 100%; /* White text on blue */
+    --primary: 217 91% 50%;
+    /* Vibrant blue */
+    --primary-foreground: 0 0% 100%;
+    /* White text on blue */
 
-    --secondary: 214 32% 91%; /* Light gray-blue */
+    --secondary: 214 32% 91%;
+    /* Light gray-blue */
     --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 20% 40%; /* Darker for better readability */
+    --muted-foreground: 215 20% 40%;
+    /* Darker for better readability */
 
-    --accent: 217 91% 95%; /* Very light blue accent */
+    --accent: 217 91% 95%;
+    /* Very light blue accent */
     --accent-foreground: 217 91% 40%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 85%; /* Visible borders */
+    --border: 214 32% 85%;
+    /* Visible borders */
     --input: 214 32% 91%;
     --ring: 217 91% 50%;
 
@@ -51,25 +64,31 @@
 
   .dark {
     /* Dark Mode - Deep Blue/Black with Cyan Accents */
-    --background: 222 47% 4%; /* Very deep blue-black */
-    --foreground: 210 40% 98%; /* Almost white text */
+    --background: 222 47% 4%;
+    /* Very deep blue-black */
+    --foreground: 210 40% 98%;
+    /* Almost white text */
 
-    --card: 222 47% 6%; /* Slightly lighter than bg */
+    --card: 222 47% 6%;
+    /* Slightly lighter than bg */
     --card-foreground: 210 40% 96%;
 
     --popover: 222 47% 5%;
     --popover-foreground: 210 40% 96%;
 
-    --primary: 199 89% 48%; /* Cyan-blue primary */
+    --primary: 199 89% 48%;
+    /* Cyan-blue primary */
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%; /* Dark blue-gray */
+    --secondary: 217 33% 17%;
+    /* Dark blue-gray */
     --secondary-foreground: 210 40% 90%;
 
     --muted: 222 40% 12%;
     --muted-foreground: 215 20% 65%;
 
-    --accent: 199 89% 48%; /* Matching cyan accent */
+    --accent: 199 89% 48%;
+    /* Matching cyan accent */
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 63% 45%;
@@ -375,6 +394,7 @@
   .image-3d:hover {
     transform: perspective(1000px) rotateY(15deg) rotateX(-5deg) scale(1.05);
   }
+
   /* Flip card animations */
   .flip-card {
     background-color: transparent;
@@ -1162,6 +1182,7 @@ select:focus-visible {
     transform: scale(1);
   }
 }
+
 /* Enhanced custom scrollbar for admin dashboard */
 .custom-scrollbar {
   scrollbar-width: thin;
@@ -1196,6 +1217,7 @@ select:focus-visible {
   from {
     transform: rotate(360deg);
   }
+
   to {
     transform: rotate(0deg);
   }
@@ -1222,9 +1244,12 @@ select:focus-visible {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: .5;
   }
@@ -1240,6 +1265,7 @@ select:focus-visible {
     opacity: 0;
     transform: translateY(-4px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);

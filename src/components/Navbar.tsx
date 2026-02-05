@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
+import { AnimationToggle } from './theme/AnimationToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -48,7 +49,7 @@ const Navbar = () => {
       setMobileMenuOpen(false);
       return;
     }
-    
+
     // If we're not on the home page, navigate there first then scroll
     if (location.pathname !== '/') {
       navigate('/');
@@ -62,7 +63,7 @@ const Navbar = () => {
       setMobileMenuOpen(false);
       return;
     }
-    
+
     const element = document.querySelector(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -89,8 +90,8 @@ const Navbar = () => {
       >
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           {/* Brand / Logo */}
-          <a 
-            href="#home" 
+          <a
+            href="#home"
             className="text-xl font-bold tracking-tighter text-foreground hover:text-emerald-400 transition-colors z-50 relative"
             onClick={(e) => {
               e.preventDefault();
@@ -133,43 +134,45 @@ const Navbar = () => {
                 {item.name}
               </motion.a>
             ))}
-            <div className="pl-4">
+            <div className="pl-4 flex items-center space-x-2">
+              <AnimationToggle />
               <ThemeToggle />
             </div>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            <AnimationToggle />
             <ThemeToggle />
-          <button
-            className="focus:outline-none text-foreground p-2"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
+            <button
+              className="focus:outline-none text-foreground p-2"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
             >
-              {mobileMenuOpen ? (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              ) : (
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              )}
-            </svg>
-          </button>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                {mobileMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
           </div>
         </div>
       </motion.nav>
