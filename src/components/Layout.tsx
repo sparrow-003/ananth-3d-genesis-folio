@@ -1,16 +1,16 @@
-import { Outlet } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+ import { Outlet } from 'react-router-dom';
+ import { Suspense, lazy } from 'react';
 import Navbar from './Navbar';
 import Footer from './Footer';
 
-// Lazy load background for performance
-const ParticleBackground = lazy(() => import('./ParticleBackground'));
+ // Lazy load themed background
+ const ThemedBackground = lazy(() => import('./effects/ThemedBackground'));
 
 const Layout = () => {
   return (
     <>
       <Suspense fallback={null}>
-        <ParticleBackground />
+         <ThemedBackground />
       </Suspense>
       <Navbar />
       <Outlet />
