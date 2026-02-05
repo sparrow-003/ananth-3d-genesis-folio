@@ -1,36 +1,36 @@
-import { motion } from "framer-motion";
-import { useRef } from "react";
-import { useInView } from "framer-motion";
-import AnimatedAvatar from "./AnimatedAvatar";
-
-const fadeInUp = (delay = 0) => ({
-  hidden: { opacity: 0, y: 60 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.9, delay, ease: "easeOut" },
-  },
-});
-
-const slideIn = (direction: "left" | "right" = "left", delay = 0) => ({
-  hidden: { opacity: 0, x: direction === "left" ? -80 : 80 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: { duration: 1, delay, ease: "easeOut" },
-  },
-});
-
-const scaleIn = (delay = 0) => ({
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 1, delay, ease: "easeOut" },
-  },
-});
-
-const About = () => {
+ import { motion } from "framer-motion";
+ import { useRef, memo } from "react";
+ import { useInView } from "framer-motion";
+ import AnimatedAvatar from "./AnimatedAvatar";
+ 
+ const fadeInUp = (delay = 0) => ({
+   hidden: { opacity: 0, y: 60 },
+   visible: {
+     opacity: 1,
+     y: 0,
+     transition: { duration: 0.9, delay, ease: "easeOut" },
+   },
+ });
+ 
+ const slideIn = (direction: "left" | "right" = "left", delay = 0) => ({
+   hidden: { opacity: 0, x: direction === "left" ? -80 : 80 },
+   visible: {
+     opacity: 1,
+     x: 0,
+     transition: { duration: 1, delay, ease: "easeOut" },
+   },
+ });
+ 
+ const scaleIn = (delay = 0) => ({
+   hidden: { opacity: 0, scale: 0.9 },
+   visible: {
+     opacity: 1,
+     scale: 1,
+     transition: { duration: 1, delay, ease: "easeOut" },
+   },
+ });
+ 
+ const About = memo(() => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
 
@@ -38,9 +38,10 @@ const About = () => {
     <section
       id="about"
       className="min-h-screen py-20 relative w-full"
+     style={{ backgroundColor: 'hsl(var(--background))' }}
       ref={ref}
     >
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/10 to-black" />
+       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background" />
 
       <div className="container mx-auto px-6 max-w-6xl relative z-10">
         {/* Title with Avatar */}
@@ -62,7 +63,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-white mb-6 drop-shadow-md uppercase italic">
+           <h2 className="text-3xl md:text-5xl font-extrabold tracking-tighter text-foreground mb-6 drop-shadow-md uppercase italic">
               About Me
             </h2>
             <motion.p
@@ -83,7 +84,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 shadow-2xl hover:border-emerald-500/30 transition-all duration-500 group">
+           <div className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-primary/10 shadow-2xl hover:border-primary/30 transition-all duration-500 group">
               <h3 className="text-3xl font-semibold text-foreground mb-6">
                 My Journey
               </h3>
@@ -108,7 +109,7 @@ const About = () => {
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
           >
-            <div className="bg-black/40 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 shadow-2xl hover:border-emerald-500/30 transition-all duration-500 group">
+           <div className="bg-card/40 backdrop-blur-xl rounded-2xl p-8 border border-primary/10 shadow-2xl hover:border-primary/30 transition-all duration-500 group">
               <h3 className="text-3xl font-semibold text-foreground mb-6">
                 What I Do
               </h3>
@@ -136,9 +137,9 @@ const About = () => {
                     className="flex items-start space-x-4"
                     variants={fadeInUp(0.2 * index)}
                   >
-                    <div className="w-3 h-3 bg-emerald-500 rounded-full mt-2 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                   <div className="w-3 h-3 bg-primary rounded-full mt-2 shadow-glow"></div>
                     <div>
-                      <h4 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
+                     <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                         {item.title}
                       </h4>
                       <p className="text-muted-foreground">{item.desc}</p>
@@ -158,20 +159,20 @@ const About = () => {
           animate={isInView ? "visible" : "hidden"}
         >
           <motion.div
-            className="bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-emerald-500/10 shadow-xl hover:border-emerald-500/20 transition duration-500"
+           className="bg-card/40 backdrop-blur-md rounded-2xl p-8 border border-primary/10 shadow-xl hover:border-primary/20 transition duration-500"
             variants={scaleIn(0.2)}
           >
-            <h3 className="text-2xl font-semibold mb-4">My Vision</h3>
+           <h3 className="text-2xl font-semibold text-foreground mb-4">My Vision</h3>
             <p className="text-muted-foreground leading-relaxed">
               I aim to create platforms that combine AI, creativity, and real-world problem-solving to empower people globally.
             </p>
           </motion.div>
 
           <motion.div
-            className="bg-black/40 backdrop-blur-md rounded-2xl p-8 border border-emerald-500/10 shadow-xl hover:border-emerald-500/20 transition duration-500"
+           className="bg-card/40 backdrop-blur-md rounded-2xl p-8 border border-primary/10 shadow-xl hover:border-primary/20 transition duration-500"
             variants={scaleIn(0.4)}
           >
-            <h3 className="text-2xl font-semibold mb-4">Beyond Tech</h3>
+           <h3 className="text-2xl font-semibold text-foreground mb-4">Beyond Tech</h3>
             <p className="text-muted-foreground leading-relaxed">
               Outside development, I explore storytelling, mentoring, and personal growth — bringing creativity into everything I do.
             </p>
@@ -193,10 +194,10 @@ const About = () => {
             ].map((stat, i) => (
               <motion.div
                 key={i}
-                className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 border border-emerald-500/10 text-center shadow-xl hover:border-emerald-500/30 transition duration-500"
+               className="bg-card/50 backdrop-blur-xl rounded-2xl p-8 border border-primary/10 text-center shadow-xl hover:border-primary/30 transition duration-500"
                 variants={scaleIn(0.2 * i)}
               >
-                <div className="text-4xl font-black text-emerald-400 mb-3 drop-shadow-[0_0_15px_rgba(16,185,129,0.3)]">
+               <div className="text-4xl font-black text-primary mb-3">
                   {stat.number}
                 </div>
                 <div className="text-muted-foreground text-lg">
@@ -209,6 +210,8 @@ const About = () => {
       </div>
     </section>
   );
-};
+ });
+ 
+ About.displayName = 'About';
 
 export default About;

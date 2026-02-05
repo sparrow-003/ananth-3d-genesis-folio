@@ -1,12 +1,9 @@
-import { useEffect, useState, lazy, Suspense, memo, useCallback } from "react";
+ import { useEffect, useState, lazy, Suspense, memo } from "react";
 import SmoothScroll from "../components/SmoothScroll";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import MatrixLoader from "../components/MatrixLoader";
 import { AnimatePresence } from "framer-motion";
 
-// Lazy load heavy components with prefetch
-const ParticleBackground = lazy(() => import("../components/ParticleBackground"));
+ // Lazy load heavy components for better performance
 const Hero = lazy(() => import("../components/Hero"));
 const About = lazy(() => import("../components/About"));
 const Skills = lazy(() => import("../components/Skills"));
@@ -14,13 +11,11 @@ const Projects = lazy(() => import("../components/Projects"));
 const Contact = lazy(() => import("../components/Contact"));
 
 // Minimal loading placeholder
-const SectionLoader = memo(() => (
-  <div className="min-h-[40vh] flex items-center justify-center">
-    <div className="w-6 h-6 border-2 border-emerald-500/50 border-t-emerald-500 rounded-full animate-spin" />
+ const SectionLoader = memo(() => (
+   <div className="min-h-[40vh] flex items-center justify-center">
+     <div className="w-6 h-6 border-2 border-primary/50 border-t-primary rounded-full animate-spin" />
   </div>
 ));
-
-SectionLoader.displayName = 'SectionLoader';
 
 SectionLoader.displayName = 'SectionLoader';
 
@@ -78,13 +73,6 @@ const Index = memo(() => {
       <AnimatePresence>
         {isLoading && <MatrixLoader onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
-      {/* Background - render immediately but with low priority */}
-      <Suspense fallback={null}>
-        <ParticleBackground />
-      </Suspense>
-
-      <Navbar />
-
       <main className="relative w-full">
         <SmoothScroll>
           <Suspense fallback={<SectionLoader />}>

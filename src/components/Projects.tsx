@@ -1,5 +1,5 @@
-import { motion, useInView } from "framer-motion";
-import { useRef, useState } from "react";
+ import { motion, useInView } from "framer-motion";
+ import { useRef, useState, memo } from "react";
 import { Code2, Users, Bot, ExternalLink, Github, Play } from "lucide-react";
 
 const projectsData = [
@@ -20,6 +20,7 @@ const projectsData = [
     type: "coding",
     icon: <Code2 className="w-8 h-8" />,
     gradient: "from-emerald-500 via-teal-500 to-cyan-500",
+   gradientClass: "from-primary via-accent to-primary",
     bgPattern: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]",
     liveUrl: "https://dev-matchs.vercel.app",
     githubUrl: "https://github.com/sparrow-003/debug-your-heart.git"
@@ -41,6 +42,7 @@ const projectsData = [
     type: "physical",
     icon: <Users className="w-8 h-8" />,
     gradient: "from-emerald-500 via-teal-500 to-green-500",
+   gradientClass: "from-primary via-accent to-primary",
     bgPattern: "bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))]",
     liveUrl: "#",
     githubUrl: "#"
@@ -62,6 +64,7 @@ const projectsData = [
     type: "coding",
     icon: <Bot className="w-8 h-8" />,
     gradient: "from-teal-500 via-emerald-500 to-cyan-500",
+   gradientClass: "from-primary via-accent to-primary",
     bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
     liveUrl: "https://v0-smart-document-summarizer.vercel.app",
     githubUrl: "https://github.com/sparrow-003/DOC-.git"
@@ -273,20 +276,20 @@ const ProjectDetails = ({ project }: any) => {
   );
 };
 
-const Projects = () => {
+ const Projects = memo(() => {
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
   const [activeProject, setActiveProject] = useState(projectsData[0]);
 
   return (
-    <section id="projects" ref={ref} className="section-container relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-emerald-950/20 to-black -z-10" />
+     <section id="projects" ref={ref} className="section-container relative bg-background">
+       <div className="absolute inset-0 bg-gradient-to-b from-background via-primary/5 to-background -z-10" />
       <div className="projects-section">
         {/* Enhanced background elements */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl animate-float" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl animate-float-delay" />
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-radial from-emerald-500/5 via-transparent to-transparent rounded-full animate-pulse" />
+           <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-float" />
+           <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-accent/20 rounded-full blur-3xl animate-float-delay" />
+           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[1000px] bg-gradient-radial from-primary/5 via-transparent to-transparent rounded-full animate-pulse" />
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMiI+PGNpcmNsZSBjeD0iNyIgY3k9IjciIHI9IjEiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30" />
         </div>
 
@@ -299,17 +302,17 @@ const Projects = () => {
             transition={{ duration: 0.8 }}
           >
             <motion.div
-              className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
+             className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-primary/10 border border-primary/20 mb-6"
               whileHover={{ scale: 1.05 }}
             >
-              <Code2 className="w-5 h-5 text-emerald-400" />
-              <span className="text-emerald-400 font-bold uppercase tracking-widest text-xs">Featured Work</span>
+             <Code2 className="w-5 h-5 text-primary" />
+             <span className="text-primary font-bold uppercase tracking-widest text-xs">Featured Work</span>
             </motion.div>
 
-            <h2 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent mb-6">
+           <h2 className="text-5xl lg:text-7xl font-bold bg-gradient-to-r from-foreground via-foreground/80 to-foreground/60 bg-clip-text text-transparent mb-6">
               My Portfolio
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
+           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Showcasing my journey in development, education, and innovation. Each project represents
               a unique challenge solved through creativity and technical expertise.
             </p>
@@ -344,6 +347,8 @@ const Projects = () => {
       </div>
     </section>
   );
-};
+ });
+ 
+ Projects.displayName = 'Projects';
 
 export default Projects;

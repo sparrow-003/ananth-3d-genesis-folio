@@ -90,14 +90,16 @@ const ParticleBackground = memo(() => {
           if (p.y > window.innerHeight) p.y = 0;
           if (p.y < 0) p.y = window.innerHeight;
           
-          ctx.fillStyle = `rgba(16, 185, 129, ${p.opacity})`;
+         // Use blue theme color
+         ctx.fillStyle = `hsla(217, 91%, 50%, ${p.opacity})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fill();
         }
         
         // Connect nearby particles (limit connections for performance)
-        ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)';
+       // Use blue theme color for connections
+       ctx.strokeStyle = 'hsla(217, 91%, 50%, 0.15)';
         ctx.lineWidth = 0.5;
         const maxDist = 100;
         const maxDistSq = maxDist * maxDist;
