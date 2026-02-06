@@ -1,299 +1,216 @@
-import { useRef, useMemo, useEffect } from 'react';
+import { useRef, useMemo, useState } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import gsap from 'gsap';
+import { Float, Sparkles } from '@react-three/drei';
+import { useAnimationPreference } from '@/contexts/AnimationContext';
 
-// Realistic star colors based on stellar classification
-const STAR_COLORS = [
-  '#ffffff', // Bright white
-  '#aabfff', // Blue-white (hot)
-  '#cad7ff', // White-blue
-  '#fff4ea', // Yellow-white
-  '#ffcc6f', // Orange
-  '#9bb0ff', // Deep blue
+// Stellar classification colors for realism
+const STELLAR_PALETTE = {
+  O: '#9bb0ff', // Deep Blue (Hot)
+  B: '#aabfff', // Blue White
+  A: '#cad7ff', // White Blue
+  F: '#fff4ea', // Yellow White
+  G: '#fff5f2', // White (Sun-like)
+  K: '#ffcc6f', // Orange
+  M: '#ff5a44', // Red-Orange (Cooler)
+};
+
+const METEOR_COLORS = [
+  '#00f2ff', // Cyan Neon
+  '#ffffff', // Pure White
+  '#ff9d00', // Amber/Orange
+  '#0066ff', // Deep Blue
 ];
 
 interface MeteorProps {
-  initialPosition: [number, number, number];
-  color: string;
-  speed: number;
-  size: number;
-  angle: number;
-  delay: number;
+  id: number;
 }
 
-const Meteor = ({ initialPosition, color, speed, size, angle, delay }: MeteorProps) => {
-  const groupRef = useRef<THREE.Group>(null);
-  const coreRef = useRef<THREE.Mesh>(null);
-  const glowRef = useRef<THREE.Mesh>(null);
-  const trailRef = useRef<THREE.Points>(null);
-  const isActive = useRef(false);
-  const startTime = useRef(0);
-  
-  // Trail particle positions
-  const trailPositions = useMemo(() => {
-    const positions = new Float32Array(90); // 30 particles * 3
-    const sizes = new Float32Array(30);
-    for (let i = 0; i < 30; i++) {
-      positions[i * 3] = 0;
-      positions[i * 3 + 1] = i * 0.3; // Trail behind
-      positions[i * 3 + 2] = 0;
-      sizes[i] = Math.max(0.05, size * (1 - i / 30) * 0.8);
-    }
-    return { positions, sizes };
-  }, [size]);
+const CinematicMeteor = ({ id }: MeteorProps) => {
+  const meshRef = useRef<THREE.Group>(null);
+  const trailRef = useRef<THREE.Mesh>(null);
+  const sparkRef = useRef<THREE.Points>(null);
 
-  // Animate on mount with GSAP
-  useEffect(() => {
-    if (groupRef.current) {
-      startTime.current = delay;
-      gsap.to(groupRef.current.position, {
-        duration: 0,
-        delay: delay,
-        onComplete: () => {
-          isActive.current = true;
-        }
-      });
-    }
-  }, [delay]);
+  // Randomize initial meteor characteristics
+  const config = useMemo(() => {
+    const isBig = Math.random() > 0.8;
+    return {
+      speed: (isBig ? 0.4 : 0.2) + Math.random() * 0.3,
+      size: isBig ? 0.8 : 0.3,
+      color: METEOR_COLORS[Math.floor(Math.random() * METEOR_COLORS.length)],
+      angle: (Math.random() - 0.5) * 0.4,
+      curvature: (Math.random() - 0.5) * 0.02, // Path curve intensity
+      z: (Math.random() - 0.5) * 20,
+      sparkCount: isBig ? 40 : 15,
+      trailLength: isBig ? 12 : 6,
+    };
+  }, []);
+
+  const [state] = useState({
+    x: (Math.random() - 0.5) * 50,
+    y: 20 + Math.random() * 15,
+    active: true,
+    flareY: (Math.random() - 0.1) * 10, // Point where it flares
+  });
 
   useFrame((state, delta) => {
-    if (!groupRef.current || !isActive.current) return;
-    
-    const elapsed = state.clock.elapsedTime;
-    
-    // Movement direction based on angle
-    const moveX = Math.sin(angle) * speed * delta * 60;
-    const moveY = -Math.cos(angle) * speed * delta * 60;
-    
-    groupRef.current.position.x += moveX;
-    groupRef.current.position.y += moveY;
-    
-    // Reset when out of view
-    if (groupRef.current.position.y < -25 || 
-        groupRef.current.position.x > 25 || 
-        groupRef.current.position.x < -25) {
-      groupRef.current.position.set(
-        (Math.random() - 0.5) * 40,
-        25 + Math.random() * 10,
-        (Math.random() - 0.5) * 15
-      );
-    }
-    
-    // Pulsing glow effect
-    if (coreRef.current && glowRef.current) {
-      const pulse = Math.sin(elapsed * 8 + delay * 10) * 0.3 + 1;
-      coreRef.current.scale.setScalar(size * pulse);
-      glowRef.current.scale.setScalar(size * 3 * pulse);
-      
-      // Flickering intensity
-      const material = coreRef.current.material as THREE.MeshBasicMaterial;
-      material.opacity = 0.9 + Math.sin(elapsed * 15) * 0.1;
-    }
-    
-    // Update trail particles
+    if (!meshRef.current) return;
+
+    // Mouse influence (Gravitational Bending)
+    const mouseX = state.mouse.x * 10;
+    const mouseY = state.mouse.y * 10;
+    const dx = meshRef.current.position.x - mouseX;
+    const dy = meshRef.current.position.y - mouseY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const influence = Math.max(0, (20 - dist) / 20) * 0.1;
+
+    // Movement with subtle curvature and mouse influence
+    state.y -= config.speed * delta * 60;
+    state.x += (Math.sin(state.y * 0.05) + config.curvature * state.y + dx * influence) * 0.1;
+
+    // Flare effect logic
+    const distanceToFlare = Math.abs(state.y - state.flareY);
+    const flareIntensity = Math.max(0, (5 - distanceToFlare) / 5);
+    const flareScale = 1 + flareIntensity * 2;
+
+    meshRef.current.position.set(state.x, state.y, config.z);
+
+    // Rotate meteor to face the direction of travel for realism
+    const targetRotation = Math.atan2(dx * influence, -config.speed);
+    meshRef.current.rotation.z = THREE.MathUtils.lerp(meshRef.current.rotation.z, targetRotation, 0.1);
+
+    // Apply flare scale to the head
+    meshRef.current.scale.set(flareScale, flareScale, flareScale);
+
+    // Stretch trail based on speed and add wobble
     if (trailRef.current) {
-      const positions = trailRef.current.geometry.attributes.position.array as Float32Array;
-      for (let i = 29; i > 0; i--) {
-        positions[i * 3] = positions[(i - 1) * 3] - moveX * 0.5;
-        positions[i * 3 + 1] = positions[(i - 1) * 3 + 1] - moveY * 0.5;
-        positions[i * 3 + 2] = positions[(i - 1) * 3 + 2];
-      }
-      positions[0] = 0;
-      positions[1] = 0;
-      positions[2] = 0;
-      trailRef.current.geometry.attributes.position.needsUpdate = true;
+      const wobble = Math.sin(state.clock.elapsedTime * 20 + id) * 0.05;
+      trailRef.current.scale.set(1 + wobble, config.trailLength * (config.speed * 2), 1);
+    }
+
+    // Reset loop
+    if (state.y < -25) {
+      state.y = 25 + Math.random() * 10;
+      state.x = (Math.random() - 0.5) * 60;
     }
   });
 
+  // Memoize the canvas texture to prevent re-creation
+  const trailTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, 'rgba(255,255,255,1)');
+    grad.addColorStop(0.2, config.color);
+    grad.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 64, 256);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  }, [config.color]);
+
   return (
-    <group ref={groupRef} position={initialPosition} rotation={[0, 0, angle]}>
-      {/* Core bright point */}
-      <mesh ref={coreRef}>
-        <sphereGeometry args={[0.1, 12, 12]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.95}
-        />
+    <group ref={meshRef} rotation={[0, 0, config.angle]}>
+      {/* Meteor Head (Core) */}
+      <mesh>
+        <sphereGeometry args={[config.size * 0.2, 16, 16]} />
+        <meshBasicMaterial color="white" />
       </mesh>
-      
-      {/* Inner glow */}
-      <mesh ref={glowRef}>
-        <sphereGeometry args={[0.25, 16, 16]} />
+
+      {/* Primary Glow */}
+      <mesh scale={[2.5, 2.5, 2.5]}>
+        <sphereGeometry args={[config.size * 0.2, 16, 16]} />
         <meshBasicMaterial
-          color={color}
+          color={config.color}
           transparent
           opacity={0.4}
           blending={THREE.AdditiveBlending}
         />
       </mesh>
-      
-      {/* Outer halo */}
-      <mesh>
-        <sphereGeometry args={[0.5, 16, 16]} />
+
+      {/* Kinetic Trail (The Streak) */}
+      <mesh ref={trailRef} position={[0, config.trailLength * 0.5, 0]}>
+        <planeGeometry args={[config.size * 0.4, 1]} />
         <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.15}
-          blending={THREE.AdditiveBlending}
-        />
-      </mesh>
-      
-      {/* Particle trail */}
-      <points ref={trailRef}>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            count={30}
-            array={trailPositions.positions}
-            itemSize={3}
-          />
-          <bufferAttribute
-            attach="attributes-size"
-            count={30}
-            array={trailPositions.sizes}
-            itemSize={1}
-          />
-        </bufferGeometry>
-        <pointsMaterial
-          color={color}
-          size={0.15}
+          map={trailTexture}
           transparent
           opacity={0.6}
           blending={THREE.AdditiveBlending}
-          sizeAttenuation
-        />
-      </points>
-      
-      {/* Streak/tail effect */}
-      <mesh position={[0, 1.5, 0]}>
-        <planeGeometry args={[0.08, 3]} />
-        <meshBasicMaterial
-          color={color}
-          transparent
-          opacity={0.25}
-          blending={THREE.AdditiveBlending}
+          depthWrite={false}
           side={THREE.DoubleSide}
         />
       </mesh>
+
+      {/* Spark Detritus (Sparkles component for premium feel) */}
+      <Sparkles
+        count={config.sparkCount}
+        scale={config.size * 2}
+        size={2}
+        speed={0.5}
+        opacity={0.8}
+        color={config.color}
+      />
     </group>
   );
 };
 
-// Background twinkling stars
-const BackgroundStars = () => {
+// Rich Starfield with depth and variations
+const CinematicStarfield = () => {
+  const { effectiveMode } = useAnimationPreference();
+  const starCount = effectiveMode === 'full' ? 400 : 150;
+
+  const [positions, colors, sizes] = useMemo(() => {
+    const p = new Float32Array(starCount * 3);
+    const c = new Float32Array(starCount * 3);
+    const s = new Float32Array(starCount);
+
+    const types = Object.values(STELLAR_PALETTE);
+
+    for (let i = 0; i < starCount; i++) {
+      p[i * 3] = (Math.random() - 0.5) * 100;
+      p[i * 3 + 1] = (Math.random() - 0.5) * 60;
+      p[i * 3 + 2] = -20 - Math.random() * 50;
+
+      const color = new THREE.Color(types[Math.floor(Math.random() * types.length)]);
+      c[i * 3] = color.r;
+      c[i * 3 + 1] = color.g;
+      c[i * 3 + 2] = color.b;
+
+      s[i] = Math.random() * (i % 10 === 0 ? 0.3 : 0.1); // Occasional bright stars
+    }
+    return [p, c, s];
+  }, [starCount]);
+
   const starsRef = useRef<THREE.Points>(null);
-  
-  const { positions, colors, sizes } = useMemo(() => {
-    const count = 200;
-    const positions = new Float32Array(count * 3);
-    const colors = new Float32Array(count * 3);
-    const sizes = new Float32Array(count);
-    
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 60;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 40;
-      positions[i * 3 + 2] = -10 - Math.random() * 20;
-      
-      // Star colors
-      const colorIndex = Math.floor(Math.random() * STAR_COLORS.length);
-      const color = new THREE.Color(STAR_COLORS[colorIndex]);
-      colors[i * 3] = color.r;
-      colors[i * 3 + 1] = color.g;
-      colors[i * 3 + 2] = color.b;
-      
-      sizes[i] = Math.random() * 0.08 + 0.02;
+
+  useFrame(({ clock }) => {
+    if (!starsRef.current) return;
+    const time = clock.elapsedTime;
+    const sizeAttr = starsRef.current.geometry.attributes.size;
+    const sizeArr = sizeAttr.array as Float32Array;
+
+    for (let i = 0; i < sizeArr.length; i++) {
+      // Twinkle logic
+      sizeArr[i] = sizes[i] * (0.8 + Math.sin(time * 2 + i * 10) * 0.4);
     }
-    
-    return { positions, colors, sizes };
-  }, []);
-  
-  useFrame((state) => {
-    if (starsRef.current) {
-      const time = state.clock.elapsedTime;
-      const sizesAttr = starsRef.current.geometry.attributes.size;
-      const sizesArray = sizesAttr.array as Float32Array;
-      
-      for (let i = 0; i < sizesArray.length; i++) {
-        sizesArray[i] = sizes[i] * (0.7 + Math.sin(time * 2 + i) * 0.3);
-      }
-      sizesAttr.needsUpdate = true;
-    }
+    sizeAttr.needsUpdate = true;
   });
-  
+
   return (
     <points ref={starsRef}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={200}
-          array={positions}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-color"
-          count={200}
-          array={colors}
-          itemSize={3}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          count={200}
-          array={sizes}
-          itemSize={1}
-        />
+        <bufferAttribute attach="attributes-position" count={starCount} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-color" count={starCount} array={colors} itemSize={3} />
+        <bufferAttribute attach="attributes-size" count={starCount} array={sizes} itemSize={1} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.1}
+        size={0.15}
+        vertexColors
         transparent
         opacity={0.8}
-        vertexColors
-        blending={THREE.AdditiveBlending}
-        sizeAttenuation
-      />
-    </points>
-  );
-};
-
-// Nebula/dust clouds for depth
-const SpaceDust = () => {
-  const dustRef = useRef<THREE.Points>(null);
-  
-  const positions = useMemo(() => {
-    const count = 100;
-    const positions = new Float32Array(count * 3);
-    
-    for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 50;
-      positions[i * 3 + 1] = (Math.random() - 0.5) * 35;
-      positions[i * 3 + 2] = -5 - Math.random() * 15;
-    }
-    
-    return positions;
-  }, []);
-  
-  useFrame((state) => {
-    if (dustRef.current) {
-      dustRef.current.rotation.z = state.clock.elapsedTime * 0.01;
-    }
-  });
-  
-  return (
-    <points ref={dustRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={100}
-          array={positions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#4a5568"
-        size={0.5}
-        transparent
-        opacity={0.15}
         blending={THREE.AdditiveBlending}
         sizeAttenuation
       />
@@ -302,43 +219,27 @@ const SpaceDust = () => {
 };
 
 const FallingStars = () => {
-  const meteors = useMemo(() => {
-    return Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      position: [
-        (Math.random() - 0.5) * 40,
-        15 + Math.random() * 20,
-        (Math.random() - 0.5) * 15
-      ] as [number, number, number],
-      color: STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)],
-      speed: 0.15 + Math.random() * 0.25,
-      size: 0.3 + Math.random() * 0.5,
-      angle: (Math.random() - 0.5) * 0.5, // Slight angle variation
-      delay: Math.random() * 3
-    }));
-  }, []);
+  const { effectiveMode } = useAnimationPreference();
+
+  if (effectiveMode === 'off') return null;
+
+  const meteorCount = effectiveMode === 'full' ? 15 : 6;
 
   return (
     <group>
-      {/* Deep space background */}
-      <BackgroundStars />
-      <SpaceDust />
-      
-      {/* Falling meteors */}
-      {meteors.map((meteor) => (
-        <Meteor
-          key={meteor.id}
-          initialPosition={meteor.position}
-          color={meteor.color}
-          speed={meteor.speed}
-          size={meteor.size}
-          angle={meteor.angle}
-          delay={meteor.delay}
-        />
-      ))}
-      
-      {/* Ambient space glow */}
-      <ambientLight intensity={0.1} />
+      {/* Background depth layers */}
+      <CinematicStarfield />
+
+      {/* Volumetric ambient glow using Drei's Float for organic drift */}
+      <Float speed={1.5} rotationIntensity={0.5} floatIntensity={0.5}>
+        <group>
+          {Array.from({ length: meteorCount }).map((_, i) => (
+            <CinematicMeteor key={i} id={i} />
+          ))}
+        </group>
+      </Float>
+
+      <ambientLight intensity={0.2} />
     </group>
   );
 };

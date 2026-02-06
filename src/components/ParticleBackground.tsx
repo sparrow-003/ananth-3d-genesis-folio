@@ -3,17 +3,17 @@ import { useEffect, useRef, memo } from 'react';
 const ParticleBackground = memo(() => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const animationRef = useRef<number>();
-  
+
   useEffect(() => {
     if (!canvasRef.current) return;
-    
+
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d', { alpha: false });
     if (!ctx) return;
-    
+
     // Use device pixel ratio capped at 1.5 for performance
     const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-    
+
     const resize = () => {
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
@@ -22,14 +22,13 @@ const ParticleBackground = memo(() => {
       ctx.scale(dpr, dpr);
     };
     resize();
-    
+
     // Reduced particle counts for better performance
     const particleCount = Math.min(40, Math.floor(window.innerWidth / 30));
     const starCount = Math.min(80, Math.floor(window.innerWidth / 15));
-    
+
     const particles: Particle[] = [];
-    const stars: Star[] = [];
-    
+
     // Create particles
     for (let i = 0; i < particleCount; i++) {
       particles.push({
@@ -41,75 +40,52 @@ const ParticleBackground = memo(() => {
         opacity: Math.random() * 0.4 + 0.2,
       });
     }
-    
-    // Create background stars
-    for (let i = 0; i < starCount; i++) {
-      stars.push({
-        x: Math.random() * window.innerWidth,
-        y: Math.random() * window.innerHeight,
-        size: Math.random() * 1.5 + 0.3,
-        opacity: Math.random() * 0.5 + 0.2,
-        twinklePhase: Math.random() * Math.PI * 2,
-      });
-    }
-    
+
     let lastTime = 0;
     const targetFPS = 30; // Cap at 30 FPS for performance
     const frameInterval = 1000 / targetFPS;
-    
+
     function animate(currentTime: number) {
       const deltaTime = currentTime - lastTime;
-      
+
       if (deltaTime >= frameInterval) {
         lastTime = currentTime - (deltaTime % frameInterval);
-        
-        // Clear with solid black
+
+        // Clear with solid black - keeping it for contrast
         ctx.fillStyle = '#000000';
         ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
-        
-        // Draw stars with simple twinkle
-        const time = currentTime * 0.001;
-        for (let i = 0; i < stars.length; i++) {
-          const star = stars[i];
-          const twinkle = Math.sin(time * 2 + star.twinklePhase) * 0.3 + 0.7;
-          ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity * twinkle})`;
-          ctx.beginPath();
-          ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        
+
         // Update and draw particles
         for (let i = 0; i < particles.length; i++) {
           const p = particles[i];
           p.x += p.speedX;
           p.y += p.speedY;
-          
+
           // Wrap around edges
           if (p.x > window.innerWidth) p.x = 0;
           if (p.x < 0) p.x = window.innerWidth;
           if (p.y > window.innerHeight) p.y = 0;
           if (p.y < 0) p.y = window.innerHeight;
-          
-         // Use blue theme color
-         ctx.fillStyle = `hsla(217, 91%, 50%, ${p.opacity})`;
+
+          // Use blue theme color
+          ctx.fillStyle = `hsla(217, 91%, 50%, ${p.opacity})`;
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
           ctx.fill();
         }
-        
+
         // Connect nearby particles (limit connections for performance)
-       // Use blue theme color for connections
-       ctx.strokeStyle = 'hsla(217, 91%, 50%, 0.15)';
+        ctx.strokeStyle = 'hsla(217, 91%, 50%, 0.15)';
         ctx.lineWidth = 0.5;
         const maxDist = 100;
         const maxDistSq = maxDist * maxDist;
-        
+
         for (let i = 0; i < particles.length; i++) {
           for (let j = i + 1; j < Math.min(i + 10, particles.length); j++) {
             const dx = particles[i].x - particles[j].x;
             const dy = particles[i].y - particles[j].y;
             const distSq = dx * dx + dy * dy;
-            
+
             if (distSq < maxDistSq) {
               ctx.beginPath();
               ctx.moveTo(particles[i].x, particles[i].y);
@@ -119,13 +95,13 @@ const ParticleBackground = memo(() => {
           }
         }
       }
-      
+
       animationRef.current = requestAnimationFrame(animate);
     }
-    
+
     animationRef.current = requestAnimationFrame(animate);
     window.addEventListener('resize', resize, { passive: true });
-    
+
     return () => {
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
@@ -133,7 +109,7 @@ const ParticleBackground = memo(() => {
       window.removeEventListener('resize', resize);
     };
   }, []);
-  
+
   return (
     <canvas
       ref={canvasRef}
