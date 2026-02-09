@@ -5,16 +5,17 @@ import { Code2, Users, Bot, ExternalLink, Github, Play } from "lucide-react";
 const projectsData = [
   {
     id: 1,
-    title: "DevMatch",
-    subtitle: "Developer Collaboration Platform",
-    description: "A sophisticated social network designed exclusively for developers, featuring AI-powered matching algorithms to connect like-minded programmers and facilitate seamless collaboration on innovative projects.",
-    technologies: ["React", "TypeScript", "Node.js", "MongoDB", "Socket.io", "AI/ML"],
+    title: "BOOKSTORE",
+    subtitle: "E-com platform for Books",
+    description: `✨ BOOK_STORE – Full-stack Book Store web application built with a React/Next.js frontend and a Node.js/Express backend for browsing, managing and purchasing books.
+                  ✨ Implemented RESTful APIs, user interactions, and dynamic UI components to deliver seamless book catalog browsing and cart functionality.`,
+    technologies: ["React", "TypeScript", "Node.js", "MongoDB", "Socket.io", "Express.js"],
     features: [
-      "AI-powered developer matching algorithm",
-      "Real-time collaborative coding environment",
-      "Project discovery and team formation",
-      "Integrated chat and video calls",
-      "Code review and sharing system"
+      "AI-powered book recommendation system",
+      "User-friendly book browsing and search",
+      "Secure authentication and user accounts",
+      "Shopping cart and order management",
+      "RESTful API integration with dynamic UI"
     ],
     category: "Full-Stack Development",
     type: "coding",
@@ -22,8 +23,8 @@ const projectsData = [
     gradient: "from-emerald-500 via-teal-500 to-cyan-500",
    gradientClass: "from-primary via-accent to-primary",
     bgPattern: "bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))]",
-    liveUrl: "https://dev-matchs.vercel.app",
-    githubUrl: "https://github.com/sparrow-003/debug-your-heart.git"
+    liveUrl: "https://bookstore-vn.vercel.app/",
+    githubUrl: "https://github.com/rolex132/BOOK_STORE.git"
   },
   {
     id: 2,
@@ -32,7 +33,7 @@ const projectsData = [
     description: "A comprehensive educational program where I personally mentor and teach 150+ students in Artificial Intelligence and Business Intelligence through hands-on workshops, practical sessions, and real-world project guidance.",
     technologies: ["Python", "Jupyter Notebooks", "TensorFlow", "Power BI", "Tableau", "Data Analytics"],
     features: [
-      "Live coding sessions with 150+ students",
+      "Live class sessions with 150+ students",
       "Hands-on AI/BI project workshops",
       "Personalized mentorship programs",
       "Real-world case study implementations",
@@ -49,16 +50,16 @@ const projectsData = [
   },
   {
     id: 3,
-    title: "RAG Chat Bot",
-    subtitle: "Smart Document Summarizer",
-    description: "An intelligent RAG (Retrieval-Augmented Generation) chatbot that analyzes and summarizes documents with advanced AI capabilities, providing context-aware responses and efficient information extraction.",
-    technologies: ["Python", "Transformers", "React", "FastAPI", "RAG", "NLP"],
+    title: "Chat Bot UI using React.js",
+    subtitle: "ChatGPT clone ",
+    description: "A modern and responsive ChatGPT-like web interface built to interact with AI models, providing real-time conversational experiences with a clean UI and smooth user interactions.",
+    technologies: ["React", "Tailwind CSS", "TypeScript"],
     features: [
-      "Document analysis and summarization",
-      "Context-aware conversation management",
-      "Multi-format document support",
-      "Intelligent information retrieval",
-      "Real-time AI-powered responses"
+       "ChatGPT-style conversational user interface",
+       "Real-time message rendering with smooth UX",
+       "Responsive design for desktop and mobile",
+       "Reusable and modular UI components",
+       "Clean state management for chat history"
     ],
     category: "AI/ML Development",
     type: "coding",
@@ -67,7 +68,7 @@ const projectsData = [
    gradientClass: "from-primary via-accent to-primary",
     bgPattern: "bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))]",
     liveUrl: "https://v0-smart-document-summarizer.vercel.app",
-    githubUrl: "https://github.com/sparrow-003/DOC-.git"
+    githubUrl: "https://github.com/sparrow-003/chat-gpt-ui.git"
   }
 ];
 
