@@ -1,8 +1,8 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { memo, useState, useRef, useEffect } from 'react';
 import avatarImage1 from '/lovable-uploads/cb2d3283-5322-4f2d-80de-6bf5dd7bff68.png';
-import avatarImage2 from '@/assets/avatar-art-2.png';
-import avatarImage3 from '@/assets/avatar-art-3.png';
+import avatarImage2 from '/assets/avatar-art-2.png';
+import avatarImage3 from '/assets/avatar-art-3.png';
 
 interface AnimatedAvatarProps {
   variant: 'hero' | 'about' | 'contact';
