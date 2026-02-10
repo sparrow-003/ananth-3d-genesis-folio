@@ -1,6 +1,5 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster } from "sonner";
+import { TooltipProvider } from "@radix-ui/react-tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy, memo } from "react";
@@ -52,8 +51,7 @@ const App = memo(() => (
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <TooltipProvider>
           <div className="w-full min-h-screen bg-background text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
-            <Toaster />
-            <Sonner position="top-center" richColors closeButton />
+            <Toaster position="top-center" richColors closeButton />
             <BrowserRouter>
               <ScrollToTop />
               <ErrorBoundary>
