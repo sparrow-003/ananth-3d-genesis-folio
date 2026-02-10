@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, memo } from 'react'
+import React, { useState, useMemo, useCallback, memo, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useQuery } from '@tanstack/react-query'
 import { Search, Filter, Calendar, Tag, RefreshCw, AlertCircle } from 'lucide-react'
@@ -20,23 +20,16 @@ interface BlogListProps {
   onPostSelect: (post: BlogPostType) => void
 }
 
-const LoadingSpinner = memo(() => (
-  <div className="flex items-center justify-center min-h-[400px]">
-    <div className="relative w-12 h-12">
-      <div className="absolute inset-0 rounded-full border-2 border-primary/20" />
-      <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-primary animate-spin" />
-    </div>
-  </div>
-))
+import { BlogListSkeleton } from './skeletons/BlogSkeleton'
 
-LoadingSpinner.displayName = 'LoadingSpinner'
+import { useDebounce } from '@/hooks/useDebounce'
 
 const BlogList = memo(({ onPostSelect }: BlogListProps) => {
-  const { 
-    data: posts = [], 
-    isLoading: loading, 
+  const {
+    data: posts = [],
+    isLoading: loading,
     error,
-    refetch 
+    refetch
   } = useQuery({
     queryKey: ['posts'],
     queryFn: blogAPI.getPosts,
@@ -52,6 +45,16 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
   const [selectedTag, setSelectedTag] = useState<string>('')
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'popular'>('newest')
 
+  // Debounce search and tag filter for smoother filtering on large lists
+  const debouncedSearchTerm = useDebounce(searchTerm, 300)
+  const debouncedSelectedTag = useDebounce(selectedTag, 300)
+  const [isFiltering, setIsFiltering] = useState(false)
+
+  // Show filtering state when inputs differ from debounced values
+  useEffect(() => {
+    setIsFiltering(searchTerm !== debouncedSearchTerm || selectedTag !== debouncedSelectedTag)
+  }, [searchTerm, debouncedSearchTerm, selectedTag, debouncedSelectedTag])
+
   const allTags = useMemo(() => {
     const tagSet = new Set<string>()
     posts.forEach(post => {
@@ -65,8 +68,8 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
   const filteredPosts = useMemo(() => {
     let filtered = [...posts]
 
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
+    if (debouncedSearchTerm) {
+      const term = debouncedSearchTerm.toLowerCase()
       filtered = filtered.filter(post =>
         post.title.toLowerCase().includes(term) ||
         post.excerpt.toLowerCase().includes(term) ||
@@ -74,9 +77,9 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
       )
     }
 
-    if (selectedTag) {
+    if (debouncedSelectedTag) {
       filtered = filtered.filter(post =>
-        post.tags && post.tags.includes(selectedTag)
+        post.tags && post.tags.includes(debouncedSelectedTag)
       )
     }
 
@@ -92,7 +95,7 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
     })
 
     return filtered
-  }, [posts, searchTerm, selectedTag, sortBy])
+  }, [posts, debouncedSearchTerm, debouncedSelectedTag, sortBy])
 
   const clearFilters = useCallback(() => {
     setSearchTerm('')
@@ -117,7 +120,12 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
   }, [refetch])
 
   if (loading) {
-    return <LoadingSpinner />
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-64 w-full bg-emerald-500/5 blur-3xl absolute -z-10" />
+        <BlogListSkeleton />
+      </div>
+    )
   }
 
   return (
@@ -250,12 +258,12 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
           <div className="flex flex-wrap gap-2">
             {searchTerm && (
               <Badge variant="secondary" className="bg-card text-foreground border border-border rounded-none">
-                Search: "{searchTerm}"
+                {`Search: "${searchTerm}"`}
               </Badge>
             )}
             {selectedTag && (
               <Badge variant="secondary" className="bg-card text-foreground border border-border rounded-none">
-                <Tag className="w-3 h-3 mr-1 text-primary" />
+                <Tag className="w-3 h-3 mr-1 text-primary inline-block" />
                 {selectedTag}
               </Badge>
             )}
@@ -265,7 +273,7 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
         {/* Results Count */}
         {posts.length > 0 && (
           <div className="text-sm text-muted-foreground">
-            {filteredPosts.length === posts.length 
+            {filteredPosts.length === posts.length
               ? `Showing all ${posts.length} posts`
               : `Showing ${filteredPosts.length} of ${posts.length} posts`
             }
@@ -287,8 +295,8 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
             }
           </p>
           {posts.length > 0 && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={clearFilters}
               className="mt-4"
             >
@@ -308,17 +316,17 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
             >
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-primary/50 to-secondary/50 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200" />
-                <BlogCard 
-                  post={filteredPosts[0]} 
-                  onClick={() => onPostSelect(filteredPosts[0])} 
-                  featured={true} 
+                <BlogCard
+                  post={filteredPosts[0]}
+                  onClick={() => onPostSelect(filteredPosts[0])}
+                  featured={true}
                 />
               </div>
             </motion.div>
           )}
 
           {/* Grid Layout */}
-          <motion.div 
+          <motion.div
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
             variants={{
               hidden: { opacity: 0 },
@@ -340,9 +348,9 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
                   show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 50, damping: 20 } }
                 }}
               >
-                <BlogCard 
-                  post={post} 
-                  onClick={() => onPostSelect(post)} 
+                <BlogCard
+                  post={post}
+                  onClick={() => onPostSelect(post)}
                 />
               </motion.div>
             ))}

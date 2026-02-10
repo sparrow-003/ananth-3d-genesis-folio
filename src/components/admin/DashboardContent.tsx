@@ -13,6 +13,8 @@ interface DashboardContentProps {
   onView: (post: BlogPostType) => void
 }
 
+import { AdminDashboardSkeleton } from "@/components/skeletons/AdminSkeleton"
+
 export const DashboardContent = memo(({
   posts,
   comments,
@@ -22,12 +24,7 @@ export const DashboardContent = memo(({
   onView
 }: DashboardContentProps) => {
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-2 text-muted-foreground">Loading dashboard...</span>
-      </div>
-    )
+    return <AdminDashboardSkeleton />
   }
 
   return (

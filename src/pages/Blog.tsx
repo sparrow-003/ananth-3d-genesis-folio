@@ -29,6 +29,8 @@ const LoadingSpinner = memo(() => (
 
 LoadingSpinner.displayName = 'LoadingSpinner'
 
+import { BlogPostSkeleton, BlogListSkeleton } from '@/components/skeletons/BlogSkeleton'
+
 const Blog = memo(() => {
   const { slug } = useParams()
   const navigate = useNavigate()
@@ -36,12 +38,12 @@ const Blog = memo(() => {
   const [selectedPost, setSelectedPost] = useState<BlogPostType | null>(null)
 
   // Fetch single post when slug is provided
-  const { 
-    data: fetchedPost, 
-    isLoading, 
-    isError, 
+  const {
+    data: fetchedPost,
+    isLoading,
+    isError,
     error,
-    refetch 
+    refetch
   } = useQuery({
     queryKey: ['post', slug],
     queryFn: () => blogAPI.getPostBySlug(slug!),
@@ -56,7 +58,6 @@ const Blog = memo(() => {
   useEffect(() => {
     if (slug && fetchedPost) {
       setSelectedPost(fetchedPost)
-      // Track view asynchronously
       blogAPI.incrementViews(fetchedPost.id).catch(console.error)
     } else if (!slug) {
       setSelectedPost(null)
@@ -67,10 +68,8 @@ const Blog = memo(() => {
   useEffect(() => {
     if (isError && slug) {
       console.error('Error loading post:', error)
-      // Don't navigate away immediately, let user try to refresh
     }
     if (slug && !isLoading && !fetchedPost && !isError) {
-      // Post not found after loading completed
       toast.error('Post not found')
       navigate('/blog')
     }
@@ -90,7 +89,6 @@ const Blog = memo(() => {
     if (slug) {
       refetch()
     } else {
-      // Refresh the posts list
       queryClient.invalidateQueries({ queryKey: ['posts'] })
     }
   }, [slug, refetch, queryClient])
@@ -100,19 +98,21 @@ const Blog = memo(() => {
       <Suspense fallback={null}>
         <ParticleBackground />
       </Suspense>
-      
+
       <Navbar />
 
       <main className="pt-24 pb-12 relative z-10 min-h-[80vh]">
         <AnimatePresence mode="wait">
           {isLoading ? (
             <motion.div
-              key="loading"
+              key="loading-slug"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              className="relative"
             >
-              <LoadingSpinner />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none -z-10" />
+              <BlogPostSkeleton />
             </motion.div>
           ) : isError ? (
             <motion.div
@@ -122,27 +122,26 @@ const Blog = memo(() => {
               exit={{ opacity: 0, y: -20 }}
               className="max-w-2xl mx-auto px-4 py-12"
             >
-              <Alert className="border-red-200 bg-red-50 text-red-800">
+              <Alert className="border-red-500/20 bg-red-500/5 text-red-500 backdrop-blur-md">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription className="flex flex-col gap-3">
-                  <span>
-                    Failed to load the blog post. This might be due to a network issue or the post may not exist.
-                  </span>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
+                <AlertDescription className="flex flex-col gap-4">
+                  <span className="font-medium text-lg">Failed to load the blog post.</span>
+                  <span className="text-sm opacity-70">This might be due to a network issue or the post may not exist.</span>
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={handleRetry}
-                      className="text-red-800 border-red-300 hover:bg-red-100"
+                      className="text-red-500 border-red-500/30 hover:bg-red-500/10 transition-colors"
                     >
                       <RefreshCw className="w-4 h-4 mr-2" />
                       Try Again
                     </Button>
-                    <Button 
-                      variant="outline" 
+                    <Button
+                      variant="outline"
                       size="sm"
                       onClick={() => navigate('/blog')}
-                      className="text-red-800 border-red-300 hover:bg-red-100"
+                      className="text-red-500 border-red-500/30 hover:bg-red-500/10 transition-colors"
                     >
                       Back to Blog
                     </Button>
@@ -152,13 +151,16 @@ const Blog = memo(() => {
             </motion.div>
           ) : (
             <motion.div
-              key={selectedPost ? 'post' : 'list'}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
+              key={selectedPost ? `post-${selectedPost.id}` : 'list'}
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 1.02, y: -10 }}
+              transition={{
+                duration: 0.5,
+                ease: [0.16, 1, 0.3, 1] // Custom easeOutExpo
+              }}
             >
-              <Suspense fallback={<LoadingSpinner />}>
+              <Suspense fallback={slug ? <BlogPostSkeleton /> : <BlogListSkeleton />}>
                 {selectedPost ? (
                   <BlogPost post={selectedPost} onBack={handleBackToBlog} />
                 ) : (

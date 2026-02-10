@@ -9,8 +9,10 @@ import { AnimatePresence } from 'framer-motion'
 const AdminPanel = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [showMatrix, setShowMatrix] = useState(true)
+  const [showMatrix, setShowMatrix] = useState(false) // Start false, show only if needed
+  const [matrixDuration, setMatrixDuration] = useState(4000) // Default 4s instead of 10s
   const lastUserIdRef = useRef<string | null>(null)
+  const initialCheckDone = useRef(false)
 
   const checkAdminRole = useCallback(async (userId: string): Promise<boolean> => {
     try {
@@ -32,8 +34,6 @@ const AdminPanel = () => {
       session: Session | null,
       options?: { force?: boolean; showLoader?: boolean }
     ) => {
-      const { force = false, showLoader = false } = options ?? {}
-
       if (!mounted) return
 
       const userId = session?.user?.id ?? null
@@ -42,44 +42,46 @@ const AdminPanel = () => {
         lastUserIdRef.current = null
         setIsAuthenticated(false)
         setLoading(false)
+        // Show matrix only if not already checked and not authenticated
+        if (!initialCheckDone.current) {
+          setShowMatrix(true)
+          initialCheckDone.current = true
+        }
         return
       }
 
-      const userUnchanged = lastUserIdRef.current === userId
-      if (userUnchanged && !force) {
-        // Avoid a loading flicker/loop on events like TOKEN_REFRESHED.
-        setLoading(false)
-        return
-      }
-
-      if (showLoader) setLoading(true)
       const isAdmin = await checkAdminRole(userId)
-
       if (!mounted) return
 
       lastUserIdRef.current = userId
       setIsAuthenticated(isAdmin)
       setLoading(false)
+      
+      // If already authenticated, we don't need the matrix loader
+      if (isAdmin && !initialCheckDone.current) {
+        setShowMatrix(false)
+        initialCheckDone.current = true
+      } else if (!initialCheckDone.current) {
+        setShowMatrix(true)
+        initialCheckDone.current = true
+      }
     }
 
     const checkAuth = async () => {
       try {
-        // First get session (faster than getUser)
         const { data: { session } } = await supabase.auth.getSession()
-        await resolveFromSession(session, { force: true, showLoader: true })
+        await resolveFromSession(session)
       } catch (error) {
-        console.error('Auth check failed:', error)
         if (mounted) {
           setIsAuthenticated(false)
           setLoading(false)
+          setShowMatrix(true)
         }
       }
     }
 
-    // Initial auth check
     checkAuth()
 
-    // Subscribe to auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (!mounted) return
 
@@ -87,18 +89,21 @@ const AdminPanel = () => {
         setIsAuthenticated(false)
         setLoading(false)
         lastUserIdRef.current = null
+        setShowMatrix(true)
         return
       }
 
-      // Prevent continuous loading loops caused by periodic token refreshes.
-      if (event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-        return
+      if (event === 'SIGNED_IN') {
+        setMatrixDuration(2000) // Faster transition on successful login
+        setShowMatrix(true)
       }
 
-      await resolveFromSession(session, {
-        force: event === 'USER_UPDATED',
-        showLoader: event === 'SIGNED_IN' || event === 'USER_UPDATED',
-      })
+      if (event !== 'TOKEN_REFRESHED' && event !== 'INITIAL_SESSION') {
+        await resolveFromSession(session, {
+          force: event === 'USER_UPDATED',
+          showLoader: event === 'SIGNED_IN' || event === 'USER_UPDATED',
+        })
+      }
     })
 
     return () => {
@@ -109,33 +114,51 @@ const AdminPanel = () => {
 
   const handleLogin = useCallback(() => {
     setIsAuthenticated(true)
+    setMatrixDuration(2000)
+    setShowMatrix(true)
   }, [])
 
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut()
     setIsAuthenticated(false)
+    setShowMatrix(true)
+    setMatrixDuration(3000)
   }, [])
 
   return (
     <>
       <AnimatePresence>
         {showMatrix && (
-          <MatrixLoader 
-            duration={10000} 
-            onComplete={() => setShowMatrix(false)} 
-          />
+          <div className="relative z-[100]">
+            <MatrixLoader 
+              duration={matrixDuration} 
+              onComplete={() => setShowMatrix(false)} 
+            />
+            <button 
+              onClick={() => setShowMatrix(false)}
+              className="fixed bottom-8 right-8 z-[110] px-4 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-full text-emerald-500 text-xs font-mono tracking-widest uppercase transition-all"
+            >
+              Skip Initialization
+            </button>
+          </div>
         )}
       </AnimatePresence>
 
-      <div className={showMatrix ? "fixed inset-0 -z-10 opacity-0 pointer-events-none" : "animate-in fade-in duration-500"}>
+      <div className={showMatrix ? "fixed inset-0 -z-10 opacity-0 pointer-events-none" : "animate-in fade-in zoom-in-95 duration-700 ease-out"}>
         {loading ? (
-          <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-4">
-            <div className="fixed inset-0 bg-gradient-to-br from-emerald-950/20 via-black to-teal-950/20 -z-10" />
-            <div className="relative w-12 h-12">
-              <div className="absolute inset-0 rounded-full border-2 border-emerald-500/30" />
-              <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-emerald-500 animate-spin" />
+          <div className="min-h-screen flex flex-col items-center justify-center bg-black gap-6">
+            <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.1),transparent_70%)] -z-10" />
+            <div className="relative">
+              <div className="w-20 h-20 rounded-full border-2 border-emerald-500/10" />
+              <div className="absolute inset-0 rounded-full border-t-2 border-emerald-500 animate-spin" />
+              <div className="absolute inset-4 rounded-full border-b-2 border-teal-500/50 animate-reverse-spin" />
             </div>
-            <p className="text-emerald-500/50 text-sm animate-pulse">Verifying Access Protocols...</p>
+            <div className="flex flex-col items-center gap-2">
+              <p className="text-emerald-500 font-mono text-xs tracking-[0.3em] uppercase animate-pulse">Establishing Secure Node</p>
+              <div className="h-0.5 w-32 bg-emerald-500/10 overflow-hidden rounded-full">
+                <div className="h-full bg-emerald-500 animate-loading-bar" />
+              </div>
+            </div>
           </div>
         ) : isAuthenticated ? (
           <AdminDashboard onLogout={handleLogout} />
