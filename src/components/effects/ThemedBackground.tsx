@@ -10,24 +10,25 @@ const FallingStars = lazy(() => import('../FallingStars'));
 const ThemedBackground = memo(() => {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
-  
+
   return (
     <>
       <Suspense fallback={null}>
-        {isDark ? <ParticleBackground /> : <LightThemeBackground />}
+        {/* If dark mode, the FallingStars component handles the entire background (nebula + stars).
+            If light mode, we show the LightThemeBackground. */}
+        {isDark ? null : <LightThemeBackground />}
       </Suspense>
-      
-      {/* Falling stars effect for dark mode */}
+
+      {/* Falling stars / Real Space effect for dark mode */}
       {isDark && (
-        <div className="fixed inset-0 pointer-events-none z-[1]">
+        <div className="fixed inset-0 pointer-events-none -z-10 bg-black">
           <Suspense fallback={null}>
             <Canvas
-              camera={{ position: [0, 0, 15], fov: 60 }}
+              camera={{ position: [0, 0, 20], fov: 60 }}
               style={{ background: 'transparent' }}
-              gl={{ alpha: true, antialias: false }}
+              gl={{ alpha: false, antialias: false }} // alpha false for solid black background performance
               dpr={[1, 1.5]}
             >
-              <ambientLight intensity={0.3} />
               <FallingStars />
             </Canvas>
           </Suspense>
