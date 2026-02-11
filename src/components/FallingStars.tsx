@@ -1,4 +1,4 @@
-import { useRef, useMemo, useState } from 'react';
+import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { Float, Sparkles } from '@react-three/drei';
@@ -46,34 +46,35 @@ const CinematicMeteor = ({ id }: MeteorProps) => {
     };
   }, []);
 
-  const [state] = useState({
+  const posRef = useRef({
     x: (Math.random() - 0.5) * 50,
     y: 20 + Math.random() * 15,
     active: true,
-    flareY: (Math.random() - 0.1) * 10, // Point where it flares
+    flareY: (Math.random() - 0.1) * 10,
   });
 
-  useFrame((state, delta) => {
+  useFrame((rootState, delta) => {
     if (!meshRef.current) return;
+    const pos = posRef.current;
 
     // Mouse influence (Gravitational Bending)
-    const mouseX = state.mouse.x * 10;
-    const mouseY = state.mouse.y * 10;
+    const mouseX = rootState.mouse.x * 10;
+    const mouseY = rootState.mouse.y * 10;
     const dx = meshRef.current.position.x - mouseX;
     const dy = meshRef.current.position.y - mouseY;
     const dist = Math.sqrt(dx * dx + dy * dy);
     const influence = Math.max(0, (20 - dist) / 20) * 0.1;
 
     // Movement with subtle curvature and mouse influence
-    state.y -= config.speed * delta * 60;
-    state.x += (Math.sin(state.y * 0.05) + config.curvature * state.y + dx * influence) * 0.1;
+    pos.y -= config.speed * delta * 60;
+    pos.x += (Math.sin(pos.y * 0.05) + config.curvature * pos.y + dx * influence) * 0.1;
 
     // Flare effect logic
-    const distanceToFlare = Math.abs(state.y - state.flareY);
+    const distanceToFlare = Math.abs(pos.y - pos.flareY);
     const flareIntensity = Math.max(0, (5 - distanceToFlare) / 5);
     const flareScale = 1 + flareIntensity * 2;
 
-    meshRef.current.position.set(state.x, state.y, config.z);
+    meshRef.current.position.set(pos.x, pos.y, config.z);
 
     // Rotate meteor to face the direction of travel for realism
     const targetRotation = Math.atan2(dx * influence, -config.speed);
@@ -84,14 +85,14 @@ const CinematicMeteor = ({ id }: MeteorProps) => {
 
     // Stretch trail based on speed and add wobble
     if (trailRef.current) {
-      const wobble = Math.sin(state.clock.elapsedTime * 20 + id) * 0.05;
+      const wobble = Math.sin(rootState.clock.elapsedTime * 20 + id) * 0.05;
       trailRef.current.scale.set(1 + wobble, config.trailLength * (config.speed * 2), 1);
     }
 
     // Reset loop
-    if (state.y < -25) {
-      state.y = 25 + Math.random() * 10;
-      state.x = (Math.random() - 0.5) * 60;
+    if (pos.y < -25) {
+      pos.y = 25 + Math.random() * 10;
+      pos.x = (Math.random() - 0.5) * 60;
     }
   });
 

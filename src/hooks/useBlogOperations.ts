@@ -55,7 +55,7 @@ export const useBlogOperations = () => {
         queryClient.setQueryData(['posts'], (old: BlogPost[] = []) =>
           old.filter(post => post.id !== id)
         )
-      } else if (data.published === true || previousPublicPosts?.find((p: BlogPost) => p.id === id)) {
+      } else if (data.published === true || (previousPublicPosts as BlogPost[] | undefined)?.find((p: BlogPost) => p.id === id)) {
         // If publishing or already published, update
         queryClient.setQueryData(['posts'], (old: BlogPost[] = []) =>
           old.map(post => post.id === id ? { ...post, ...data } : post)
