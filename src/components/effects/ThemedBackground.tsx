@@ -21,12 +21,19 @@ const ThemedBackground = memo(() => {
 
       {/* Falling stars / Real Space effect for dark mode */}
       {isDark && (
-        <div className="fixed inset-0 pointer-events-none -z-10 bg-black">
+        <div className="fixed inset-0 pointer-events-none -z-10 bg-[#030508]">
+          {/* Cinematic Vignette & Depth Gradient */}
+          <div
+            className="absolute inset-0 z-[1] opacity-60"
+            style={{
+              background: 'radial-gradient(circle at center, transparent 0%, rgba(3, 5, 8, 0.8) 70%, #030508 100%)'
+            }}
+          />
           <Suspense fallback={null}>
             <Canvas
               camera={{ position: [0, 0, 20], fov: 60 }}
               style={{ background: 'transparent' }}
-              gl={{ alpha: false, antialias: false }} // alpha false for solid black background performance
+              gl={{ alpha: true, antialias: false }}
               dpr={[1, 1.5]}
             >
               <FallingStars />

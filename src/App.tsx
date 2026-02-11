@@ -51,7 +51,7 @@ const App = memo(() => (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
         <TooltipProvider>
-          <div className="w-full min-h-screen bg-background text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
+          <div className="w-full min-h-screen bg-transparent text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
             <Toaster />
             <Sonner position="top-center" richColors closeButton />
             <BrowserRouter>
