@@ -8,17 +8,17 @@ export const useBlogOperations = () => {
 
   // Create post mutation
   const createPostMutation = useMutation({
-    mutationFn: (data: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>) => 
+    mutationFn: (data: Omit<BlogPost, 'id' | 'created_at' | 'updated_at' | 'likes_count' | 'views_count'>) =>
       blogAPI.createPost(data),
     onSuccess: (newPost) => {
       // Update admin posts cache
       queryClient.setQueryData(['admin-posts'], (old: BlogPost[] = []) => [newPost, ...old])
-      
+
       // If published, update public posts cache
       if (newPost.published) {
         queryClient.setQueryData(['posts'], (old: BlogPost[] = []) => [newPost, ...old])
       }
-      
+
       // Invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ['admin-posts'] })
       if (newPost.published) {
@@ -33,29 +33,35 @@ export const useBlogOperations = () => {
 
   // Update post mutation
   const updatePostMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Partial<BlogPost> }) => 
+    mutationFn: ({ id, data }: { id: string; data: Partial<BlogPost> }) =>
       blogAPI.updatePost(id, data),
     onMutate: async ({ id, data }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['admin-posts'] })
       await queryClient.cancelQueries({ queryKey: ['posts'] })
-      
+
       // Snapshot previous values
       const previousAdminPosts = queryClient.getQueryData(['admin-posts'])
       const previousPublicPosts = queryClient.getQueryData(['posts'])
-      
+
       // Optimistically update admin posts
       queryClient.setQueryData(['admin-posts'], (old: BlogPost[] = []) =>
         old.map(post => post.id === id ? { ...post, ...data } : post)
       )
-      
-      // Optimistically update public posts if published
-      if (data.published) {
+
+      // Handle public posts cache
+      if (data.published === false) {
+        // If unpublishing, remove from public list
+        queryClient.setQueryData(['posts'], (old: BlogPost[] = []) =>
+          old.filter(post => post.id !== id)
+        )
+      } else if (data.published === true || previousPublicPosts?.find((p: BlogPost) => p.id === id)) {
+        // If publishing or already published, update
         queryClient.setQueryData(['posts'], (old: BlogPost[] = []) =>
           old.map(post => post.id === id ? { ...post, ...data } : post)
         )
       }
-      
+
       return { previousAdminPosts, previousPublicPosts }
     },
     onError: (error: any, variables, context) => {
@@ -66,7 +72,7 @@ export const useBlogOperations = () => {
       if (context?.previousPublicPosts) {
         queryClient.setQueryData(['posts'], context.previousPublicPosts)
       }
-      
+
       console.error('Update post error:', error)
       toast.error(`Failed to update post: ${error.message}`)
     },
@@ -84,11 +90,11 @@ export const useBlogOperations = () => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: ['admin-posts'] })
       await queryClient.cancelQueries({ queryKey: ['posts'] })
-      
+
       // Snapshot previous values
       const previousAdminPosts = queryClient.getQueryData(['admin-posts'])
       const previousPublicPosts = queryClient.getQueryData(['posts'])
-      
+
       // Optimistically remove from both caches
       queryClient.setQueryData(['admin-posts'], (old: BlogPost[] = []) =>
         old.filter(post => post.id !== id)
@@ -96,7 +102,7 @@ export const useBlogOperations = () => {
       queryClient.setQueryData(['posts'], (old: BlogPost[] = []) =>
         old.filter(post => post.id !== id)
       )
-      
+
       return { previousAdminPosts, previousPublicPosts }
     },
     onError: (error: any, variables, context) => {
@@ -107,7 +113,7 @@ export const useBlogOperations = () => {
       if (context?.previousPublicPosts) {
         queryClient.setQueryData(['posts'], context.previousPublicPosts)
       }
-      
+
       console.error('Delete post error:', error)
       toast.error(`Failed to delete post: ${error.message}`)
     },

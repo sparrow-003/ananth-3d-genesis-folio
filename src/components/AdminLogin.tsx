@@ -87,6 +87,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                     onChange={(e) => setCredentials(prev => ({ ...prev, email: e.target.value }))}
                     className="pl-10 bg-black/50 border-emerald-500/10 text-white placeholder:text-gray-600 h-12 focus:border-emerald-500/40 transition-all rounded-xl"
                     required
+                    disabled={loading}
                   />
                 </div>
               </div>
@@ -104,6 +105,7 @@ const AdminLogin = ({ onLogin }: AdminLoginProps) => {
                     onChange={(e) => setCredentials(prev => ({ ...prev, password: e.target.value }))}
                     className="pl-10 pr-10 bg-black/50 border-emerald-500/10 text-white placeholder:text-gray-600 h-12 focus:border-emerald-500/40 transition-all rounded-xl"
                     required
+                    disabled={loading}
                   />
                   <button
                     type="button"

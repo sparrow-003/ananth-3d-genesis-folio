@@ -8,12 +8,12 @@ import { Analytics } from "@vercel/analytics/react";
 import { ThemeProvider } from "@/components/theme-provider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import ScrollToTop from "./components/ScrollToTop";
-import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import AdminPanel from "./pages/AdminPanel";
 import Layout from "./components/Layout";
 
-// Lazy load blog components for better performance
+// Lazy load pages for better performance
+const Index = lazy(() => import("./pages/Index"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const AdminPanel = lazy(() => import("./pages/AdminPanel"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogSystemTest = lazy(() => import("./components/BlogSystemTest"));
 

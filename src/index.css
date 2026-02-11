@@ -710,11 +710,8 @@
     animation: shimmer 2s ease-in-out infinite;
   }
 
-  /* Ultra smooth scrolling */
-  * {
-    scroll-behavior: smooth;
-  }
-
+  /* Ultra smooth scrolling - handled on html */
+  
   /* Optimized image display */
   .avatar-image-container {
     @apply relative overflow-hidden;
