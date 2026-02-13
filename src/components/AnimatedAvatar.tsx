@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { memo, useState, useRef, useEffect } from 'react';
-import avatarImage1 from '@/assets/avatar-art-1.png';
+import heroAvatar from '@/assets/hero-avatar.jpg';
 import avatarImage2 from '@/assets/avatar-art-2.png';
 import avatarImage3 from '@/assets/avatar-art-3.png';
 
@@ -41,13 +41,13 @@ const AnimatedAvatar = memo(({ variant, className = '' }: AnimatedAvatarProps) =
   const getImage = () => {
     switch (variant) {
       case 'hero':
-        return avatarImage1;
+        return heroAvatar;
       case 'about':
         return avatarImage3;
       case 'contact':
         return avatarImage2;
       default:
-        return avatarImage1;
+        return heroAvatar;
     }
   };
 
