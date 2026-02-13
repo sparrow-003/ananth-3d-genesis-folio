@@ -2,7 +2,7 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
-import { Float, Stars } from '@react-three/drei';
+import { Stars } from '@react-three/drei';
 import { useAnimationPreference } from '@/contexts/AnimationContext';
 
 // -----------------------------------------------------------------------------
@@ -22,29 +22,25 @@ const METEOR_COLORS = [
 
 const CinematicMeteor = ({ id }: { id: number }) => {
   const meshRef = useRef<THREE.Group>(null);
-  const trailRef = useRef<THREE.Mesh>(null);
   const { viewport } = useThree();
 
   // Initialize meteor properties
   const config = useMemo(() => {
     const isBig = Math.random() > 0.9;
-    const angle = -Math.PI / 4 + (Math.random() - 0.5) * 0.5; // -45 degrees +/- variance
+    const angle = -Math.PI / 4 + (Math.random() - 0.5) * 0.5;
     return {
       speed: (isBig ? 1.0 : 0.6) + Math.random() * 0.5,
       size: isBig ? 0.2 : 0.08,
       color: new THREE.Color(METEOR_COLORS[Math.floor(Math.random() * METEOR_COLORS.length)]),
       length: isBig ? 8 : 4,
-      xStart: (Math.random() - 0.5) * viewport.width * 1.5,
       z: -(Math.random() * 10),
       angle: angle,
-      dx: Math.cos(angle + Math.PI / 2) * 2, // Direction vector X
-      dy: Math.sin(angle + Math.PI / 2) * 25, // Direction vector Y (downwards mostly)
     };
-  }, [viewport.width]);
+  }, []);
 
   const posRef = useRef({
-    x: config.xStart,
-    y: viewport.height / 2 + 10 + Math.random() * 20,
+    x: (Math.random() - 0.5) * 30,
+    y: 15 + Math.random() * 20,
   });
 
   // Create gradient texture for trails
@@ -54,7 +50,6 @@ const CinematicMeteor = ({ id }: { id: number }) => {
     canvas.height = 512;
     const ctx = canvas.getContext('2d')!;
     const grad = ctx.createLinearGradient(0, 0, 0, 512);
-    // Head (white-hot) -> Tail (color) -> Fade
     grad.addColorStop(0, 'rgba(255, 255, 255, 1)');
     grad.addColorStop(0.1, '#' + config.color.getHexString());
     grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
@@ -63,10 +58,9 @@ const CinematicMeteor = ({ id }: { id: number }) => {
     return new THREE.CanvasTexture(canvas);
   }, [config.color]);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (!meshRef.current) return;
 
-    // Move meteor based on angle
     const speed = config.speed * delta;
     posRef.current.x += Math.sin(config.angle) * speed * 25;
     posRef.current.y -= Math.cos(config.angle) * speed * 25;
@@ -75,7 +69,6 @@ const CinematicMeteor = ({ id }: { id: number }) => {
     if (posRef.current.y < -viewport.height / 2 - 10) {
       posRef.current.y = viewport.height / 2 + 10 + Math.random() * 10;
       posRef.current.x = (Math.random() - 0.5) * viewport.width * 1.5;
-      // Randomize delay to prevent "rain" effect, make it sporadic
       if (Math.random() > 0.3) posRef.current.y += 20;
     }
 
@@ -85,19 +78,14 @@ const CinematicMeteor = ({ id }: { id: number }) => {
 
   return (
     <group ref={meshRef}>
-      {/* Head */}
       <mesh>
         <sphereGeometry args={[config.size, 16, 16]} />
         <meshBasicMaterial color="#ffffff" toneMapped={false} />
       </mesh>
-
-      {/* Glow */}
       <mesh scale={[3, 3, 3]}>
         <sphereGeometry args={[config.size, 16, 16]} />
         <meshBasicMaterial color={config.color} transparent opacity={0.4} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
-
-      {/* Trail */}
       <mesh position={[0, config.length / 2, 0]}>
         <planeGeometry args={[config.size * 2, config.length]} />
         <meshBasicMaterial
@@ -120,9 +108,8 @@ const CinematicMeteor = ({ id }: { id: number }) => {
 const DeepSpaceBackground = () => {
   const starsRef = useRef<THREE.Group>(null);
 
-  useFrame((state, delta) => {
+  useFrame((_state, delta) => {
     if (starsRef.current) {
-      // Very slow rotation for "real space" feel - like the earth turning
       starsRef.current.rotation.y += delta * 0.02;
       starsRef.current.rotation.x += delta * 0.005;
     }
@@ -130,26 +117,8 @@ const DeepSpaceBackground = () => {
 
   return (
     <group ref={starsRef}>
-      {/* Dense Background Stars - Distant */}
-      <Stars
-        radius={100}
-        depth={50}
-        count={7000}
-        factor={4}
-        saturation={0}
-        fade
-        speed={1}
-      />
-      {/* Foreground Stars - Brighter, colored */}
-      <Stars
-        radius={50}
-        depth={20}
-        count={1000}
-        factor={6}
-        saturation={1}
-        fade
-        speed={2}
-      />
+      <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+      <Stars radius={50} depth={20} count={800} factor={6} saturation={1} fade speed={2} />
     </group>
   );
 };
@@ -161,20 +130,16 @@ const DeepSpaceBackground = () => {
 const FallingStars = () => {
   const { effectiveMode } = useAnimationPreference();
 
-  // If user turned off animations, render nothing or just a static dark bg (handled by parent css)
   if (effectiveMode === 'off') return null;
 
-  const meteorCount = effectiveMode === 'full' ? 5 : 2; // Real meteors are rare
+  const meteorCount = effectiveMode === 'full' ? 5 : 2;
 
   return (
     <>
-      <color attach="background" args={['#030508']} /> {/* Deep space black-blue */}
+      <color attach="background" args={['#030508']} />
       <fog attach="fog" args={['#030508', 20, 100]} />
-
       <ambientLight intensity={0.1} />
-
       <DeepSpaceBackground />
-
       <group>
         {Array.from({ length: meteorCount }).map((_, i) => (
           <CinematicMeteor key={i} id={i} />
@@ -185,4 +150,3 @@ const FallingStars = () => {
 };
 
 export default FallingStars;
-
