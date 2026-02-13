@@ -125,7 +125,7 @@ Best regards,
           />
 
           <div className="mt-6 text-center text-xs text-emerald-400 animate-pulse font-medium tracking-widest uppercase mb-4">
-            Interactive Genesis Node
+            ___________________
           </div>
 
           {/* Social Media Links */}

@@ -83,7 +83,7 @@ const MatrixLoader = memo(({ onComplete, duration = 5000 }: { onComplete?: () =>
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.1, filter: 'blur(20px)' }}
-            transition={{ duration: 1, ease: 'easeInOut' }}
+            transition={{ duration: 2, ease: 'easeInOut' }}
             className="fixed inset-0 z-[100] bg-black flex items-center justify-center overflow-hidden"
         >
             <canvas ref={canvasRef} className="absolute inset-0 opacity-60" />
@@ -93,7 +93,7 @@ const MatrixLoader = memo(({ onComplete, duration = 5000 }: { onComplete?: () =>
                 <motion.div
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.5, duration: 1, type: 'spring' }}
+                    transition={{ delay: 1.5, duration: 1, type: 'spring' }}
                     className="relative"
                 >
                     <div className="absolute -inset-10 bg-emerald-500/20 blur-3xl rounded-full animate-pulse" />
@@ -112,7 +112,7 @@ const MatrixLoader = memo(({ onComplete, duration = 5000 }: { onComplete?: () =>
                             <motion.div
                                 key={i}
                                 animate={{ opacity: [0, 1, 0] }}
-                                transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+                                transition={{ duration: 3, repeat: Infinity, delay: i * 0.2 }}
                                 className="w-1.5 h-1.5 bg-emerald-500 rounded-full"
                             />
                         ))}
