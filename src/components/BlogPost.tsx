@@ -387,7 +387,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="glass-card text-foreground sm:max-w-md">
+        <DialogContent className="glass-card text-foreground sm:max-w-md [&>*]:pointer-events-auto">
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-foreground">Share this post</DialogTitle>
             <DialogDescription className="text-center text-muted-foreground">
@@ -396,26 +396,27 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
           </DialogHeader>
 
           <div className="flex flex-col items-center justify-center py-6 space-y-6">
-            <div className="bg-white p-4 rounded-xl shadow-xl">
+            <div className="bg-white p-4 rounded-xl shadow-xl pointer-events-none select-none">
               <img
-                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}&color=10B981&bgcolor=ffffff`}
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(shareUrl)}&format=png`}
                 alt="QR Code"
-                className="w-48 h-48"
-                loading="lazy"
+                className="w-48 h-48 block"
+                draggable={false}
+                style={{ imageRendering: 'pixelated' }}
               />
             </div>
 
-            <div className="w-full space-y-2">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Short Link</label>
+            <div className="w-full space-y-3">
+              <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Share URL</label>
               <div className="flex gap-2">
                 <Input
                   readOnly
-                  value={shortUrl}
-                  className="bg-card border-border text-muted-foreground font-mono text-xs rounded-lg h-10"
+                  value={shareUrl}
+                  className="bg-card border-border text-foreground font-mono text-xs rounded-lg h-10"
                 />
                 <Button
                   onClick={() => {
-                    navigator.clipboard.writeText(shortUrl)
+                    navigator.clipboard.writeText(shareUrl)
                     toast.success('Link copied!')
                   }}
                   size="icon"
@@ -424,6 +425,28 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                   <Share2 className="w-4 h-4" />
                 </Button>
               </div>
+              {shortUrl !== shareUrl && (
+                <>
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Short Link</label>
+                  <div className="flex gap-2">
+                    <Input
+                      readOnly
+                      value={shortUrl}
+                      className="bg-card border-border text-foreground font-mono text-xs rounded-lg h-10"
+                    />
+                    <Button
+                      onClick={() => {
+                        navigator.clipboard.writeText(shortUrl)
+                        toast.success('Short link copied!')
+                      }}
+                      size="icon"
+                      className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 w-10"
+                    >
+                      <Share2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </DialogContent>
