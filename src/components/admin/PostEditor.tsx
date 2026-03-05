@@ -64,6 +64,8 @@ interface FormData {
   allow_comments: boolean
   author_name: string
   location: string
+  views_count: number
+  likes_count: number
 }
 
 interface ValidationErrors {
