@@ -64,6 +64,8 @@ interface FormData {
   allow_comments: boolean
   author_name: string
   location: string
+  views_count: number
+  likes_count: number
 }
 
 interface ValidationErrors {
@@ -85,7 +87,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     publish_at: '',
     allow_comments: true,
     author_name: 'Ananth',
-    location: ''
+    location: '',
+    views_count: 0,
+    likes_count: 0
   })
 
   const [publishDate, setPublishDate] = useState<Date | undefined>(undefined)
@@ -113,7 +117,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         publish_at: post.publish_at || '',
         allow_comments: post.allow_comments ?? true,
         author_name: post.author_name ?? 'Ananth',
-        location: post.location || ''
+        location: post.location || '',
+        views_count: post.views_count ?? 0,
+        likes_count: post.likes_count ?? 0
       })
       
       if (post.publish_at) {
@@ -196,7 +202,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   }, [generateSlug])
 
   // Handle form field changes
-  const handleFieldChange = useCallback((field: keyof FormData, value: string | boolean) => {
+  const handleFieldChange = useCallback((field: keyof FormData, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     // Clear validation error for this field
@@ -441,6 +447,39 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
               />
             </div>
           )}
+        </AccordionContent>
+      </AccordionItem>
+
+      {/* Stats (Admin Only) */}
+      <AccordionItem value="stats" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <Eye className="w-4 h-4 text-cyan-500" />
+            <span>Stats</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">View Count</label>
+            <Input 
+              type="number"
+              min="0"
+              value={formData.views_count ?? 0}
+              onChange={e => handleFieldChange('views_count', parseInt(e.target.value) || 0)}
+              className="font-mono text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Like Count</label>
+            <Input 
+              type="number"
+              min="0"
+              value={formData.likes_count ?? 0}
+              onChange={e => handleFieldChange('likes_count', parseInt(e.target.value) || 0)}
+              className="font-mono text-sm"
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground/60">Manually override engagement metrics.</p>
         </AccordionContent>
       </AccordionItem>
 
