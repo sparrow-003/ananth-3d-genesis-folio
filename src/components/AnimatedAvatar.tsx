@@ -1,6 +1,6 @@
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { memo, useState, useRef, useEffect } from 'react';
-import heroAvatar from '@/assets/hero-avatar.png';
+import heroAvatar from '@/assets/hero-avatar.jpg';
 import avatarImage2 from '@/assets/avatar-art-2.png';
 import avatarImage3 from '@/assets/avatar-art-3.png';
 
