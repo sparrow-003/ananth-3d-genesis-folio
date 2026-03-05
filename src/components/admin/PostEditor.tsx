@@ -444,6 +444,39 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         </AccordionContent>
       </AccordionItem>
 
+      {/* Stats (Admin Only) */}
+      <AccordionItem value="stats" className="border-border">
+        <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
+          <div className="flex items-center gap-2 text-sm">
+            <Eye className="w-4 h-4 text-cyan-500" />
+            <span>Stats</span>
+          </div>
+        </AccordionTrigger>
+        <AccordionContent className="px-4 pb-4 space-y-4">
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">View Count</label>
+            <Input 
+              type="number"
+              min="0"
+              value={formData.views_count ?? 0}
+              onChange={e => handleFieldChange('views_count', parseInt(e.target.value) || 0)}
+              className="font-mono text-sm"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-xs font-medium text-muted-foreground">Like Count</label>
+            <Input 
+              type="number"
+              min="0"
+              value={formData.likes_count ?? 0}
+              onChange={e => handleFieldChange('likes_count', parseInt(e.target.value) || 0)}
+              className="font-mono text-sm"
+            />
+          </div>
+          <p className="text-[10px] text-muted-foreground/60">Manually override engagement metrics.</p>
+        </AccordionContent>
+      </AccordionItem>
+
       {/* Advanced */}
       <AccordionItem value="advanced" className="border-border">
         <AccordionTrigger className="px-4 py-3 hover:no-underline hover:bg-muted/50">
