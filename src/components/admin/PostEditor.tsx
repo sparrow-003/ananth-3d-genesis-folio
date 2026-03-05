@@ -87,7 +87,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     publish_at: '',
     allow_comments: true,
     author_name: 'Ananth',
-    location: ''
+    location: '',
+    views_count: 0,
+    likes_count: 0
   })
 
   const [publishDate, setPublishDate] = useState<Date | undefined>(undefined)
