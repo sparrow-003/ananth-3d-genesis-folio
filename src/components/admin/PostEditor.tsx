@@ -117,7 +117,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         publish_at: post.publish_at || '',
         allow_comments: post.allow_comments ?? true,
         author_name: post.author_name ?? 'Ananth',
-        location: post.location || ''
+        location: post.location || '',
+        views_count: post.views_count ?? 0,
+        likes_count: post.likes_count ?? 0
       })
       
       if (post.publish_at) {
