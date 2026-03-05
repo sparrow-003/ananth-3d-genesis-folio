@@ -202,7 +202,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   }, [generateSlug])
 
   // Handle form field changes
-  const handleFieldChange = useCallback((field: keyof FormData, value: string | boolean) => {
+  const handleFieldChange = useCallback((field: keyof FormData, value: string | boolean | number) => {
     setFormData(prev => ({ ...prev, [field]: value }))
     
     // Clear validation error for this field
