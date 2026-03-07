@@ -6,13 +6,16 @@ const purifyConfig = {
     'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
     'p', 'br', 'hr',
     'ul', 'ol', 'li',
-    'strong', 'em', 'b', 'i', 'u', 's',
+    'strong', 'em', 'b', 'i', 'u', 's', 'del',
     'blockquote', 'pre', 'code',
     'a', 'img',
-    'span', 'div', 'figure', 'figcaption'
+    'span', 'div', 'figure', 'figcaption',
+    'table', 'thead', 'tbody', 'tr', 'th', 'td',
+    'sup', 'sub', 'mark'
   ],
   ALLOWED_ATTR: [
-    'class', 'href', 'src', 'alt', 'title', 'target', 'rel', 'loading'
+    'class', 'href', 'src', 'alt', 'title', 'target', 'rel', 'loading',
+    'colspan', 'rowspan'
   ],
   ALLOW_DATA_ATTR: false,
 }
@@ -28,27 +31,67 @@ export const parseMarkdown = (markdown: string): string => {
     return `<figure class="blog-image-figure"><img src="${safeSrc}" alt="${safeAlt}" class="blog-content-image" loading="lazy" />${safeAlt ? `<figcaption class="blog-image-caption">${safeAlt}</figcaption>` : ''}</figure>`
   })
 
+  // Tables (must be before paragraphs)
+  html = html.replace(/^(\|.+\|)\n(\|[\s:|-]+\|)\n((?:\|.+\|\n?)+)/gm, (match, headerRow, separatorRow, bodyRows) => {
+    // Parse header
+    const headers = headerRow.split('|').filter((c: string) => c.trim() !== '').map((c: string) => c.trim())
+    
+    // Parse alignment from separator
+    const alignments = separatorRow.split('|').filter((c: string) => c.trim() !== '').map((c: string) => {
+      const cell = c.trim()
+      if (cell.startsWith(':') && cell.endsWith(':')) return 'center'
+      if (cell.endsWith(':')) return 'right'
+      return 'left'
+    })
+    
+    // Parse body rows
+    const rows = bodyRows.trim().split('\n').map((row: string) => 
+      row.split('|').filter((c: string) => c.trim() !== '').map((c: string) => c.trim())
+    )
+    
+    let tableHtml = '<div class="blog-table-wrapper"><table class="blog-table"><thead><tr>'
+    headers.forEach((h: string, i: number) => {
+      tableHtml += `<th style="text-align:${alignments[i] || 'left'}">${escapeHtml(h)}</th>`
+    })
+    tableHtml += '</tr></thead><tbody>'
+    rows.forEach((row: string[]) => {
+      tableHtml += '<tr>'
+      row.forEach((cell: string, i: number) => {
+        tableHtml += `<td style="text-align:${alignments[i] || 'left'}">${escapeHtml(cell)}</td>`
+      })
+      tableHtml += '</tr>'
+    })
+    tableHtml += '</tbody></table></div>'
+    return tableHtml
+  })
+
   // Headers
+  html = html.replace(/^#### (.*$)/gim, '<h4 class="blog-h4">$1</h4>')
   html = html.replace(/^### (.*$)/gim, '<h3 class="blog-h3">$1</h3>')
   html = html.replace(/^## (.*$)/gim, '<h2 class="blog-h2">$1</h2>')
   html = html.replace(/^# (.*$)/gim, '<h1 class="blog-h1">$1</h1>')
 
-  // Bold and Italic
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
-
   // Horizontal rule
   html = html.replace(/^---$/gm, '<hr class="blog-hr" />')
 
-  // Code blocks - escape content first
+  // Code blocks with language label
   html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-    return `<pre class="blog-code-block"><code class="blog-code">${escapeHtml(code.trim())}</code></pre>`
+    const langLabel = lang ? `<div class="blog-code-lang">${escapeHtml(lang)}</div>` : ''
+    return `<div class="blog-code-wrapper">${langLabel}<pre class="blog-code-block"><code class="blog-code">${escapeHtml(code.trim())}</code></pre></div>`
   })
 
   // Inline code - escape content
   html = html.replace(/`([^`]+)`/g, (match, code) => {
     return `<code class="blog-inline-code">${escapeHtml(code)}</code>`
   })
+
+  // Bold and Italic (must be after code blocks)
+  html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
+
+  // Strikethrough
+  html = html.replace(/~~(.*?)~~/g, '<del>$1</del>')
 
   // Links - sanitize href
   html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
@@ -73,9 +116,9 @@ export const parseMarkdown = (markdown: string): string => {
   html = html.replace(/^> (.+)$/gm, '<blockquote class="blog-blockquote">$1</blockquote>')
 
   // Paragraphs - lines that don't start with HTML tags
-  html = html.replace(/^(?!<[hublpfio])(.*\S.*)$/gm, '<p class="blog-paragraph">$1</p>')
+  html = html.replace(/^(?!<[hublpfidto])(.*\S.*)$/gm, '<p class="blog-paragraph">$1</p>')
 
-  // Clean up: convert remaining newlines to nothing (not <br>), paragraphs handle spacing
+  // Clean up newlines
   html = html.replace(/\n{2,}/g, '')
   html = html.replace(/\n/g, '')
 
