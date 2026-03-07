@@ -26,17 +26,17 @@ const getAdminHeaders = async () => {
 }
 
 // Helper to sanitize post data before sending to Supabase
-const sanitizePostData = (post: any) => {
+const sanitizePostData = (post: any, preserveStats = false) => {
   const { 
-    id, created_at, updated_at, likes_count, views_count, comments_count, blog_comments, 
+    id, created_at, updated_at, comments_count, blog_comments, 
     ...cleanData 
   } = post
   
   // Ensure required fields have default values
   return {
     ...cleanData,
-    likes_count: 0, // Always start with 0 likes
-    views_count: 0, // Always start with 0 views
+    likes_count: preserveStats ? (cleanData.likes_count ?? 0) : (cleanData.likes_count ?? 0),
+    views_count: preserveStats ? (cleanData.views_count ?? 0) : (cleanData.views_count ?? 0),
     allow_comments: cleanData.allow_comments ?? true,
     author_name: cleanData.author_name || 'Ananth',
     published: cleanData.published ?? false,
