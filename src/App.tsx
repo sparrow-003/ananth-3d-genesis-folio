@@ -49,35 +49,37 @@ LoadingSpinner.displayName = 'LoadingSpinner';
 
 const App = memo(() => (
   <ErrorBoundary>
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
-        <TooltipProvider>
-          <div className="w-full min-h-screen bg-transparent text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
-            <Toaster />
-            <Sonner position="top-center" richColors closeButton />
-            <BrowserRouter>
-              <ScrollToTop />
-              <ErrorBoundary>
-                <Suspense fallback={<LoadingSpinner />}>
-                  <Routes>
-                    <Route element={<Layout />}>
-                      <Route path="/" element={<Index />} />
-                      <Route path="/blog" element={<Blog />} />
-                      <Route path="/blog/:slug" element={<Blog />} />
-                      <Route path="/blog-system-test" element={<BlogSystemTest />} />
-                      <Route path="*" element={<NotFound />} />
-                    </Route>
-                    <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
-                  </Routes>
-                </Suspense>
-              </ErrorBoundary>
-            </BrowserRouter>
-            <Analytics />
-            <SpeedInsights />
-          </div>
-        </TooltipProvider>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <HelmetProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <TooltipProvider>
+            <div className="w-full min-h-screen bg-transparent text-foreground selection:bg-emerald-500/30 selection:text-emerald-200">
+              <Toaster />
+              <Sonner position="top-center" richColors closeButton />
+              <BrowserRouter>
+                <ScrollToTop />
+                <ErrorBoundary>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Routes>
+                      <Route element={<Layout />}>
+                        <Route path="/" element={<Index />} />
+                        <Route path="/blog" element={<Blog />} />
+                        <Route path="/blog/:slug" element={<Blog />} />
+                        <Route path="/blog-system-test" element={<BlogSystemTest />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Route>
+                      <Route path="/genesis-node-control-x99-admin" element={<AdminPanel />} />
+                    </Routes>
+                  </Suspense>
+                </ErrorBoundary>
+              </BrowserRouter>
+              <Analytics />
+              <SpeedInsights />
+            </div>
+          </TooltipProvider>
+        </ThemeProvider>
+      </QueryClientProvider>
+    </HelmetProvider>
   </ErrorBoundary>
 ));
 
