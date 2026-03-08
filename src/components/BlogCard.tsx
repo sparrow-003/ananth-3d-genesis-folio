@@ -126,7 +126,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           {/* Category Badge over Image */}
           {post.tags && post.tags.length > 0 && (
             <div className="absolute top-4 left-4 z-10">
-              <Badge className="bg-background/50 hover:bg-background/80 text-foreground backdrop-blur-md border border-white/10 px-3 py-1 shadow-lg uppercase tracking-wider text-[10px]">
+              <Badge className="bg-background/80 hover:bg-background text-foreground backdrop-blur-md border border-border px-3 py-1 shadow-sm uppercase tracking-wider text-[10px]">
                 {post.tags[0]}
               </Badge>
             </div>
