@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dialog"
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
+import { Helmet } from 'react-helmet-async'
 
 interface BlogPostProps {
   post: BlogPostType
@@ -35,6 +36,33 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
   const shareUrl = `${window.location.origin}/blog/${post.slug}`
   const [shortUrl, setShortUrl] = useState(shareUrl)
 
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.excerpt,
+    "author": {
+      "@type": "Person",
+      "name": post.author_name || "Ananth"
+    },
+    "datePublished": post.created_at,
+    "dateModified": post.updated_at || post.created_at,
+    "image": post.featured_image || undefined,
+    "url": shareUrl,
+    "mainEntityOfPage": shareUrl,
+    "publisher": {
+      "@type": "Organization",
+      "name": "ANANTH.DEV",
+      "url": window.location.origin
+    },
+    "keywords": (post.tags || []).join(', '),
+    "interactionStatistic": [
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/LikeAction", "userInteractionCount": post.likes_count },
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/ViewAction", "userInteractionCount": post.views_count }
+    ]
+  }
+
   useEffect(() => {
     blogAPI.incrementViews(post.id)
     checkIfLiked()
@@ -46,13 +74,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
       .then(res => res.ok ? res.text() : shareUrl)
       .then(setShortUrl)
       .catch(() => setShortUrl(shareUrl))
-
-    // Update title for SEO
-    document.title = `${post.title} | Genesis Blog`
-    return () => {
-      document.title = 'Genesis Blog'
-    }
-  }, [post.id, shareUrl, post.title])
+  }, [post.id, shareUrl])
 
   const loadComments = useCallback(async () => {
     try {
@@ -155,6 +177,34 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
   return (
     <>
+      {/* SEO Meta Tags */}
+      <Helmet>
+        <title>{post.title} | ANANTH.DEV Blog</title>
+        <meta name="description" content={post.excerpt} />
+        <meta name="keywords" content={(post.tags || []).join(', ')} />
+        <meta name="author" content={post.author_name || 'Ananth'} />
+        <link rel="canonical" href={shareUrl} />
+        
+        {/* Open Graph */}
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:description" content={post.excerpt} />
+        <meta property="og:url" content={shareUrl} />
+        {post.featured_image && <meta property="og:image" content={post.featured_image} />}
+        <meta property="article:published_time" content={post.created_at} />
+        <meta property="article:author" content={post.author_name || 'Ananth'} />
+        {(post.tags || []).map(tag => <meta key={tag} property="article:tag" content={tag} />)}
+
+        {/* Twitter */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={post.title} />
+        <meta name="twitter:description" content={post.excerpt} />
+        {post.featured_image && <meta name="twitter:image" content={post.featured_image} />}
+
+        {/* JSON-LD */}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
+      </Helmet>
+
       {/* Reading Progress Bar */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-1 bg-primary origin-left z-50"
@@ -243,6 +293,11 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
                 <span>{estimateReadingTime(post.content)} min read</span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Eye className="w-4 h-4 text-muted-foreground" />
+                <span>{(post.views_count ?? 0).toLocaleString()} views</span>
               </div>
             </div>
           </header>
@@ -419,12 +474,12 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                     navigator.clipboard.writeText(shareUrl)
                     toast.success('Link copied!')
                   }}
-                  size="icon"
-                  className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 w-10"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-4 rounded-lg h-10 shrink-0"
                 >
-                  <Share2 className="w-4 h-4" />
+                  Copy
                 </Button>
               </div>
+
               {shortUrl !== shareUrl && (
                 <>
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Short Link</label>
@@ -439,10 +494,10 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
                         navigator.clipboard.writeText(shortUrl)
                         toast.success('Short link copied!')
                       }}
-                      size="icon"
-                      className="shrink-0 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg h-10 w-10"
+                      variant="outline"
+                      className="border-border text-foreground font-bold px-4 rounded-lg h-10 shrink-0"
                     >
-                      <Share2 className="w-4 h-4" />
+                      Copy
                     </Button>
                   </div>
                 </>
