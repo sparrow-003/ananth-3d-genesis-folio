@@ -89,7 +89,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         className={cn(
-          "group/card relative overflow-hidden glass-card cursor-pointer border border-white/10 hover:border-primary/50 transition-colors duration-500",
+          "group/card relative overflow-hidden rounded-xl cursor-pointer border border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/50 transition-all duration-500",
           featured ? "md:grid md:grid-cols-2 gap-0" : "flex flex-col h-full"
         )}
         onClick={onClick}
@@ -114,9 +114,9 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
               }}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-gray-900 to-black flex items-center justify-center relative overflow-hidden">
-               <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(var(--primary),0.2),transparent_50%)]" />
-               <div className="w-full h-full absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]" />
+            <div className="w-full h-full bg-gradient-to-br from-muted to-muted-foreground/10 flex items-center justify-center relative overflow-hidden">
+               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,hsl(var(--primary)/0.3),transparent_50%)]" />
+               <div className="w-full h-full absolute inset-0 bg-[linear-gradient(to_right,hsl(var(--border))_1px,transparent_1px),linear-gradient(to_bottom,hsl(var(--border))_1px,transparent_1px)] bg-[size:24px_24px] opacity-50" />
             </div>
           )}
           
@@ -126,7 +126,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           {/* Category Badge over Image */}
           {post.tags && post.tags.length > 0 && (
             <div className="absolute top-4 left-4 z-10">
-              <Badge className="bg-background/50 hover:bg-background/80 text-foreground backdrop-blur-md border border-white/10 px-3 py-1 shadow-lg uppercase tracking-wider text-[10px]">
+              <Badge className="bg-background/80 hover:bg-background text-foreground backdrop-blur-md border border-border px-3 py-1 shadow-sm uppercase tracking-wider text-[10px]">
                 {post.tags[0]}
               </Badge>
             </div>
@@ -136,7 +136,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
         {/* Content Section */}
         <div className={cn(
           "relative flex flex-col p-6 z-10",
-          featured ? "justify-center md:p-10 lg:p-14 bg-background/30 backdrop-blur-sm" : "flex-1 bg-transparent"
+          featured ? "justify-center md:p-10 lg:p-14 bg-card/80 backdrop-blur-sm" : "flex-1"
         )}>
           {/* Meta Header */}
           <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground mb-4 uppercase tracking-wider">
@@ -168,7 +168,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           </p>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
