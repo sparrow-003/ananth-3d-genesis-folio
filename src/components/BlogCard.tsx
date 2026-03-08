@@ -136,7 +136,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
         {/* Content Section */}
         <div className={cn(
           "relative flex flex-col p-6 z-10",
-          featured ? "justify-center md:p-10 lg:p-14 bg-background/30 backdrop-blur-sm" : "flex-1 bg-transparent"
+          featured ? "justify-center md:p-10 lg:p-14 bg-card/80 backdrop-blur-sm" : "flex-1"
         )}>
           {/* Meta Header */}
           <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-muted-foreground mb-4 uppercase tracking-wider">
