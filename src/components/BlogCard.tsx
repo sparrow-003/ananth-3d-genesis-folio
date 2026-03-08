@@ -92,7 +92,13 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           "group/card relative overflow-hidden rounded-xl cursor-pointer border border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/50 transition-all duration-500",
           featured ? "md:grid md:grid-cols-2 gap-0" : "flex flex-col h-full"
         )}
-        onClick={onClick}
+        onClick={(e) => {
+          if (showShareDialog) {
+            e.stopPropagation()
+            return
+          }
+          onClick()
+        }}
       >
         {/* Glow Effect */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 opacity-0 group-hover/card:opacity-100 transition-opacity duration-500 pointer-events-none" />
@@ -214,7 +220,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
       {/* Share Dialog - Centered, with QR code and copy */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
         <DialogContent
-          className="glass-card text-foreground sm:max-w-md mx-auto"
+          className="bg-card/95 backdrop-blur-xl border border-border text-foreground sm:max-w-md mx-auto rounded-xl shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onPointerMove={(e) => e.stopPropagation()}
