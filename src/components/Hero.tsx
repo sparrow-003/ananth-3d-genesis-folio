@@ -4,7 +4,6 @@ import AnimatedAvatar from './AnimatedAvatar';
 import { memo, useEffect, useState, useRef, useCallback } from 'react';
 import { Mail, ArrowRight, Briefcase, MapPin, Code } from 'lucide-react';
 
-// Memoized roles array to prevent re-creation
 const ROLES = [
   "Vibe Coder",
   "Python Developer",
@@ -15,7 +14,6 @@ const ROLES = [
   "Web Developer"
 ] as const;
 
-// Memoized pickup lines
 const HR_PICKUP_LINES = [
   "A dreamer who codes worlds beyond the ordinary",
   "Crafting futures where AI and imagination collide",
@@ -32,7 +30,6 @@ const Hero = memo(() => {
     offset: ["start start", "end start"]
   });
 
-  // Enhanced parallax values for better 3D effect
   const avatarY = useTransform(scrollYProgress, [0, 1], [0, -50]);
   const avatarRotate = useTransform(scrollYProgress, [0, 1], [0, 5]);
   const contentY = useTransform(scrollYProgress, [0, 1], [0, 100]);
@@ -63,13 +60,11 @@ Best regards,
 
   const [currentPickupLine, setCurrentPickupLine] = useState<string>(HR_PICKUP_LINES[0]);
 
-  // Rotate through pickup lines
   useEffect(() => {
     const interval = setInterval(() => {
       const randomIndex = Math.floor(Math.random() * HR_PICKUP_LINES.length);
       setCurrentPickupLine(HR_PICKUP_LINES[randomIndex]);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -80,32 +75,25 @@ Best regards,
         setScrollY(window.scrollY);
       }
     };
-
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrollY]);
 
   return (
     <section ref={sectionRef} id="home" className="relative min-h-screen flex items-center justify-center pt-20 sm:pt-24 w-full overflow-hidden bg-background">
-      {/* Enhanced gradient background with emerald theme - respects light/dark */}
-      <div className="absolute inset-0 bg-gradient-to-br from-emerald-950/30 via-background to-teal-950/20 dark:from-emerald-950/30 dark:via-black dark:to-teal-950/20" />
+      {/* Background gradient - theme-aware */}
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-primary/5" />
 
       {/* Animated background effects */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-radial from-emerald-500/10 to-transparent rounded-full blur-3xl"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3]
-          }}
+          className="absolute -top-1/2 -left-1/2 w-full h-full bg-gradient-radial from-primary/10 to-transparent rounded-full blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
-          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-radial from-teal-500/10 to-transparent rounded-full blur-3xl"
-          animate={{
-            scale: [1.2, 1, 1.2],
-            opacity: [0.3, 0.5, 0.3]
-          }}
+          className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-gradient-radial from-primary/8 to-transparent rounded-full blur-3xl"
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
           transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
         />
       </div>
@@ -124,7 +112,7 @@ Best regards,
             className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96"
           />
 
-          <div className="mt-6 text-center text-xs text-emerald-400 animate-pulse font-medium tracking-widest uppercase mb-4">
+          <div className="mt-6 text-center text-xs text-primary animate-pulse font-medium tracking-widest uppercase mb-4">
             ___________________
           </div>
 
@@ -141,12 +129,12 @@ Best regards,
                 href={social.href}
                 target="_blank"
                 rel="noreferrer"
-                className="w-12 h-12 bg-gradient-to-br from-emerald-500/10 to-teal-500/5 rounded-full flex items-center justify-center border border-emerald-500/20 hover:border-emerald-500/50 transition-all group"
-                whileHover={{ scale: 1.15, rotate: idx % 2 === 0 ? 5 : -5, boxShadow: "0 0 20px rgba(16, 185, 129, 0.4)" }}
+                className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center border border-primary/20 hover:border-primary/50 transition-all group text-primary"
+                whileHover={{ scale: 1.15, rotate: idx % 2 === 0 ? 5 : -5, boxShadow: "0 0 20px hsl(var(--primary) / 0.3)" }}
                 whileTap={{ scale: 0.95 }}
                 aria-label={social.label}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform">
                   <path d={social.icon} />
                 </svg>
               </motion.a>
@@ -163,7 +151,7 @@ Best regards,
           className="z-10 text-center lg:text-left flex-1"
         >
           <motion.h2
-            className="text-xl md:text-2xl mb-4 text-emerald-400 font-medium tracking-widest"
+            className="text-xl md:text-2xl mb-4 text-primary font-medium tracking-widest"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.8 }}
@@ -179,7 +167,7 @@ Best regards,
             <span className="text-gradient">ANANTH.N</span>
           </motion.h1>
           <motion.div
-            className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16"
+            className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-semibold mb-6 sm:mb-8 min-h-12 sm:min-h-16 text-foreground"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6, duration: 0.8 }}
@@ -202,7 +190,7 @@ Best regards,
             animate={{ opacity: 1 }}
             transition={{ delay: 0.9, duration: 0.8 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/10"></div>
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/10" />
             <p className="text-primary/80 italic font-medium tracking-wide">"{currentPickupLine}"</p>
           </motion.div>
 
@@ -218,7 +206,6 @@ Best regards,
                 Hire Me Now
                 <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
               </span>
-              <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity" />
             </motion.button>
 
             <motion.a
@@ -239,16 +226,16 @@ Best regards,
           {/* Information cards */}
           <div className="mt-8 sm:mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
-              { label: "Experience", value: "Teaching 150+ Students", icon: Briefcase, color: "text-primary" },
-              { label: "Location", value: "Madurai, Tamil Nadu", icon: MapPin, color: "text-primary" },
-              { label: "Vibe Skills", value: "AI, Python, React", icon: Code, color: "text-primary" }
+              { label: "Experience", value: "Teaching 150+ Students", icon: Briefcase },
+              { label: "Location", value: "Madurai, Tamil Nadu", icon: MapPin },
+              { label: "Vibe Skills", value: "AI, Python, React", icon: Code }
             ].map((card, i) => (
               <motion.div
                 key={i}
                 className="bg-card/50 backdrop-blur-sm p-4 rounded-2xl border border-border flex items-center gap-3 hover:border-primary/30 transition-colors"
                 whileHover={{ y: -5 }}
               >
-                <div className={`w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center ${card.color}`}>
+                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
                   <card.icon size={20} />
                 </div>
                 <div className="text-left">
