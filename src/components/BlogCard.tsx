@@ -89,7 +89,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
         whileTap={{ scale: 0.98 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         className={cn(
-          "group/card relative overflow-hidden glass-card cursor-pointer border border-white/10 hover:border-primary/50 transition-colors duration-500",
+          "group/card relative overflow-hidden rounded-xl cursor-pointer border border-border bg-card shadow-sm hover:shadow-lg hover:border-primary/50 transition-all duration-500",
           featured ? "md:grid md:grid-cols-2 gap-0" : "flex flex-col h-full"
         )}
         onClick={onClick}
