@@ -1,4 +1,4 @@
-import React, { useState, useCallback, memo, lazy, Suspense } from 'react'
+import React, { useState, useCallback, memo, lazy, Suspense, useMemo } from 'react'
 import { BlogPost as BlogPostType } from '@/lib/supabase'
 import { adminAuth } from '@/lib/auth'
 import { useBlogOperations } from '@/hooks/useBlogOperations'
@@ -16,6 +16,10 @@ const PostEditor = lazy(() => import('./admin/PostEditor').then(module => ({ def
 const CliTerminal = lazy(() => import('./admin/CliTerminal').then(module => ({ default: module.CliTerminal })))
 const PostsTable = lazy(() => import('./admin/PostsTable').then(module => ({ default: module.PostsTable })))
 const DashboardContent = lazy(() => import('./admin/DashboardContent').then(module => ({ default: module.DashboardContent })))
+const AnalyticsView = lazy(() => import('./admin/AnalyticsView').then(module => ({ default: module.AnalyticsView })))
+const CommentsView = lazy(() => import('./admin/CommentsView').then(module => ({ default: module.CommentsView })))
+const AppearanceView = lazy(() => import('./admin/AppearanceView').then(module => ({ default: module.AppearanceView })))
+const SettingsView = lazy(() => import('./admin/SettingsView').then(module => ({ default: module.SettingsView })))
 
 interface AdminDashboardProps {
   onLogout: () => void
@@ -26,6 +30,7 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [showEditor, setShowEditor] = useState(false)
   const [editingPost, setEditingPost] = useState<BlogPostType | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
 
   // Use optimized data hook
   const {
@@ -39,6 +44,18 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
   } = useAdminData()
 
   const { createPost, updatePost, deletePost, isLoading: operationLoading } = useBlogOperations()
+
+  // Filter posts by search query
+  const filteredPosts = useMemo(() => {
+    if (!searchQuery.trim()) return posts
+    const q = searchQuery.toLowerCase()
+    return posts.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      p.excerpt.toLowerCase().includes(q) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(q)) ||
+      (p.author_name || '').toLowerCase().includes(q)
+    )
+  }, [posts, searchQuery])
 
   // --- Editor Logic ---
   const openEditor = useCallback((post?: BlogPostType) => {
@@ -96,6 +113,16 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
     adminAuth.logout()
     onLogout()
   }, [onLogout])
+
+  // Get view title
+  const viewTitles: Record<string, string> = {
+    dashboard: 'Dashboard',
+    posts: 'All Posts',
+    stats: 'Analytics',
+    comments: 'Comments',
+    appearance: 'Appearance',
+    settings: 'Settings',
+  }
 
   // Show editor
   if (showEditor) {
@@ -155,10 +182,12 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
         <AdminHeader
           toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           isSidebarCollapsed={isSidebarCollapsed}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
         />
 
         <main className="flex-1 overflow-y-auto p-8 relative">
-          {/* Background - simplified for performance */}
+          {/* Background */}
           <div className="fixed inset-0 bg-gradient-to-br from-primary/5 via-background to-secondary/5 -z-20" />
 
           <div className="max-w-7xl mx-auto space-y-8">
@@ -166,10 +195,15 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">
-                  {activeView === 'dashboard' ? 'Dashboard' : activeView.charAt(0).toUpperCase() + activeView.slice(1)}
+                  {viewTitles[activeView] || activeView.charAt(0).toUpperCase() + activeView.slice(1)}
                 </h1>
                 <p className="text-muted-foreground mt-1">
-                  Welcome back, Admin. Here's what's happening today.
+                  {activeView === 'dashboard' && 'Welcome back, Admin. Here\'s what\'s happening today.'}
+                  {activeView === 'posts' && `${filteredPosts.length} posts${searchQuery ? ` matching "${searchQuery}"` : ''}`}
+                  {activeView === 'stats' && 'Deep dive into your blog metrics'}
+                  {activeView === 'comments' && 'Manage reader engagement'}
+                  {activeView === 'appearance' && 'Customize your admin experience'}
+                  {activeView === 'settings' && 'Manage your account and system'}
                 </p>
               </div>
               <div className="flex items-center gap-3">
@@ -182,13 +216,15 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
                 >
                   <RefreshCw className={`w-4 h-4 ${(postsLoading || commentsLoading || operationLoading) ? 'animate-spin' : ''}`} />
                 </Button>
-                <Button
-                  onClick={() => openEditor()}
-                  disabled={operationLoading}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Create Post
-                </Button>
+                {(activeView === 'dashboard' || activeView === 'posts') && (
+                  <Button
+                    onClick={() => openEditor()}
+                    disabled={operationLoading}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/20"
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> Create Post
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -205,9 +241,9 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
               </Alert>
             )}
 
-            {/* Content - no heavy animations */}
-            {activeView === 'dashboard' && (
-              <Suspense fallback={<AdminDashboardSkeleton />}>
+            {/* Content Views */}
+            <Suspense fallback={<AdminDashboardSkeleton />}>
+              {activeView === 'dashboard' && (
                 <DashboardContent
                   posts={posts}
                   comments={comments}
@@ -216,25 +252,39 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
                   onDelete={handleDelete}
                   onView={handleViewPost}
                 />
-              </Suspense>
-            )}
+              )}
 
-            {activeView === 'posts' && (
-              <div>
-                {postsLoading ? (
-                  <AdminTableSkeleton />
-                ) : (
-                  <Suspense fallback={<AdminTableSkeleton />}>
+              {activeView === 'posts' && (
+                <div>
+                  {postsLoading ? (
+                    <AdminTableSkeleton />
+                  ) : (
                     <PostsTable
-                      posts={posts}
+                      posts={filteredPosts}
                       onEdit={openEditor}
                       onDelete={handleDelete}
                       onView={handleViewPost}
                     />
-                  </Suspense>
-                )}
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+
+              {activeView === 'stats' && (
+                <AnalyticsView posts={posts} comments={comments} />
+              )}
+
+              {activeView === 'comments' && (
+                <CommentsView comments={comments} isLoading={commentsLoading} />
+              )}
+
+              {activeView === 'appearance' && (
+                <AppearanceView />
+              )}
+
+              {activeView === 'settings' && (
+                <SettingsView onLogout={handleLogout} />
+              )}
+            </Suspense>
           </div>
         </main>
       </div>
