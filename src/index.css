@@ -1144,15 +1144,102 @@ select:focus-visible {
   line-height: 1.5;
 }
 
-/* Blog post content spacing */
-.blog-content>*+* {
-  margin-top: 1.5rem;
+/* Blog post content spacing - tighter, no excessive gaps */
+.blog-content > * + * {
+  margin-top: 0.5em;
 }
 
-.blog-content h1+*,
-.blog-content h2+*,
-.blog-content h3+* {
-  margin-top: 0.5rem;
+.blog-content .blog-h1 + *,
+.blog-content .blog-h2 + *,
+.blog-content .blog-h3 + * {
+  margin-top: 0.25em;
+}
+
+.blog-content .blog-paragraph + .blog-paragraph {
+  margin-top: 0.4em;
+}
+
+.blog-content .blog-code-wrapper + *,
+.blog-content .blog-table-wrapper + *,
+.blog-content .blog-image-figure + *,
+.blog-content .blog-blockquote + * {
+  margin-top: 0.75em;
+}
+
+/* Mermaid / ASCII diagram blocks */
+.blog-content .blog-diagram {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 0.75em 0;
+  overflow-x: auto;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  color: hsl(var(--foreground));
+  white-space: pre;
+}
+
+.blog-content .blog-diagram-label {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.2rem 0.6rem;
+  font-size: 0.7rem;
+  color: hsl(var(--accent-foreground));
+  background-color: hsl(var(--accent));
+  border-radius: 0 0.75rem 0 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Checklist items */
+.blog-content .blog-checklist {
+  list-style: none;
+  padding-left: 0;
+  margin: 0.35em 0;
+}
+
+.blog-content .blog-checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.15em 0;
+  color: hsl(var(--muted-foreground));
+}
+
+.blog-content .blog-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 3px;
+  border: 1.5px solid hsl(var(--border));
+  flex-shrink: 0;
+}
+
+.blog-content .blog-check.checked {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Footnotes */
+.blog-content .blog-footnote {
+  font-size: 0.8rem;
+  vertical-align: super;
+  color: hsl(var(--primary));
+  cursor: pointer;
+}
+
+/* Highlight / mark */
+.blog-content mark {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+  padding: 0.1em 0.3em;
+  border-radius: 0.2em;
 }
 
 /* Responsive blog layout */
