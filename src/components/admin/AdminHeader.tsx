@@ -1,5 +1,5 @@
 import React from 'react'
-import { Search, Bell, Maximize2, Minimize2, Menu, Globe } from 'lucide-react'
+import { Search, Bell, Menu, Globe } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -15,9 +15,11 @@ import {
 interface AdminHeaderProps {
   toggleSidebar: () => void
   isSidebarCollapsed: boolean
+  searchQuery?: string
+  onSearchChange?: (query: string) => void
 }
 
-export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed }: AdminHeaderProps) => {
+export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed, searchQuery = '', onSearchChange }: AdminHeaderProps) => {
   return (
     <header className="h-16 bg-background/80 backdrop-blur-md border-b border-border sticky top-0 z-30 flex items-center justify-between px-6 transition-all duration-300">
       <div className="flex items-center gap-4">
@@ -28,7 +30,9 @@ export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed }: AdminHeaderPr
         <div className="relative hidden md:block">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input 
-            placeholder="Search anything..." 
+            placeholder="Search posts..." 
+            value={searchQuery}
+            onChange={e => onSearchChange?.(e.target.value)}
             className="pl-9 w-64 bg-muted/50 border-transparent focus:bg-background focus:border-primary/20 transition-all rounded-full h-9" 
           />
         </div>
@@ -41,7 +45,7 @@ export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed }: AdminHeaderPr
 
         <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground relative">
           <Bell className="w-5 h-5" />
-          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-destructive rounded-full animate-pulse" />
         </Button>
 
         <DropdownMenu>
@@ -62,7 +66,6 @@ export const AdminHeader = ({ toggleSidebar, isSidebarCollapsed }: AdminHeaderPr
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Billing</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
