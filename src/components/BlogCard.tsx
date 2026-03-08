@@ -213,7 +213,12 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
 
       {/* Share Dialog - Centered, with QR code and copy */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="glass-card text-foreground sm:max-w-md mx-auto" onClick={(e) => e.stopPropagation()}>
+        <DialogContent
+          className="glass-card text-foreground sm:max-w-md mx-auto"
+          onClick={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+          onPointerMove={(e) => e.stopPropagation()}
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-center text-foreground">Share this post</DialogTitle>
             <DialogDescription className="text-center text-muted-foreground text-sm">
@@ -222,18 +227,16 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           </DialogHeader>
 
           <div className="flex flex-col items-center py-4 space-y-5">
-            {/* QR Code */}
-            <div className="bg-white p-3 rounded-xl shadow-lg">
+            <div className="bg-white p-3 rounded-xl shadow-lg select-none">
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(shareUrl)}&format=png`}
                 alt="QR Code"
-                className="w-44 h-44 block"
+                className="w-44 h-44 block pointer-events-none"
                 draggable={false}
                 style={{ imageRendering: 'pixelated' }}
               />
             </div>
 
-            {/* URL Copy */}
             <div className="w-full space-y-2">
               <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Post URL</label>
               <div className="flex gap-2">
