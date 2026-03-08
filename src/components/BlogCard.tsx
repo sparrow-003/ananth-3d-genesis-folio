@@ -168,7 +168,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
           </p>
 
           {/* Footer Actions */}
-          <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/5">
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-border">
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
