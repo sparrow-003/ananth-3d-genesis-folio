@@ -220,7 +220,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
       {/* Share Dialog - Centered, with QR code and copy */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
         <DialogContent
-          className="glass-card text-foreground sm:max-w-md mx-auto"
+          className="bg-card/95 backdrop-blur-xl border border-border text-foreground sm:max-w-md mx-auto rounded-xl shadow-2xl"
           onClick={(e) => e.stopPropagation()}
           onPointerDown={(e) => e.stopPropagation()}
           onPointerMove={(e) => e.stopPropagation()}
