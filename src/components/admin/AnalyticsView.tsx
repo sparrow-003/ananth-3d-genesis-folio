@@ -66,6 +66,10 @@ const detectAnomalies = (data: number[]): boolean[] => {
 
 export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 30), to: new Date() })
+  
+  const handleDateRangeSelect = (range: { from?: Date; to?: Date } | undefined) => {
+    setDateRange({ from: range?.from, to: range?.to })
+  }
   const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>('all')
   const [predictionDays, setPredictionDays] = useState<7 | 30>(7)
 
