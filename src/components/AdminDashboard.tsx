@@ -11,8 +11,8 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Plus, RefreshCw, AlertCircle, Loader2 } from 'lucide-react'
 import { AdminTableSkeleton, AdminDashboardSkeleton } from '@/components/skeletons/AdminSkeleton'
 
-// Lazy load heavy components
-const PostEditor = lazy(() => import('./admin/PostEditor').then(module => ({ default: module.PostEditor })))
+// Lazy load heavy components - use enhanced editor
+const PostEditor = lazy(() => import('./admin/EnhancedPostEditor').then(module => ({ default: module.PostEditor })))
 const CliTerminal = lazy(() => import('./admin/CliTerminal').then(module => ({ default: module.CliTerminal })))
 const PostsTable = lazy(() => import('./admin/PostsTable').then(module => ({ default: module.PostsTable })))
 const DashboardContent = lazy(() => import('./admin/DashboardContent').then(module => ({ default: module.DashboardContent })))
