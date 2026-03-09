@@ -363,6 +363,7 @@ export const PostsTable = memo(({ posts, onEdit, onDelete, onView }: PostsTableP
                   onEdit={onEdit}
                   onDelete={onDelete}
                   onView={onView}
+                  onUpdateStats={onUpdateStats}
                 />
               </motion.tr>
             ))
