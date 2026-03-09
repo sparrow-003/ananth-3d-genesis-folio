@@ -276,6 +276,7 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
                       onEdit={openEditor}
                       onDelete={handleDelete}
                       onView={handleViewPost}
+                      onUpdateStats={handleUpdateStats}
                     />
                   )}
                 </div>

@@ -311,7 +311,7 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
 
 PostRow.displayName = 'PostRow'
 
-export const PostsTable = memo(({ posts, onEdit, onDelete, onView }: PostsTableProps) => {
+export const PostsTable = memo(({ posts, onEdit, onDelete, onView, onUpdateStats }: PostsTableProps) => {
   const container = {
     hidden: { opacity: 0 },
     show: {
