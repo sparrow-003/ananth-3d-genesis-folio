@@ -571,7 +571,6 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
           <Switch
             checked={focusMode}
             onCheckedChange={setFocusMode}
-            size="sm"
           />
         </div>
       </div>
