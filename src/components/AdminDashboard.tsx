@@ -109,6 +109,17 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
     await deletePost(id)
   }, [deletePost])
 
+  const handleUpdateStats = useCallback(async (id: string, views: number, likes: number) => {
+    try {
+      await updatePost(id, { views_count: views, likes_count: likes })
+      toast.success('Stats updated successfully!')
+    } catch (error: any) {
+      console.error('Error updating stats:', error)
+      toast.error('Failed to update stats')
+      throw error
+    }
+  }, [updatePost])
+
   const handleLogout = useCallback(() => {
     adminAuth.logout()
     onLogout()
@@ -264,6 +275,7 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
                       onEdit={openEditor}
                       onDelete={handleDelete}
                       onView={handleViewPost}
+                      onUpdateStats={handleUpdateStats}
                     />
                   )}
                 </div>
