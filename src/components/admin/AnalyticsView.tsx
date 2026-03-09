@@ -327,11 +327,11 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                 <p className="text-2xl font-bold mt-1">{stats.totalViews.toLocaleString()}</p>
                 <div className="flex items-center gap-1 mt-1">
                   {parseFloat(stats.viewsGrowth) >= 0 ? (
-                    <ArrowUp className="w-3 h-3 text-green-500" />
+                    <ArrowUp className="w-3 h-3 text-chart-3" />
                   ) : (
-                    <ArrowDown className="w-3 h-3 text-red-500" />
+                    <ArrowDown className="w-3 h-3 text-destructive" />
                   )}
-                  <span className={cn("text-xs font-medium", parseFloat(stats.viewsGrowth) >= 0 ? "text-green-500" : "text-red-500")}>
+                  <span className={cn("text-xs font-medium", parseFloat(stats.viewsGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
                     {stats.viewsGrowth}%
                   </span>
                   <span className="text-xs text-muted-foreground">vs prev</span>
@@ -352,11 +352,11 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                 <p className="text-2xl font-bold mt-1">{stats.totalLikes.toLocaleString()}</p>
                 <div className="flex items-center gap-1 mt-1">
                   {parseFloat(stats.likesGrowth) >= 0 ? (
-                    <ArrowUp className="w-3 h-3 text-green-500" />
+                    <ArrowUp className="w-3 h-3 text-chart-3" />
                   ) : (
-                    <ArrowDown className="w-3 h-3 text-red-500" />
+                    <ArrowDown className="w-3 h-3 text-destructive" />
                   )}
-                  <span className={cn("text-xs font-medium", parseFloat(stats.likesGrowth) >= 0 ? "text-green-500" : "text-red-500")}>
+                  <span className={cn("text-xs font-medium", parseFloat(stats.likesGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
                     {stats.likesGrowth}%
                   </span>
                   <span className="text-xs text-muted-foreground">vs prev</span>
