@@ -82,11 +82,130 @@ const StatusBadge = memo(({ post }: { post: BlogPost }) => {
 
 StatusBadge.displayName = 'StatusBadge'
 
-const PostRow = memo(({ post, onEdit, onDelete, onView }: {
+// Stats Editor Component
+const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: string, views: number, likes: number) => Promise<void> }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [views, setViews] = useState(post.views_count)
+  const [likes, setLikes] = useState(post.likes_count)
+  const [isUpdating, setIsUpdating] = useState(false)
+
+  const handleSave = async () => {
+    if (!onUpdate) return
+    
+    try {
+      setIsUpdating(true)
+      await onUpdate(post.id, views, likes)
+      setIsOpen(false)
+    } catch (error) {
+      console.error('Failed to update stats:', error)
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setViews(post.views_count)
+    setLikes(post.likes_count)
+    setIsOpen(false)
+  }
+
+  return (
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <div className="flex items-center justify-end gap-4 text-sm cursor-pointer">
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors group">
+                <Eye className="w-3 h-3" />
+                <span>{post.views_count.toLocaleString()}</span>
+                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{onUpdate ? 'Click to edit views' : 'Views'}</p>
+            </TooltipContent>
+          </Tooltip>
+          
+          <Tooltip>
+            <TooltipTrigger>
+              <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors group">
+                <Heart className="w-3 h-3" />
+                <span>{post.likes_count.toLocaleString()}</span>
+                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{onUpdate ? 'Click to edit likes' : 'Likes'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </PopoverTrigger>
+      
+      {onUpdate && (
+        <PopoverContent className="w-64" align="end">
+          <div className="space-y-4">
+            <h4 className="font-semibold text-sm">Edit Stats</h4>
+            
+            <div className="grid gap-3">
+              <div className="space-y-1">
+                <Label htmlFor="views" className="text-xs">Views</Label>
+                <Input
+                  id="views"
+                  type="number"
+                  min="0"
+                  value={views}
+                  onChange={(e) => setViews(parseInt(e.target.value) || 0)}
+                  className="h-8"
+                />
+              </div>
+              
+              <div className="space-y-1">
+                <Label htmlFor="likes" className="text-xs">Likes</Label>
+                <Input
+                  id="likes"
+                  type="number"
+                  min="0"
+                  value={likes}
+                  onChange={(e) => setLikes(parseInt(e.target.value) || 0)}
+                  className="h-8"
+                />
+              </div>
+            </div>
+            
+            <div className="flex justify-end gap-2">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handleCancel}
+                disabled={isUpdating}
+              >
+                <X className="w-3 h-3 mr-1" />
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={isUpdating}
+              >
+                <Check className="w-3 h-3 mr-1" />
+                {isUpdating ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          </div>
+        </PopoverContent>
+      )}
+    </Popover>
+  )
+})
+
+StatsEditor.displayName = 'StatsEditor'
+
+const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
   post: BlogPost
   onEdit: (post: BlogPost) => void
   onDelete: (id: string) => void
   onView: (post: BlogPost) => void
+  onUpdateStats?: (id: string, views: number, likes: number) => Promise<void>
 }) => {
   const isScheduled = post.published && post.publish_at && new Date(post.publish_at) > new Date()
   const publishDate = post.publish_at ? new Date(post.publish_at) : new Date(post.created_at)
