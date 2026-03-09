@@ -288,8 +288,8 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             <PopoverContent className="w-auto p-0" align="end">
               <Calendar
                 mode="range"
-                selected={dateRange}
-                onSelect={(range) => setDateRange(range || { from: undefined, to: undefined })}
+                selected={{ from: dateRange.from, to: dateRange.to }}
+                onSelect={handleDateRangeSelect}
                 numberOfMonths={2}
                 className="pointer-events-auto"
               />
