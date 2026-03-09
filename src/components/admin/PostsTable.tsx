@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState } from 'react'
 import { motion } from 'framer-motion'
 import { format } from 'date-fns'
 import { 
@@ -13,11 +13,16 @@ import {
   Calendar,
   User,
   MessageSquare,
-  Heart
+  Heart,
+  Edit3,
+  Check,
+  X
 } from 'lucide-react'
 import { BlogPost } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +44,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 interface PostsTableProps {
   posts: BlogPost[]
