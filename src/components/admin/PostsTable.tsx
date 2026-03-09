@@ -269,31 +269,7 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
       </TableCell>
       
       <TableCell className="text-right">
-        <div className="flex items-center justify-end gap-4 text-sm">
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-                <Eye className="w-3 h-3" />
-                <span>{post.views_count.toLocaleString()}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Views</p>
-            </TooltipContent>
-          </Tooltip>
-          
-          <Tooltip>
-            <TooltipTrigger>
-              <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors">
-                <Heart className="w-3 h-3" />
-                <span>{post.likes_count.toLocaleString()}</span>
-              </div>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Likes</p>
-            </TooltipContent>
-          </Tooltip>
-        </div>
+        <StatsEditor post={post} onUpdate={onUpdateStats} />
       </TableCell>
       
       <TableCell className="text-right">
