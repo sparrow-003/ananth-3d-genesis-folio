@@ -599,7 +599,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground uppercase">Views Growth</p>
-                <p className={cn("text-xl font-bold mt-1", parseFloat(stats.viewsGrowth) >= 0 ? "text-green-500" : "text-red-500")}>
+                <p className={cn("text-xl font-bold mt-1", parseFloat(stats.viewsGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
                   {parseFloat(stats.viewsGrowth) >= 0 ? '+' : ''}{stats.viewsGrowth}%
                 </p>
               </CardContent>
@@ -607,7 +607,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground uppercase">Likes Growth</p>
-                <p className={cn("text-xl font-bold mt-1", parseFloat(stats.likesGrowth) >= 0 ? "text-green-500" : "text-red-500")}>
+                <p className={cn("text-xl font-bold mt-1", parseFloat(stats.likesGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
                   {parseFloat(stats.likesGrowth) >= 0 ? '+' : ''}{stats.likesGrowth}%
                 </p>
               </CardContent>
