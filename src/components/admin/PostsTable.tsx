@@ -55,6 +55,7 @@ interface PostsTableProps {
   onEdit: (post: BlogPost) => void
   onDelete: (id: string) => void
   onView: (post: BlogPost) => void
+  onUpdateStats?: (id: string, views: number, likes: number) => Promise<void>
 }
 
 const StatusBadge = memo(({ post }: { post: BlogPost }) => {
