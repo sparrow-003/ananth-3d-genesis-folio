@@ -790,10 +790,10 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                       )}
                     </>
                   )}
-                  
-                  <div 
-                    className="min-h-[200px]"
-                    dangerouslySetInnerHTML={{ __html: parseMarkdown(formData.content || (showPreviewSplit ? '' : '*Start writing to see preview...*')) }} 
+
+                  <div
+                    className="blog-content min-h-[200px]"
+                    dangerouslySetInnerHTML={{ __html: parseMarkdown(formData.content || (showPreviewSplit ? '' : '*Start writing to see preview...*')) }}
                   />
                 </div>
               )}

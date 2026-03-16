@@ -559,6 +559,26 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                 <TooltipContent>Image</TooltipContent>
               </Tooltip>
             </div>
+
+            {/* Tables & Dividers */}
+            <div className="flex items-center border-l border-border pl-2 ml-2 gap-1">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('| Header 1 | Header 2 |\n| --- | --- |\n| Cell 1 | Cell 2 |\n| Cell 3 | Cell 4 |')}>
+                    <TableIcon className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Table</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="sm" onClick={() => insertMarkdown('\n---\n')}>
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Divider</TooltipContent>
+              </Tooltip>
+            </div>
           </TooltipProvider>
         </div>
 
@@ -1070,7 +1090,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
 
               {/* Preview Column */}
               {(activeTab === 'preview' || showPreviewSplit) && (
-                <motion.div 
+                <motion.div
                   className={cn(
                     "prose dark:prose-invert prose-lg max-w-none overflow-y-auto h-full pr-4",
                     showPreviewSplit ? "border-l border-border pl-8" : ""
@@ -1084,10 +1104,10 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                       <h1 className="text-4xl font-bold">{formData.title || 'Untitled Post'}</h1>
                       {formData.featured_image && (
                         <div className="my-8">
-                          <img 
-                            src={formData.featured_image} 
-                            alt="Cover" 
-                            className="w-full h-64 object-cover rounded-xl shadow-lg" 
+                          <img
+                            src={formData.featured_image}
+                            alt="Cover"
+                            className="w-full h-64 object-cover rounded-xl shadow-lg"
                           />
                         </div>
                       )}
@@ -1104,12 +1124,12 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
                       </div>
                     </>
                   )}
-                  
-                  <div 
-                    className="min-h-[200px]"
-                    dangerouslySetInnerHTML={{ 
-                      __html: parseMarkdown(formData.content || (showPreviewSplit ? '' : '*Start writing to see preview...*')) 
-                    }} 
+
+                  <div
+                    className="blog-content min-h-[200px]"
+                    dangerouslySetInnerHTML={{
+                      __html: parseMarkdown(formData.content || (showPreviewSplit ? '' : '*Start writing to see preview...*'))
+                    }}
                   />
                 </motion.div>
               )}
