@@ -950,7 +950,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
           </div>
         </TabsContent>
       </Tabs>
-    </div>
+    </motion.div>
   )
 })
 
