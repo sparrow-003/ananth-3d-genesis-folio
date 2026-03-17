@@ -16,7 +16,7 @@ import {
 import { supabase } from '@/integrations/supabase/client'
 import { toast } from 'sonner'
 import { motion } from 'framer-motion'
-import { useTheme } from '@/components/ThemeProvider'
+import { useTheme } from '@/components/theme-provider'
 import { Badge } from '@/components/ui/badge'
 import {
   Select,

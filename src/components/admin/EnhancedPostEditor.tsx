@@ -183,7 +183,7 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [saveHistory, setSaveHistory] = useState<string[]>([])
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const autoSaveRef = useRef<NodeJS.Timeout>()
+  const autoSaveRef = useRef<ReturnType<typeof setTimeout>>()
 
   // SEO Score calculation
   const seoAnalysis = useMemo(() => calculateSEOScore(formData), [formData])
