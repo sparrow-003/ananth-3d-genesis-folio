@@ -11,7 +11,7 @@ interface AnimatedTextProps {
 const AnimatedText = ({ texts, interval = 3000, className = '' }: AnimatedTextProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     // Clear any existing intervals to prevent memory leaks

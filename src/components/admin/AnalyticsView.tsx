@@ -20,7 +20,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart,
-  RadialBarChart, RadialBar, Gauge
+  RadialBarChart, RadialBar
 } from 'recharts'
 
 interface AnalyticsViewProps {
