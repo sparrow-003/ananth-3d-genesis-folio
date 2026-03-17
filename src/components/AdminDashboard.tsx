@@ -109,9 +109,19 @@ const AdminDashboard = memo(({ onLogout }: AdminDashboardProps) => {
     await deletePost(id)
   }, [deletePost])
 
-  const handleUpdateStats = useCallback(async (id: string, views: number, likes: number) => {
+  const handleUpdateStats = useCallback(async (id: string, views: number, likes: number, displayViews?: number, displayLikes?: number) => {
     try {
-      await updatePost(id, { views_count: views, likes_count: likes })
+      const updates: any = {}
+      
+      // Update real counts if provided
+      if (views !== undefined) updates.views_count = views
+      if (likes !== undefined) updates.likes_count = likes
+      
+      // Update display counts if provided
+      if (displayViews !== undefined) updates.display_views_count = displayViews
+      if (displayLikes !== undefined) updates.display_likes_count = displayLikes
+      
+      await updatePost(id, updates)
       toast.success('Stats updated successfully!')
     } catch (error: any) {
       console.error('Error updating stats:', error)

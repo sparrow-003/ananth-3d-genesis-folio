@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useCallback } from 'react'
+import React, { memo, useMemo, useState, useCallback, useEffect } from 'react'
 import { BlogPost as BlogPostType } from '@/lib/supabase'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -7,16 +7,20 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
-import { 
-  BarChart2, Eye, Heart, TrendingUp, FileText, Calendar as CalendarIcon, 
+import { Progress } from '@/components/ui/progress'
+import {
+  BarChart2, Eye, Heart, TrendingUp, FileText, Calendar as CalendarIcon,
   Download, Filter, AlertTriangle, ArrowUp, ArrowDown, Target, Users,
-  Activity, Zap, RefreshCw
+  Activity, Zap, RefreshCw, DollarSign, MousePointer, Award, Sparkles,
+  Eye as EyeIcon, Heart as HeartIcon, TrendingUp as TrendingUpIcon
 } from 'lucide-react'
 import { format, subDays, isWithinInterval, startOfDay, endOfDay, differenceInDays, addDays } from 'date-fns'
 import { cn } from '@/lib/utils'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ComposedChart,
+  RadialBarChart, RadialBar, Gauge
 } from 'recharts'
 
 interface AnalyticsViewProps {
@@ -27,11 +31,40 @@ interface AnalyticsViewProps {
 type DateRange = { from: Date | undefined; to: Date | undefined }
 type SegmentFilter = 'all' | 'published' | 'drafts'
 
+// Animation variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.2
+    }
+  }
+}
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { duration: 0.5, ease: 'easeOut' } }
+}
+
+const cardVariants = {
+  hidden: { scale: 0.9, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { duration: 0.4, ease: 'easeOut' } }
+}
+
+const pulseAnimation = {
+  pulse: {
+    scale: [1, 1.05, 1],
+    transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' }
+  }
+}
+
 // Simple linear regression for predictions
 const linearRegression = (data: number[]) => {
   const n = data.length
   if (n < 2) return { slope: 0, intercept: data[0] || 0 }
-  
+
   let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0
   for (let i = 0; i < n; i++) {
     sumX += i
@@ -39,10 +72,10 @@ const linearRegression = (data: number[]) => {
     sumXY += i * data[i]
     sumXX += i * i
   }
-  
+
   const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX)
   const intercept = (sumY - slope * sumX) / n
-  
+
   return { slope, intercept }
 }
 
@@ -60,18 +93,53 @@ const detectAnomalies = (data: number[]): boolean[] => {
   if (data.length < 3) return data.map(() => false)
   const mean = data.reduce((a, b) => a + b, 0) / data.length
   const std = Math.sqrt(data.reduce((a, b) => a + (b - mean) ** 2, 0) / data.length)
-  const threshold = 2 // 2 standard deviations
+  const threshold = 2
   return data.map(v => std > 0 && Math.abs(v - mean) > threshold * std)
+}
+
+// Animated number component
+const AnimatedNumber = ({ value, prefix = '', suffix = '', decimals = 0 }: { value: number; prefix?: string; suffix?: string; decimals?: number }) => {
+  const [displayValue, setDisplayValue] = useState(0)
+
+  useEffect(() => {
+    const duration = 1500
+    const startValue = displayValue
+    const change = value - startValue
+    const startTime = performance.now()
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      
+      // Ease out quart
+      const eased = 1 - Math.pow(1 - progress, 4)
+      
+      setDisplayValue(startValue + (change * eased))
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [value])
+
+  return (
+    <span>
+      {prefix}{displayValue.toFixed(decimals)}{suffix}
+    </span>
+  )
 }
 
 export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
   const [dateRange, setDateRange] = useState<DateRange>({ from: subDays(new Date(), 30), to: new Date() })
-  
+  const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>('all')
+  const [predictionDays, setPredictionDays] = useState<7 | 30>(7)
+  const [activeTab, setActiveTab] = useState('overview')
+
   const handleDateRangeSelect = (range: { from?: Date; to?: Date } | undefined) => {
     setDateRange({ from: range?.from, to: range?.to })
   }
-  const [segmentFilter, setSegmentFilter] = useState<SegmentFilter>('all')
-  const [predictionDays, setPredictionDays] = useState<7 | 30>(7)
 
   // Filter posts by date range and segment
   const filteredPosts = useMemo(() => {
@@ -81,59 +149,94 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
         start: startOfDay(dateRange.from),
         end: endOfDay(dateRange.to)
       })
-      const matchesSegment = segmentFilter === 'all' || 
+      const matchesSegment = segmentFilter === 'all' ||
         (segmentFilter === 'published' && post.published) ||
         (segmentFilter === 'drafts' && !post.published)
       return inDateRange && matchesSegment
     })
   }, [posts, dateRange, segmentFilter])
 
-  // Calculate comprehensive stats
+  // Calculate comprehensive stats - SEPARATE REAL vs DISPLAY
   const stats = useMemo(() => {
-    const totalViews = filteredPosts.reduce((acc, p) => acc + (p.views_count ?? 0), 0)
-    const totalLikes = filteredPosts.reduce((acc, p) => acc + (p.likes_count ?? 0), 0)
+    // REAL counts (for analytics)
+    const totalRealViews = filteredPosts.reduce((acc, p) => acc + (p.views_count ?? 0), 0)
+    const totalRealLikes = filteredPosts.reduce((acc, p) => acc + (p.likes_count ?? 0), 0)
+    
+    // DISPLAY counts (what users see - can be inflated by admin)
+    const totalDisplayViews = filteredPosts.reduce((acc, p) => acc + (p.display_views_count ?? p.views_count ?? 0), 0)
+    const totalDisplayLikes = filteredPosts.reduce((acc, p) => acc + (p.display_likes_count ?? p.likes_count ?? 0), 0)
+    
     const publishedPosts = filteredPosts.filter(p => p.published)
     const draftPosts = filteredPosts.filter(p => !p.published)
-    const avgViews = publishedPosts.length > 0 ? Math.round(totalViews / publishedPosts.length) : 0
-    const avgLikes = publishedPosts.length > 0 ? Math.round(totalLikes / publishedPosts.length) : 0
-    const topPosts = [...filteredPosts].sort((a, b) => (b.views_count ?? 0) - (a.views_count ?? 0)).slice(0, 5)
-    const mostLiked = [...filteredPosts].sort((a, b) => (b.likes_count ?? 0) - (a.likes_count ?? 0)).slice(0, 5)
+    const avgRealViews = publishedPosts.length > 0 ? Math.round(totalRealViews / publishedPosts.length) : 0
+    const avgRealLikes = publishedPosts.length > 0 ? Math.round(totalRealLikes / publishedPosts.length) : 0
+    const avgDisplayViews = publishedPosts.length > 0 ? Math.round(totalDisplayViews / publishedPosts.length) : 0
+    const avgDisplayLikes = publishedPosts.length > 0 ? Math.round(totalDisplayLikes / publishedPosts.length) : 0
+    
+    const topPosts = [...filteredPosts].sort((a, b) => (b.display_views_count ?? b.views_count ?? 0) - (a.display_views_count ?? a.views_count ?? 0)).slice(0, 5)
+    const mostLiked = [...filteredPosts].sort((a, b) => (b.display_likes_count ?? b.likes_count ?? 0) - (a.display_likes_count ?? a.likes_count ?? 0)).slice(0, 5)
     const recentComments = comments.slice(0, 10)
 
-    // Calculate engagement rate (likes / views)
-    const engagementRate = totalViews > 0 ? ((totalLikes / totalViews) * 100).toFixed(2) : '0.00'
+    // Calculate engagement rate (real likes / real views)
+    const realEngagementRate = totalRealViews > 0 ? ((totalRealLikes / totalRealViews) * 100).toFixed(2) : '0.00'
+    const displayEngagementRate = totalDisplayViews > 0 ? ((totalDisplayLikes / totalDisplayViews) * 100).toFixed(2) : '0.00'
 
     // Compare with previous period
     const daysDiff = dateRange.from && dateRange.to ? differenceInDays(dateRange.to, dateRange.from) : 30
     const prevPeriodStart = dateRange.from ? subDays(dateRange.from, daysDiff) : subDays(new Date(), 60)
     const prevPeriodEnd = dateRange.from ? subDays(dateRange.from, 1) : subDays(new Date(), 31)
-    
+
     const prevPosts = posts.filter(post => {
       const postDate = new Date(post.created_at)
       return isWithinInterval(postDate, { start: startOfDay(prevPeriodStart), end: endOfDay(prevPeriodEnd) })
     })
-    const prevViews = prevPosts.reduce((acc, p) => acc + (p.views_count ?? 0), 0)
-    const prevLikes = prevPosts.reduce((acc, p) => acc + (p.likes_count ?? 0), 0)
-    
-    const viewsGrowth = prevViews > 0 ? (((totalViews - prevViews) / prevViews) * 100).toFixed(1) : '0.0'
-    const likesGrowth = prevLikes > 0 ? (((totalLikes - prevLikes) / prevLikes) * 100).toFixed(1) : '0.0'
+    const prevRealViews = prevPosts.reduce((acc, p) => acc + (p.views_count ?? 0), 0)
+    const prevRealLikes = prevPosts.reduce((acc, p) => acc + (p.likes_count ?? 0), 0)
 
-    return { 
-      totalViews, totalLikes, publishedPosts, draftPosts, avgViews, avgLikes,
-      topPosts, mostLiked, recentComments, engagementRate, viewsGrowth, likesGrowth
+    const viewsGrowth = prevRealViews > 0 ? (((totalRealViews - prevRealViews) / prevRealViews) * 100).toFixed(1) : '0.0'
+    const likesGrowth = prevRealLikes > 0 ? (((totalRealLikes - prevRealLikes) / prevRealLikes) * 100).toFixed(1) : '0.0'
+
+    // Manipulation metrics
+    const viewManipulation = totalDisplayViews - totalRealViews
+    const likeManipulation = totalDisplayLikes - totalRealLikes
+    const viewManipulationPercent = totalRealViews > 0 ? ((viewManipulation / totalRealViews) * 100).toFixed(1) : '0.0'
+    const likeManipulationPercent = totalRealLikes > 0 ? ((likeManipulation / totalRealLikes) * 100).toFixed(1) : '0.0'
+
+    return {
+      totalRealViews,
+      totalRealLikes,
+      totalDisplayViews,
+      totalDisplayLikes,
+      publishedPosts,
+      draftPosts,
+      avgRealViews,
+      avgRealLikes,
+      avgDisplayViews,
+      avgDisplayLikes,
+      topPosts,
+      mostLiked,
+      recentComments,
+      realEngagementRate,
+      displayEngagementRate,
+      viewsGrowth,
+      likesGrowth,
+      viewManipulation,
+      likeManipulation,
+      viewManipulationPercent,
+      likeManipulationPercent
     }
   }, [filteredPosts, comments, dateRange, posts])
 
-  // Generate time-series data for charts
+  // Generate time-series data for charts (REAL data only for analytics)
   const timeSeriesData = useMemo(() => {
     const days = dateRange.from && dateRange.to ? differenceInDays(dateRange.to, dateRange.from) + 1 : 30
     const data: { date: string; views: number; likes: number; posts: number }[] = []
-    
+
     for (let i = 0; i < days; i++) {
       const date = dateRange.from ? addDays(dateRange.from, i) : subDays(new Date(), days - i - 1)
       const dateStr = format(date, 'yyyy-MM-dd')
       const dayPosts = filteredPosts.filter(p => format(new Date(p.created_at), 'yyyy-MM-dd') === dateStr)
-      
+
       data.push({
         date: format(date, 'MMM d'),
         views: dayPosts.reduce((acc, p) => acc + (p.views_count ?? 0), 0),
@@ -141,7 +244,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
         posts: dayPosts.length
       })
     }
-    
+
     return data
   }, [filteredPosts, dateRange])
 
@@ -149,12 +252,12 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
   const trendData = useMemo(() => {
     const views = timeSeriesData.map(d => d.views)
     const likes = timeSeriesData.map(d => d.likes)
-    
+
     const viewsMA = movingAverage(views, 5)
     const likesMA = movingAverage(likes, 5)
     const viewAnomalies = detectAnomalies(views)
     const likeAnomalies = detectAnomalies(likes)
-    
+
     return timeSeriesData.map((d, i) => ({
       ...d,
       viewsMA: Math.round(viewsMA[i]),
@@ -168,22 +271,22 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
   const predictionData = useMemo(() => {
     const views = timeSeriesData.map(d => d.views)
     const likes = timeSeriesData.map(d => d.likes)
-    
+
     const viewsReg = linearRegression(views)
     const likesReg = linearRegression(likes)
-    
+
     const predictions: { date: string; predictedViews: number; predictedLikes: number; upperBound: number; lowerBound: number }[] = []
     const lastDate = dateRange.to || new Date()
-    
+
     for (let i = 1; i <= predictionDays; i++) {
       const date = addDays(lastDate, i)
       const idx = views.length + i - 1
       const predictedViews = Math.max(0, Math.round(viewsReg.slope * idx + viewsReg.intercept))
       const predictedLikes = Math.max(0, Math.round(likesReg.slope * idx + likesReg.intercept))
-      
+
       // Confidence band (±20%)
       const variance = predictedViews * 0.2 * (i / predictionDays)
-      
+
       predictions.push({
         date: format(date, 'MMM d'),
         predictedViews,
@@ -192,17 +295,17 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
         lowerBound: Math.max(0, Math.round(predictedViews - variance))
       })
     }
-    
+
     return predictions
   }, [timeSeriesData, dateRange, predictionDays])
 
-  // Funnel data (conversion funnel simulation)
+  // Funnel data
   const funnelData = useMemo(() => {
-    const totalViews = stats.totalViews || 100
-    const readers = Math.round(totalViews * 0.65) // 65% read article
-    const engaged = stats.totalLikes + comments.length // likes + comments
-    const returning = Math.round(engaged * 0.3) // 30% return visitors estimate
-    
+    const totalViews = stats.totalRealViews || 100
+    const readers = Math.round(totalViews * 0.65)
+    const engaged = stats.totalRealLikes + comments.length
+    const returning = Math.round(engaged * 0.3)
+
     return [
       { name: 'Page Views', value: totalViews, fill: 'hsl(var(--primary))' },
       { name: 'Readers', value: readers, fill: 'hsl(var(--chart-2))' },
@@ -211,7 +314,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
     ]
   }, [stats, comments])
 
-  // Retention cohort data (simulated)
+  // Retention cohort data
   const cohortData = useMemo(() => {
     const cohorts = []
     for (let week = 0; week < 4; week++) {
@@ -243,16 +346,18 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
 
   // Export to CSV
   const exportToCSV = useCallback(() => {
-    const headers = ['Title', 'Published', 'Views', 'Likes', 'Created At', 'Tags']
+    const headers = ['Title', 'Published', 'Real Views', 'Display Views', 'Real Likes', 'Display Likes', 'Created At', 'Tags']
     const rows = filteredPosts.map(p => [
       `"${p.title.replace(/"/g, '""')}"`,
       p.published ? 'Yes' : 'No',
       p.views_count ?? 0,
+      p.display_views_count ?? p.views_count ?? 0,
       p.likes_count ?? 0,
+      p.display_likes_count ?? p.likes_count ?? 0,
       format(new Date(p.created_at), 'yyyy-MM-dd'),
       `"${(p.tags || []).join(', ')}"`
     ])
-    
+
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n')
     const blob = new Blob([csv], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
@@ -266,19 +371,26 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
   const CHART_COLORS = ['hsl(var(--primary))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))']
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      className="space-y-6"
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+    >
       {/* Header with filters */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <motion.div variants={itemVariants} className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold tracking-tight">Analytics Dashboard</h2>
+          <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
+            <Activity className="w-6 h-6 text-primary" />
+            Analytics Dashboard
+          </h2>
           <p className="text-muted-foreground text-sm mt-1">Advanced insights with trend analysis and predictions</p>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-3">
-          {/* Date Range Picker */}
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 hover:bg-primary/10 hover:border-primary/50 transition-all">
                 <CalendarIcon className="w-4 h-4" />
                 {dateRange.from && dateRange.to ? (
                   `${format(dateRange.from, 'MMM d')} - ${format(dateRange.to, 'MMM d')}`
@@ -296,9 +408,8 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             </PopoverContent>
           </Popover>
 
-          {/* Segment Filter */}
           <Select value={segmentFilter} onValueChange={(v: SegmentFilter) => setSegmentFilter(v)}>
-            <SelectTrigger className="w-[130px] h-9">
+            <SelectTrigger className="w-[130px] h-9 hover:bg-primary/10 hover:border-primary/50 transition-all">
               <Filter className="w-4 h-4 mr-2" />
               <SelectValue />
             </SelectTrigger>
@@ -309,242 +420,318 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             </SelectContent>
           </Select>
 
-          {/* Export Button */}
-          <Button variant="outline" size="sm" onClick={exportToCSV} className="gap-2">
+          <Button variant="outline" size="sm" onClick={exportToCSV} className="gap-2 hover:bg-primary/10 hover:border-primary/50 transition-all">
             <Download className="w-4 h-4" />
             Export CSV
           </Button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* KPI Cards with growth indicators */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Views</p>
-                <p className="text-2xl font-bold mt-1">{stats.totalViews.toLocaleString()}</p>
-                <div className="flex items-center gap-1 mt-1">
-                  {parseFloat(stats.viewsGrowth) >= 0 ? (
-                    <ArrowUp className="w-3 h-3 text-chart-3" />
-                  ) : (
-                    <ArrowDown className="w-3 h-3 text-destructive" />
-                  )}
-                  <span className={cn("text-xs font-medium", parseFloat(stats.viewsGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
-                    {stats.viewsGrowth}%
-                  </span>
-                  <span className="text-xs text-muted-foreground">vs prev</span>
+      {/* KPI Cards with REAL vs DISPLAY comparison */}
+      <motion.div variants={containerVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <motion.div variants={cardVariants}>
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 group">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Real Views</p>
+                  <p className="text-2xl font-bold mt-1 text-primary">
+                    <AnimatedNumber value={stats.totalRealViews} />
+                  </p>
+                  <div className="flex items-center gap-1 mt-1">
+                    {parseFloat(stats.viewsGrowth) >= 0 ? (
+                      <ArrowUp className="w-3 h-3 text-chart-3" />
+                    ) : (
+                      <ArrowDown className="w-3 h-3 text-destructive" />
+                    )}
+                    <span className={cn("text-xs font-medium", parseFloat(stats.viewsGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
+                      {stats.viewsGrowth}%
+                    </span>
+                    <span className="text-xs text-muted-foreground">vs prev</span>
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground">Display: <span className="text-foreground font-semibold">{stats.totalDisplayViews.toLocaleString()}</span></p>
+                    <p className="text-xs text-muted-foreground">Manipulation: <span className={cn("font-semibold", stats.viewManipulation > 0 ? "text-amber-500" : "text-muted-foreground")}>+{stats.viewManipulationPercent}%</span></p>
+                  </div>
                 </div>
+                <motion.div 
+                  className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:scale-110 transition-transform"
+                  animate={pulseAnimation.pulse}
+                >
+                  <Eye className="w-6 h-6 text-primary" />
+                </motion.div>
               </div>
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Total Likes</p>
-                <p className="text-2xl font-bold mt-1">{stats.totalLikes.toLocaleString()}</p>
-                <div className="flex items-center gap-1 mt-1">
-                  {parseFloat(stats.likesGrowth) >= 0 ? (
-                    <ArrowUp className="w-3 h-3 text-chart-3" />
-                  ) : (
-                    <ArrowDown className="w-3 h-3 text-destructive" />
-                  )}
-                  <span className={cn("text-xs font-medium", parseFloat(stats.likesGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
-                    {stats.likesGrowth}%
-                  </span>
-                  <span className="text-xs text-muted-foreground">vs prev</span>
+        <motion.div variants={cardVariants}>
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-destructive/50 transition-all duration-300 hover:shadow-lg hover:shadow-destructive/10 group">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Real Likes</p>
+                  <p className="text-2xl font-bold mt-1 text-destructive">
+                    <AnimatedNumber value={stats.totalRealLikes} />
+                  </p>
+                  <div className="flex items-center gap-1 mt-1">
+                    {parseFloat(stats.likesGrowth) >= 0 ? (
+                      <ArrowUp className="w-3 h-3 text-chart-3" />
+                    ) : (
+                      <ArrowDown className="w-3 h-3 text-destructive" />
+                    )}
+                    <span className={cn("text-xs font-medium", parseFloat(stats.likesGrowth) >= 0 ? "text-chart-3" : "text-destructive")}>
+                      {stats.likesGrowth}%
+                    </span>
+                    <span className="text-xs text-muted-foreground">vs prev</span>
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground">Display: <span className="text-foreground font-semibold">{stats.totalDisplayLikes.toLocaleString()}</span></p>
+                    <p className="text-xs text-muted-foreground">Manipulation: <span className={cn("font-semibold", stats.likeManipulation > 0 ? "text-amber-500" : "text-muted-foreground")}>+{stats.likeManipulationPercent}%</span></p>
+                  </div>
                 </div>
+                <motion.div 
+                  className="h-12 w-12 rounded-xl bg-destructive/10 flex items-center justify-center group-hover:scale-110 transition-transform"
+                  animate={pulseAnimation.pulse}
+                >
+                  <Heart className="w-6 h-6 text-destructive" />
+                </motion.div>
               </div>
-              <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-destructive" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Engagement Rate</p>
-                <p className="text-2xl font-bold mt-1">{stats.engagementRate}%</p>
-                <p className="text-xs text-muted-foreground mt-1">Likes per view</p>
+        <motion.div variants={cardVariants}>
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-accent/50 transition-all duration-300 hover:shadow-lg hover:shadow-accent/10 group">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Real Engagement</p>
+                  <p className="text-2xl font-bold mt-1 text-accent-foreground">
+                    <AnimatedNumber value={parseFloat(stats.realEngagementRate)} suffix="%" decimals={2} />
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">Likes per view</p>
+                  <div className="mt-2 pt-2 border-t border-border/30">
+                    <p className="text-xs text-muted-foreground">Display: <span className="text-foreground font-semibold">{stats.displayEngagementRate}%</span></p>
+                  </div>
+                </div>
+                <motion.div 
+                  className="h-12 w-12 rounded-xl bg-accent flex items-center justify-center group-hover:scale-110 transition-transform"
+                  animate={pulseAnimation.pulse}
+                >
+                  <Target className="w-6 h-6 text-accent-foreground" />
+                </motion.div>
               </div>
-              <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center">
-                <Target className="w-5 h-5 text-accent-foreground" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Posts</p>
-                <p className="text-2xl font-bold mt-1">{stats.publishedPosts.length}</p>
-                <p className="text-xs text-muted-foreground mt-1">{stats.draftPosts.length} drafts</p>
+        <motion.div variants={cardVariants}>
+          <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-secondary/50 transition-all duration-300 hover:shadow-lg hover:shadow-secondary/10 group">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Posts</p>
+                  <p className="text-2xl font-bold mt-1 text-secondary-foreground">
+                    <AnimatedNumber value={stats.publishedPosts.length} />
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">{stats.draftPosts.length} drafts</p>
+                  <div className="mt-2 pt-2 border-t border-border/30">
+                    <Progress value={(stats.publishedPosts.length / (stats.publishedPosts.length + stats.draftPosts.length || 1)) * 100} className="h-1.5" />
+                  </div>
+                </div>
+                <motion.div 
+                  className="h-12 w-12 rounded-xl bg-secondary flex items-center justify-center group-hover:scale-110 transition-transform"
+                  animate={pulseAnimation.pulse}
+                >
+                  <FileText className="w-6 h-6 text-secondary-foreground" />
+                </motion.div>
               </div>
-              <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center">
-                <FileText className="w-5 h-5 text-secondary-foreground" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </motion.div>
 
       {/* Main Charts Section */}
-      <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList className="bg-muted/50">
-          <TabsTrigger value="overview" className="gap-2">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-muted/50 p-1">
+          <TabsTrigger value="overview" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
             <Activity className="w-4 h-4" />
             Overview
           </TabsTrigger>
-          <TabsTrigger value="trends" className="gap-2">
+          <TabsTrigger value="trends" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
             <TrendingUp className="w-4 h-4" />
             Trends
           </TabsTrigger>
-          <TabsTrigger value="predictions" className="gap-2">
+          <TabsTrigger value="predictions" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
             <Zap className="w-4 h-4" />
             Predictions
           </TabsTrigger>
-          <TabsTrigger value="funnel" className="gap-2">
+          <TabsTrigger value="funnel" className="gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
             <Users className="w-4 h-4" />
             Funnel
           </TabsTrigger>
         </TabsList>
 
         {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Line Chart */}
-            <Card className="lg:col-span-2 bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Views & Likes Over Time</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ComposedChart data={timeSeriesData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
-                      <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
-                      <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
-                          border: '1px solid hsl(var(--border))',
-                          borderRadius: '8px'
-                        }} 
-                      />
-                      <Legend />
-                      <Area type="monotone" dataKey="views" fill="hsl(var(--primary) / 0.2)" stroke="hsl(var(--primary))" name="Views" />
-                      <Line type="monotone" dataKey="likes" stroke="hsl(var(--destructive))" strokeWidth={2} dot={false} name="Likes" />
-                    </ComposedChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Tag Distribution Pie Chart */}
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader className="pb-2">
-                <CardTitle className="text-base">Content by Tags</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px]">
-                  {tagDistribution.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={tagDistribution}
-                          cx="50%"
-                          cy="50%"
-                          innerRadius={60}
-                          outerRadius={100}
-                          paddingAngle={2}
-                          dataKey="value"
-                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                          labelLine={false}
-                        >
-                          {tagDistribution.map((_, index) => (
-                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-muted-foreground">
-                      No tags data available
+        <AnimatePresence mode="wait">
+          <TabsContent value="overview" className="space-y-6">
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            >
+              {/* Main Line Chart */}
+              <motion.div variants={cardVariants} className="lg:col-span-2">
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <TrendingUpIcon className="w-4 h-4 text-primary" />
+                      Real Views & Likes Over Time
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ComposedChart data={timeSeriesData}>
+                          <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
+                          <XAxis dataKey="date" tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                          <YAxis tick={{ fontSize: 12 }} className="text-muted-foreground" />
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: 'hsl(var(--card))',
+                              border: '1px solid hsl(var(--border))',
+                              borderRadius: '8px',
+                              backdropFilter: 'blur(8px)'
+                            }}
+                          />
+                          <Legend />
+                          <Area type="monotone" dataKey="views" fill="hsl(var(--primary) / 0.2)" stroke="hsl(var(--primary))" strokeWidth={2} name="Views" />
+                          <Line type="monotone" dataKey="likes" stroke="hsl(var(--destructive))" strokeWidth={2} dot={false} name="Likes" />
+                        </ComposedChart>
+                      </ResponsiveContainer>
                     </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
 
-          {/* Top Posts Tables */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-primary" />
-                  Most Viewed Posts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {stats.topPosts.length > 0 ? stats.topPosts.map((post, i) => (
-                  <div key={post.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-mono text-muted-foreground w-5">{i + 1}.</span>
-                      <div>
-                        <p className="text-sm font-medium truncate max-w-[220px]">{post.title}</p>
-                        <p className="text-xs text-muted-foreground">{format(new Date(post.created_at), 'MMM d, yyyy')}</p>
-                      </div>
+              {/* Tag Distribution Pie Chart */}
+              <motion.div variants={cardVariants}>
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <Award className="w-4 h-4 text-primary" />
+                      Content by Tags
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="h-[300px]">
+                      {tagDistribution.length > 0 ? (
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={tagDistribution}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={100}
+                              paddingAngle={2}
+                              dataKey="value"
+                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                              labelLine={false}
+                            >
+                              {tagDistribution.map((_, index) => (
+                                <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                              ))}
+                            </Pie>
+                            <Tooltip />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      ) : (
+                        <div className="h-full flex items-center justify-center text-muted-foreground">
+                          No tags data available
+                        </div>
+                      )}
                     </div>
-                    <span className="text-sm font-mono text-primary">{(post.views_count ?? 0).toLocaleString()}</span>
-                  </div>
-                )) : (
-                  <p className="text-sm text-muted-foreground">No posts yet.</p>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
 
-            <Card className="bg-card/50 backdrop-blur-sm border-border/50">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-destructive" />
-                  Most Liked Posts
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {stats.mostLiked.length > 0 ? stats.mostLiked.map((post, i) => (
-                  <div key={post.id} className="flex items-center justify-between py-2 border-b border-border/30 last:border-0">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-mono text-muted-foreground w-5">{i + 1}.</span>
-                      <div>
-                        <p className="text-sm font-medium truncate max-w-[220px]">{post.title}</p>
-                        <Badge variant={post.published ? 'default' : 'secondary'} className="text-[10px] h-4 mt-0.5">
-                          {post.published ? 'Published' : 'Draft'}
-                        </Badge>
-                      </div>
-                    </div>
-                    <span className="text-sm font-mono text-destructive">{(post.likes_count ?? 0).toLocaleString()}</span>
-                  </div>
-                )) : (
-                  <p className="text-sm text-muted-foreground">No posts yet.</p>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+            {/* Top Posts Tables */}
+            <motion.div variants={containerVariants} className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <motion.div variants={cardVariants}>
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-primary/30 transition-all">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <EyeIcon className="w-4 h-4 text-primary" />
+                      Most Viewed Posts (Display)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {stats.topPosts.length > 0 ? stats.topPosts.map((post, i) => (
+                      <motion.div 
+                        key={post.id} 
+                        className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-mono text-muted-foreground w-5">{i + 1}.</span>
+                          <div>
+                            <p className="text-sm font-medium truncate max-w-[220px]">{post.title}</p>
+                            <p className="text-xs text-muted-foreground">{format(new Date(post.created_at), 'MMM d, yyyy')}</p>
+                          </div>
+                        </div>
+                        <span className="text-sm font-mono text-primary">{((post.display_views_count ?? post.views_count) ?? 0).toLocaleString()}</span>
+                      </motion.div>
+                    )) : (
+                      <p className="text-sm text-muted-foreground">No posts yet.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              <motion.div variants={cardVariants}>
+                <Card className="bg-card/50 backdrop-blur-sm border-border/50 hover:border-destructive/30 transition-all">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <HeartIcon className="w-4 h-4 text-destructive" />
+                      Most Liked Posts (Display)
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {stats.mostLiked.length > 0 ? stats.mostLiked.map((post, i) => (
+                      <motion.div 
+                        key={post.id} 
+                        className="flex items-center justify-between py-2 border-b border-border/30 last:border-0"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.1 }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-mono text-muted-foreground w-5">{i + 1}.</span>
+                          <div>
+                            <p className="text-sm font-medium truncate max-w-[220px]">{post.title}</p>
+                            <Badge variant={post.published ? 'default' : 'secondary'} className="text-[10px] h-4 mt-0.5">
+                              {post.published ? 'Published' : 'Draft'}
+                            </Badge>
+                          </div>
+                        </div>
+                        <span className="text-sm font-mono text-destructive">{((post.display_likes_count ?? post.likes_count) ?? 0).toLocaleString()}</span>
+                      </motion.div>
+                    )) : (
+                      <p className="text-sm text-muted-foreground">No posts yet.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            </motion.div>
+          </TabsContent>
+        </AnimatePresence>
 
         {/* Trends Tab */}
         <TabsContent value="trends" className="space-y-6">
@@ -555,7 +742,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                   <TrendingUp className="w-4 h-4" />
                   Moving Average & Anomaly Detection
                 </CardTitle>
-                <Badge variant="outline" className="gap-1">
+                <Badge variant="outline" className="gap-2">
                   <AlertTriangle className="w-3 h-3" />
                   Anomalies highlighted
                 </Badge>
@@ -568,9 +755,9 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                     <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--card))', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px'
                       }}
@@ -615,7 +802,7 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
             <Card className="bg-card/50 backdrop-blur-sm border-border/50">
               <CardContent className="p-4">
                 <p className="text-xs text-muted-foreground uppercase">Avg per Post</p>
-                <p className="text-xl font-bold mt-1">{stats.avgViews} views / {stats.avgLikes} likes</p>
+                <p className="text-xl font-bold mt-1">{stats.avgRealViews} real / {stats.avgDisplayViews} display views</p>
               </CardContent>
             </Card>
           </div>
@@ -648,12 +835,12 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                     <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                     <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                     <YAxis tick={{ fontSize: 12 }} />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: 'hsl(var(--card))', 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'hsl(var(--card))',
                         border: '1px solid hsl(var(--border))',
                         borderRadius: '8px'
-                      }} 
+                      }}
                     />
                     <Legend />
                     <Area type="monotone" dataKey="upperBound" stroke="none" fill="hsl(var(--primary) / 0.1)" name="Upper Bound" />
@@ -688,12 +875,12 @@ export const AnalyticsView = memo(({ posts, comments }: AnalyticsViewProps) => {
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border/30" />
                       <XAxis type="number" tick={{ fontSize: 12 }} />
                       <YAxis dataKey="name" type="category" tick={{ fontSize: 12 }} width={80} />
-                      <Tooltip 
-                        contentStyle={{ 
-                          backgroundColor: 'hsl(var(--card))', 
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: 'hsl(var(--card))',
                           border: '1px solid hsl(var(--border))',
                           borderRadius: '8px'
-                        }} 
+                        }}
                       />
                       <Bar dataKey="value" radius={[0, 4, 4, 0]}>
                         {funnelData.map((entry, index) => (

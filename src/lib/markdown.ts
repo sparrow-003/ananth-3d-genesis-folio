@@ -20,176 +20,283 @@ const purifyConfig = {
   ALLOW_DATA_ATTR: false,
 }
 
+interface CodeBlock {
+  lang: string
+  code: string
+}
+
+interface DiagramBlock {
+  type: string
+  content: string
+}
+
 // Simple markdown parser with XSS protection
 export const parseMarkdown = (markdown: string): string => {
-  let html = markdown
-
-  // Store code blocks and diagrams to protect them from other transformations
-  const codeBlocks: { lang: string; code: string }[] = []
-  const diagramBlocks: { type: string; content: string }[] = []
+  // Normalize line endings
+  let text = markdown.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
   
-  // Extract diagram blocks first (mermaid, diagram, ascii, chart, flow, plantuml)
-  html = html.replace(/```(mermaid|diagram|ascii|chart|flow|plantuml)\n([\s\S]*?)```/g, (match, type, content) => {
+  // Store code blocks and diagrams to protect them
+  const codeBlocks: CodeBlock[] = []
+  const diagramBlocks: DiagramBlock[] = []
+  const inlineCodes: string[] = []
+
+  // Extract diagram blocks first
+  text = text.replace(/```(mermaid|diagram|ascii|chart|flow|plantuml)\n([\s\S]*?)```/g, (match, type, content) => {
     const index = diagramBlocks.length
     diagramBlocks.push({ type, content: content.trim() })
-    return `___DIAGRAM_${index}___`
+    return `\u0000DIAGRAM${index}\u0000`
   })
 
-  // Extract code blocks with language
-  html = html.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+  // Extract code blocks
+  text = text.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
     const index = codeBlocks.length
-    codeBlocks.push({ lang, code: code.trim() })
-    return `___CODE_${index}___`
+    codeBlocks.push({ lang: lang || '', code: code.trim() })
+    return `\u0000CODE${index}\u0000`
   })
 
-  // Tables (must be before paragraphs)
-  html = html.replace(/^\|(.+)\|\n^\|([\s:|-]+)\|\n((?:^\|.+\|\n?)+)/gm, (match, headerRow, separatorRow, bodyRows) => {
-    const headers = headerRow.split('|').filter((c: string) => c.trim() !== '').map((c: string) => c.trim())
-
-    const alignments = separatorRow.split('|').filter((c: string) => c.trim() !== '').map((c: string) => {
-      const cell = c.trim()
-      if (cell.startsWith(':') && cell.endsWith(':')) return 'center'
-      if (cell.endsWith(':')) return 'right'
-      return 'left'
-    })
-
-    const rows = bodyRows.trim().split('\n').map((row: string) =>
-      row.split('|').filter((c: string) => c.trim() !== '').map((c: string) => c.trim())
-    )
-
-    let tableHtml = '<div class="blog-table-wrapper"><table class="blog-table"><thead><tr>'
-    headers.forEach((h: string, i: number) => {
-      tableHtml += `<th style="text-align:${alignments[i] || 'left'}">${parseInline(h)}</th>`
-    })
-    tableHtml += '</tr></thead><tbody>'
-    rows.forEach((row: string[]) => {
-      tableHtml += '<tr>'
-      row.forEach((cell: string, i: number) => {
-        tableHtml += `<td style="text-align:${alignments[i] || 'left'}">${parseInline(cell)}</td>`
-      })
-      tableHtml += '</tr>'
-    })
-    tableHtml += '</tbody></table></div>'
-    return tableHtml
-  })
-
-  // Headers (process from h6 to h1 to avoid conflicts)
-  html = html.replace(/^###### (.*$)/gim, '<h4 class="blog-h4">$1</h4>')
-  html = html.replace(/^##### (.*$)/gim, '<h4 class="blog-h4">$1</h4>')
-  html = html.replace(/^#### (.*$)/gim, '<h4 class="blog-h4">$1</h4>')
-  html = html.replace(/^### (.*$)/gim, '<h3 class="blog-h3">$1</h3>')
-  html = html.replace(/^## (.*$)/gim, '<h2 class="blog-h2">$1</h2>')
-  html = html.replace(/^# (.*$)/gim, '<h1 class="blog-h1">$1</h1>')
-
-  // Horizontal rule
-  html = html.replace(/^\s*---\s*$/gm, '<hr class="blog-hr" />')
-  html = html.replace(/^\s*\*\*\*\s*$/gm, '<hr class="blog-hr" />')
-  html = html.replace(/^\s*___\s*$/gm, '<hr class="blog-hr" />')
-
-  // Inline code (protect from other transformations)
-  const inlineCodes: string[] = []
-  html = html.replace(/`([^`]+)`/g, (match, code) => {
+  // Extract inline code
+  text = text.replace(/`([^`]+)`/g, (match, code) => {
     const index = inlineCodes.length
     inlineCodes.push(code)
-    return `___INLINE_CODE_${index}___`
+    return `\u0000INLINE${index}\u0000`
   })
 
-  // Bold and Italic
-  html = html.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
-  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>')
-  html = html.replace(/___(.*?)___/g, '<strong><em>$1</em></strong>')
+  // Process the text line by line
+  const lines = text.split('\n')
+  const htmlLines: string[] = []
+  let inList = false
+  let listType: 'ul' | 'ol' | null = null
+  let listItems: string[] = []
 
-  // Strikethrough
-  html = html.replace(/~~(.*?)~~/g, '<del>$1</del>')
+  const flushList = () => {
+    if (listItems.length > 0) {
+      const listTag = listType === 'ol' ? 'ol' : 'ul'
+      const className = listType === 'ol' ? 'blog-list' : 'blog-checklist'
+      htmlLines.push(`<${listTag} class="${className}">${listItems.join('')}</${listTag}>`)
+      listItems = []
+      inList = false
+      listType = null
+    }
+  }
 
-  // Highlight ==text==
-  html = html.replace(/==(.*?)==/g, '<mark>$1</mark>')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i]
+    const trimmedLine = line.trim()
 
-  // Superscript ^text^
-  html = html.replace(/\^(.*?)\^/g, '<sup>$1</sup>')
+    // Skip empty lines but track them for paragraph breaks
+    if (trimmedLine === '') {
+      flushList()
+      continue
+    }
 
-  // Links - sanitize href
-  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
-    const safeUrl = sanitizeUrl(url)
-    return `<a href="${safeUrl}" class="blog-link" target="_blank" rel="noopener noreferrer">${text}</a>`
-  })
+    // Check for special placeholders (code, diagrams, inline code)
+    if (trimmedLine.startsWith('\u0000')) {
+      flushList()
+      htmlLines.push(trimmedLine)
+      continue
+    }
 
-  // Images (already processed, but handle any remaining)
-  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
-    const safeSrc = sanitizeUrl(src)
-    const safeAlt = escapeHtml(alt)
-    return `<figure class="blog-image-figure"><img src="${safeSrc}" alt="${safeAlt}" class="blog-content-image" loading="lazy" />${safeAlt ? `<figcaption class="blog-image-caption">${safeAlt}</figcaption>` : ''}</figure>`
-  })
+    // Tables
+    if (trimmedLine.startsWith('|') && trimmedLine.endsWith('|')) {
+      flushList()
+      // Check if this is start of a table
+      const tableLines: string[] = [trimmedLine]
+      let j = i + 1
+      while (j < lines.length && lines[j].trim().startsWith('|') && lines[j].trim().endsWith('|')) {
+        tableLines.push(lines[j].trim())
+        j++
+      }
+      if (tableLines.length >= 3) {
+        const tableHtml = parseTable(tableLines)
+        htmlLines.push(tableHtml)
+        i = j - 1
+        continue
+      }
+    }
 
-  // Checklist items - [ ] and [x]
-  html = html.replace(/^- \[x\] (.+)$/gm, '<li class="checklist-item"><span class="blog-check checked">✓</span> $1</li>')
-  html = html.replace(/^- \[ \] (.+)$/gm, '<li class="checklist-item"><span class="blog-check"></span> $1</li>')
+    // Headers
+    const headerMatch = trimmedLine.match(/^(#{1,6})\s+(.+)$/)
+    if (headerMatch) {
+      flushList()
+      const level = headerMatch[1].length
+      const content = parseInline(headerMatch[2])
+      htmlLines.push(`<h${level} class="blog-h${level}">${content}</h${level}>`)
+      continue
+    }
 
-  // Unordered lists
-  html = html.replace(/^\* (.+)$/gm, '<li>$1</li>')
-  html = html.replace(/^- (.+)$/gm, '<li>$1</li>')
+    // Horizontal rule
+    if (/^([-*_])\s*\1\s*\1+$/.test(trimmedLine)) {
+      flushList()
+      htmlLines.push('<hr class="blog-hr" />')
+      continue
+    }
 
-  // Ordered lists
-  html = html.replace(/^(\d+)\. (.+)$/gm, '<li>$2</li>')
+    // Blockquote
+    if (trimmedLine.startsWith('>')) {
+      flushList()
+      const content = parseInline(trimmedLine.slice(1).trim())
+      htmlLines.push(`<blockquote class="blog-blockquote">${content}</blockquote>`)
+      continue
+    }
 
-  // Wrap consecutive checklist items
-  html = html.replace(/(<li class="checklist-item">.*?<\/li>\s*)+/gs, (match) => {
-    return `<ul class="blog-checklist">${match}</ul>`
-  })
+    // Checklist items
+    const checkedItemMatch = trimmedLine.match(/^- \[x\]\s+(.+)$/)
+    const uncheckedItemMatch = trimmedLine.match(/^- \[ \]\s+(.+)$/)
+    if (checkedItemMatch || uncheckedItemMatch) {
+      const content = checkedItemMatch ? checkedItemMatch[1] : uncheckedItemMatch![1]
+      const isChecked = !!checkedItemMatch
+      listItems.push(`<li class="checklist-item"><span class="blog-check${isChecked ? ' checked' : ''}">${isChecked ? '✓' : ''}</span> ${parseInline(content)}</li>`)
+      inList = true
+      listType = 'ul'
+      continue
+    }
 
-  // Wrap consecutive regular list items (not already in a list)
-  html = html.replace(/(?<!<\/ul>)((?:<li>(?:(?!class="checklist-item").).*?<\/li>\s*)+)(?!<\/ul>)/gs, (match) => {
-    return `<ul class="blog-list">${match}</ul>`
-  })
+    // Unordered list
+    const ulMatch = trimmedLine.match(/^[-*+]\s+(.+)$/)
+    if (ulMatch && !inList) {
+      listItems.push(`<li>${parseInline(ulMatch[1])}</li>`)
+      inList = true
+      listType = 'ul'
+      continue
+    } else if (ulMatch && inList && listType === 'ul') {
+      listItems.push(`<li>${parseInline(ulMatch[1])}</li>`)
+      continue
+    } else if (ulMatch) {
+      flushList()
+      listItems.push(`<li>${parseInline(ulMatch[1])}</li>`)
+      inList = true
+      listType = 'ul'
+      continue
+    }
 
-  // Blockquotes (merge adjacent ones)
-  html = html.replace(/^> (.+)$/gm, '<blockquote class="blog-blockquote">$1</blockquote>')
-  html = html.replace(/<\/blockquote>\n<blockquote class="blog-blockquote">/g, '<br>')
+    // Ordered list
+    const olMatch = trimmedLine.match(/^\d+\.\s+(.+)$/)
+    if (olMatch && !inList) {
+      listItems.push(`<li>${parseInline(olMatch[1])}</li>`)
+      inList = true
+      listType = 'ol'
+      continue
+    } else if (olMatch && inList && listType === 'ol') {
+      listItems.push(`<li>${parseInline(olMatch[1])}</li>`)
+      continue
+    } else if (olMatch) {
+      flushList()
+      listItems.push(`<li>${parseInline(olMatch[1])}</li>`)
+      inList = true
+      listType = 'ol'
+      continue
+    }
 
-  // Paragraphs - only for lines that aren't already HTML
-  html = html.replace(/^(?!<[hublpfidto]|<mark|<figure|<div|<\/)([^\s<].*[^\s<]|[^\s<])$/gm, '<p class="blog-paragraph">$1</p>')
+    // If we get here and we're in a list, flush it
+    flushList()
+
+    // Regular paragraph - only if it's not already HTML
+    if (!trimmedLine.startsWith('<')) {
+      htmlLines.push(`<p class="blog-paragraph">${parseInline(trimmedLine)}</p>`)
+    } else {
+      htmlLines.push(trimmedLine)
+    }
+  }
+
+  // Flush any remaining list
+  flushList()
+
+  // Join all HTML lines
+  let html = htmlLines.join('')
 
   // Restore inline codes
   inlineCodes.forEach((code, index) => {
-    html = html.replace(`___INLINE_CODE_${index}___`, `<code class="blog-inline-code">${escapeHtml(code)}</code>`)
+    html = html.replace(`\u0000INLINE${index}\u0000`, `<code class="blog-inline-code">${escapeHtml(code)}</code>`)
   })
 
-  // Restore code blocks with language label
+  // Restore code blocks
   codeBlocks.forEach((block, index) => {
     const langLabel = block.lang ? `<div class="blog-code-lang">${escapeHtml(block.lang.toUpperCase())}</div>` : ''
     const highlighted = highlightCode(block.code, block.lang || 'plaintext')
-    html = html.replace(`___CODE_${index}___`, `<div class="blog-code-wrapper">${langLabel}<pre class="blog-code-block"><code class="blog-code">${highlighted}</code></pre></div>`)
+    html = html.replace(`\u0000CODE${index}\u0000`, `<div class="blog-code-wrapper">${langLabel}<pre class="blog-code-block"><code class="blog-code">${highlighted}</code></pre></div>`)
   })
 
   // Restore diagram blocks
   diagramBlocks.forEach((block, index) => {
     const label = `<div class="blog-diagram-label">${escapeHtml(block.type)}</div>`
-    html = html.replace(`___DIAGRAM_${index}___`, `<div class="blog-diagram-wrapper" style="position:relative">${label}<div class="blog-diagram">${escapeHtml(block.content)}</div></div>`)
+    html = html.replace(`\u0000DIAGRAM${index}\u0000`, `<div class="blog-diagram-wrapper" style="position:relative;margin:1em 0">${label}<div class="blog-diagram">${escapeHtml(block.content)}</div></div>`)
   })
 
-  // Clean up excessive newlines and empty paragraphs
-  html = html.replace(/\n{3,}/g, '\n\n')
+  // Clean up empty paragraphs
   html = html.replace(/<p class="blog-paragraph">\s*<\/p>/g, '')
-  html = html.replace(/<p class="blog-paragraph"><br\s*\/?><\/p>/g, '')
 
   // CRITICAL: Sanitize the final HTML output to prevent XSS
   return DOMPurify.sanitize(html, purifyConfig)
 }
 
-// Parse inline markdown (for table cells etc.)
+// Parse table lines
+const parseTable = (lines: string[]): string => {
+  if (lines.length < 3) return ''
+
+  const headerCells = lines[0].split('|').filter(c => c.trim() !== '').map(c => c.trim())
+  const alignCells = lines[1].split('|').filter(c => c.trim() !== '').map(c => c.trim())
+  const dataLines = lines.slice(2)
+
+  const alignments = alignCells.map(cell => {
+    if (cell.startsWith(':') && cell.endsWith(':')) return 'center'
+    if (cell.endsWith(':')) return 'right'
+    return 'left'
+  })
+
+  let html = '<div class="blog-table-wrapper"><table class="blog-table"><thead><tr>'
+  headerCells.forEach((h, i) => {
+    html += `<th style="text-align:${alignments[i] || 'left'}">${parseInline(h)}</th>`
+  })
+  html += '</tr></thead><tbody>'
+
+  dataLines.forEach(rowLine => {
+    const cells = rowLine.split('|').filter(c => c.trim() !== '').map(c => c.trim())
+    if (cells.length > 0) {
+      html += '<tr>'
+      cells.forEach((cell, i) => {
+        html += `<td style="text-align:${alignments[i] || 'left'}">${parseInline(cell)}</td>`
+      })
+      html += '</tr>'
+    }
+  })
+
+  html += '</tbody></table></div>'
+  return html
+}
+
+// Parse inline markdown
 const parseInline = (text: string): string => {
   let result = escapeHtml(text)
+
+  // Bold and italic
   result = result.replace(/\*\*\*(.*?)\*\*\*/g, '<strong><em>$1</em></strong>')
+  result = result.replace(/___(.*?)___/g, '<strong><em>$1</em></strong>')
   result = result.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
   result = result.replace(/\*(.*?)\*/g, '<em>$1</em>')
-  result = result.replace(/`([^`]+)`/g, '<code class="blog-inline-code">$1</code>')
+
+  // Strikethrough
   result = result.replace(/~~(.*?)~~/g, '<del>$1</del>')
+
+  // Highlight
   result = result.replace(/==(.*?)==/g, '<mark>$1</mark>')
+
+  // Links
+  result = result.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (match, text, url) => {
+    const safeUrl = sanitizeUrl(url)
+    return `<a href="${safeUrl}" class="blog-link" target="_blank" rel="noopener noreferrer">${text}</a>`
+  })
+
+  // Images
+  result = result.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    const safeSrc = sanitizeUrl(src)
+    const safeAlt = escapeHtml(alt)
+    return `<figure class="blog-image-figure"><img src="${safeSrc}" alt="${safeAlt}" class="blog-content-image" loading="lazy" />${safeAlt ? `<figcaption class="blog-image-caption">${safeAlt}</figcaption>` : ''}</figure>`
+  })
+
   return result
 }
 
-// Escape HTML entities to prevent injection
+// Escape HTML entities
 const escapeHtml = (text: string): string => {
   const htmlEntities: { [key: string]: string } = {
     '&': '&amp;',
@@ -198,37 +305,25 @@ const escapeHtml = (text: string): string => {
     '"': '&quot;',
     "'": '&#39;',
   }
-  return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char)
+  return text.replace(/[&<>"']/g, char => htmlEntities[char] || char)
 }
 
-// Sanitize URLs to prevent javascript: and data: URLs
+// Sanitize URLs
 const sanitizeUrl = (url: string): string => {
   const trimmedUrl = url.trim().toLowerCase()
-  
-  if (
-    trimmedUrl.startsWith('javascript:') ||
-    trimmedUrl.startsWith('data:') ||
-    trimmedUrl.startsWith('vbscript:')
-  ) {
+
+  if (trimmedUrl.startsWith('javascript:') || trimmedUrl.startsWith('data:') || trimmedUrl.startsWith('vbscript:')) {
     return '#'
   }
-  
-  if (
-    trimmedUrl.startsWith('http://') ||
-    trimmedUrl.startsWith('https://') ||
-    trimmedUrl.startsWith('mailto:') ||
-    trimmedUrl.startsWith('tel:') ||
-    trimmedUrl.startsWith('/') ||
-    trimmedUrl.startsWith('#') ||
-    !trimmedUrl.includes(':')
-  ) {
+
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('mailto:') || trimmedUrl.startsWith('tel:') || trimmedUrl.startsWith('/') || trimmedUrl.startsWith('#') || !trimmedUrl.includes(':')) {
     return url
   }
-  
+
   return '#'
 }
 
-// Simple syntax highlighting for common languages
+// Simple syntax highlighting
 export const highlightCode = (code: string, language: string): string => {
   const keywords: { [key: string]: string[] } = {
     javascript: ['function', 'const', 'let', 'var', 'if', 'else', 'for', 'while', 'return', 'class', 'import', 'export', 'async', 'await', 'try', 'catch'],

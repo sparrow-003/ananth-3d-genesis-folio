@@ -81,6 +81,8 @@ export type Database = {
           author_name: string | null
           content: string
           created_at: string | null
+          display_likes_count: number | null
+          display_views_count: number | null
           excerpt: string
           featured_image: string | null
           id: string
@@ -99,6 +101,8 @@ export type Database = {
           author_name?: string | null
           content: string
           created_at?: string | null
+          display_likes_count?: number | null
+          display_views_count?: number | null
           excerpt: string
           featured_image?: string | null
           id?: string
@@ -117,6 +121,8 @@ export type Database = {
           author_name?: string | null
           content?: string
           created_at?: string | null
+          display_likes_count?: number | null
+          display_views_count?: number | null
           excerpt?: string
           featured_image?: string | null
           id?: string

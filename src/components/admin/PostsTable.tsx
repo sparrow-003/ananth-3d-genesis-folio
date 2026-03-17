@@ -1,14 +1,14 @@
 import React, { memo, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { format } from 'date-fns'
-import { 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  Eye, 
-  Globe, 
-  Clock, 
-  CheckCircle, 
+import {
+  MoreVertical,
+  Edit,
+  Trash2,
+  Eye,
+  Globe,
+  Clock,
+  CheckCircle,
   AlertCircle,
   Calendar,
   User,
@@ -16,7 +16,9 @@ import {
   Heart,
   Edit3,
   Check,
-  X
+  X,
+  TrendingUp,
+  Sparkles
 } from 'lucide-react'
 import { BlogPost } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
@@ -49,6 +51,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 
 interface PostsTableProps {
   posts: BlogPost[]
@@ -82,19 +86,28 @@ const StatusBadge = memo(({ post }: { post: BlogPost }) => {
 
 StatusBadge.displayName = 'StatusBadge'
 
-// Stats Editor Component
-const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: string, views: number, likes: number) => Promise<void> }) => {
+// Enhanced Stats Editor with Real vs Display separation
+const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: string, views: number, likes: number, displayViews?: number, displayLikes?: number) => Promise<void> }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const [views, setViews] = useState(post.views_count)
-  const [likes, setLikes] = useState(post.likes_count)
+  const [activeTab, setActiveTab] = useState<'real' | 'display'>('display')
+  
+  // Real counts
+  const [realViews, setRealViews] = useState(post.views_count ?? 0)
+  const [realLikes, setRealLikes] = useState(post.likes_count ?? 0)
+  
+  // Display counts (what users see)
+  const [displayViews, setDisplayViews] = useState(post.display_views_count ?? post.views_count ?? 0)
+  const [displayLikes, setDisplayLikes] = useState(post.display_likes_count ?? post.likes_count ?? 0)
+  
   const [isUpdating, setIsUpdating] = useState(false)
 
   const handleSave = async () => {
     if (!onUpdate) return
-    
+
     try {
       setIsUpdating(true)
-      await onUpdate(post.id, views, likes)
+      // Pass both real and display counts
+      await onUpdate(post.id, realViews, realLikes, displayViews, displayLikes)
       setIsOpen(false)
     } catch (error) {
       console.error('Failed to update stats:', error)
@@ -104,10 +117,17 @@ const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: 
   }
 
   const handleCancel = () => {
-    setViews(post.views_count)
-    setLikes(post.likes_count)
+    setRealViews(post.views_count ?? 0)
+    setRealLikes(post.likes_count ?? 0)
+    setDisplayViews(post.display_views_count ?? post.views_count ?? 0)
+    setDisplayLikes(post.display_likes_count ?? post.likes_count ?? 0)
     setIsOpen(false)
   }
+
+  const realViewsDiff = realViews !== (post.views_count ?? 0)
+  const realLikesDiff = realLikes !== (post.likes_count ?? 0)
+  const displayViewsDiff = displayViews !== (post.display_views_count ?? post.views_count ?? 0)
+  const displayLikesDiff = displayLikes !== (post.display_likes_count ?? post.likes_count ?? 0)
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -117,61 +137,149 @@ const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: 
             <TooltipTrigger>
               <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors group">
                 <Eye className="w-3 h-3" />
-                <span>{post.views_count.toLocaleString()}</span>
-                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                <span>{((post.display_views_count ?? post.views_count) ?? 0).toLocaleString()}</span>
+                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-primary" />}
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{onUpdate ? 'Click to edit views' : 'Views'}</p>
+              <p>Display: {((post.display_views_count ?? post.views_count) ?? 0).toLocaleString()}</p>
+              <p>Real: {(post.views_count ?? 0).toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Click to edit</p>
             </TooltipContent>
           </Tooltip>
-          
+
           <Tooltip>
             <TooltipTrigger>
               <div className="flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors group">
                 <Heart className="w-3 h-3" />
-                <span>{post.likes_count.toLocaleString()}</span>
-                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity" />}
+                <span>{((post.display_likes_count ?? post.likes_count) ?? 0).toLocaleString()}</span>
+                {onUpdate && <Edit3 className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 transition-opacity text-destructive" />}
               </div>
             </TooltipTrigger>
             <TooltipContent>
-              <p>{onUpdate ? 'Click to edit likes' : 'Likes'}</p>
+              <p>Display: {((post.display_likes_count ?? post.likes_count) ?? 0).toLocaleString()}</p>
+              <p>Real: {(post.likes_count ?? 0).toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground">Click to edit</p>
             </TooltipContent>
           </Tooltip>
         </div>
       </PopoverTrigger>
-      
+
       {onUpdate && (
-        <PopoverContent className="w-64" align="end">
+        <PopoverContent className="w-80" align="end">
           <div className="space-y-4">
-            <h4 className="font-semibold text-sm">Edit Stats</h4>
-            
-            <div className="grid gap-3">
-              <div className="space-y-1">
-                <Label htmlFor="views" className="text-xs">Views</Label>
-                <Input
-                  id="views"
-                  type="number"
-                  min="0"
-                  value={views}
-                  onChange={(e) => setViews(parseInt(e.target.value) || 0)}
-                  className="h-8"
-                />
-              </div>
-              
-              <div className="space-y-1">
-                <Label htmlFor="likes" className="text-xs">Likes</Label>
-                <Input
-                  id="likes"
-                  type="number"
-                  min="0"
-                  value={likes}
-                  onChange={(e) => setLikes(parseInt(e.target.value) || 0)}
-                  className="h-8"
-                />
-              </div>
+            <div className="flex items-center justify-between">
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-500" />
+                Edit Stats
+              </h4>
             </div>
-            
+
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'real' | 'display')}>
+              <TabsList className="w-full grid grid-cols-2">
+                <TabsTrigger value="real" className="gap-1">
+                  <TrendingUp className="w-3 h-3" />
+                  Real
+                </TabsTrigger>
+                <TabsTrigger value="display" className="gap-1">
+                  <Eye className="w-3 h-3" />
+                  Display
+                </TabsTrigger>
+              </TabsList>
+
+              <AnimatePresence mode="wait">
+                <TabsContent value="real" className="space-y-3 mt-3">
+                  <Alert className="bg-blue-500/10 border-blue-500/20 py-2">
+                    <TrendingUp className="w-3 h-3 text-blue-500" />
+                    <AlertDescription className="text-xs text-blue-500 mt-1">
+                      Real counts are used for analytics only
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="real-views" className="text-xs flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      Real Views
+                    </Label>
+                    <Input
+                      id="real-views"
+                      type="number"
+                      min="0"
+                      value={realViews}
+                      onChange={(e) => setRealViews(parseInt(e.target.value) || 0)}
+                      className="h-8"
+                    />
+                    {realViewsDiff && (
+                      <p className="text-xs text-amber-500">Changed from {(post.views_count ?? 0).toLocaleString()}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="real-likes" className="text-xs flex items-center gap-1">
+                      <Heart className="w-3 h-3" />
+                      Real Likes
+                    </Label>
+                    <Input
+                      id="real-likes"
+                      type="number"
+                      min="0"
+                      value={realLikes}
+                      onChange={(e) => setRealLikes(parseInt(e.target.value) || 0)}
+                      className="h-8"
+                    />
+                    {realLikesDiff && (
+                      <p className="text-xs text-amber-500">Changed from {(post.likes_count ?? 0).toLocaleString()}</p>
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="display" className="space-y-3 mt-3">
+                  <Alert className="bg-amber-500/10 border-amber-500/20 py-2">
+                    <Eye className="w-3 h-3 text-amber-500" />
+                    <AlertDescription className="text-xs text-amber-500 mt-1">
+                      Display counts are shown to users on the blog
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="display-views" className="text-xs flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      Display Views
+                    </Label>
+                    <Input
+                      id="display-views"
+                      type="number"
+                      min="0"
+                      value={displayViews}
+                      onChange={(e) => setDisplayViews(parseInt(e.target.value) || 0)}
+                      className="h-8"
+                    />
+                    {displayViewsDiff && (
+                      <p className="text-xs text-amber-500">Changed from {((post.display_views_count ?? post.views_count) ?? 0).toLocaleString()}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label htmlFor="display-likes" className="text-xs flex items-center gap-1">
+                      <Heart className="w-3 h-3" />
+                      Display Likes
+                    </Label>
+                    <Input
+                      id="display-likes"
+                      type="number"
+                      min="0"
+                      value={displayLikes}
+                      onChange={(e) => setDisplayLikes(parseInt(e.target.value) || 0)}
+                      className="h-8"
+                    />
+                    {displayLikesDiff && (
+                      <p className="text-xs text-amber-500">Changed from {((post.display_likes_count ?? post.likes_count) ?? 0).toLocaleString()}</p>
+                    )}
+                  </div>
+                </TabsContent>
+              </AnimatePresence>
+            </Tabs>
+
             <div className="flex justify-end gap-2">
               <Button
                 size="sm"
@@ -186,6 +294,7 @@ const StatsEditor = memo(({ post, onUpdate }: { post: BlogPost; onUpdate?: (id: 
                 size="sm"
                 onClick={handleSave}
                 disabled={isUpdating}
+                className="bg-primary hover:bg-primary/90"
               >
                 <Check className="w-3 h-3 mr-1" />
                 {isUpdating ? 'Saving...' : 'Save'}
@@ -205,7 +314,7 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
   onEdit: (post: BlogPost) => void
   onDelete: (id: string) => void
   onView: (post: BlogPost) => void
-  onUpdateStats?: (id: string, views: number, likes: number) => Promise<void>
+  onUpdateStats?: (id: string, views: number, likes: number, displayViews?: number, displayLikes?: number) => Promise<void>
 }) => {
   const isScheduled = post.published && post.publish_at && new Date(post.publish_at) > new Date()
   const publishDate = post.publish_at ? new Date(post.publish_at) : new Date(post.created_at)
@@ -224,7 +333,7 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4 text-xs text-muted-foreground">
             <span className="font-mono bg-muted/50 px-2 py-1 rounded">
               /{post.slug}
@@ -244,11 +353,11 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
           </div>
         </div>
       </TableCell>
-      
+
       <TableCell>
         <StatusBadge post={post} />
       </TableCell>
-      
+
       <TableCell>
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-1 text-sm">
@@ -267,17 +376,17 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
           </div>
         </div>
       </TableCell>
-      
+
       <TableCell className="text-right">
         <StatsEditor post={post} onUpdate={onUpdateStats} />
       </TableCell>
-      
+
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <Button
+              variant="ghost"
+              size="icon"
               className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-muted"
             >
               <MoreVertical className="h-4 w-4" />
@@ -292,8 +401,8 @@ const PostRow = memo(({ post, onEdit, onDelete, onView, onUpdateStats }: {
               <Globe className="mr-2 h-4 w-4" /> View Live
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem 
-              className="text-red-600 focus:text-red-600 cursor-pointer" 
+            <DropdownMenuItem
+              className="text-red-600 focus:text-red-600 cursor-pointer"
               onClick={() => {
                 if (window.confirm(`Are you sure you want to delete "${post.title}"? This action cannot be undone.`)) {
                   onDelete(post.id)
@@ -328,7 +437,7 @@ export const PostsTable = memo(({ posts, onEdit, onDelete, onView, onUpdateStats
   }
 
   return (
-    <motion.div 
+    <motion.div
       variants={container}
       initial="hidden"
       animate="show"
@@ -340,7 +449,7 @@ export const PostsTable = memo(({ posts, onEdit, onDelete, onView, onUpdateStats
             <TableHead className="w-[45%]">Post Details</TableHead>
             <TableHead className="w-[15%]">Status</TableHead>
             <TableHead className="w-[20%]">Publication</TableHead>
-            <TableHead className="w-[10%] text-right">Stats</TableHead>
+            <TableHead className="w-[10%] text-right">Stats (Display/Real)</TableHead>
             <TableHead className="w-[10%] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
@@ -358,7 +467,7 @@ export const PostsTable = memo(({ posts, onEdit, onDelete, onView, onUpdateStats
           ) : (
             posts.map((post, index) => (
               <motion.tr key={post.id} variants={item}>
-                <PostRow 
+                <PostRow
                   post={post}
                   onEdit={onEdit}
                   onDelete={onDelete}

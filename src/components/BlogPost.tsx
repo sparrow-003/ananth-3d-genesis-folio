@@ -26,17 +26,21 @@ interface BlogPostProps {
 
 const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
   const [liked, setLiked] = useState(false)
-  const [likesCount, setLikesCount] = useState(post.likes_count)
+  // Use display count if available, otherwise use real count
+  const [likesCount, setLikesCount] = useState(post.display_likes_count ?? post.likes_count ?? 0)
   const [loading, setLoading] = useState(false)
   const [comments, setComments] = useState<BlogComment[]>([])
   const [newComment, setNewComment] = useState('')
   const [commentAuthor, setCommentAuthor] = useState('')
   const [showShareDialog, setShowShareDialog] = useState(false)
+  
+  // Get display views count
+  const displayViews = post.display_views_count ?? post.views_count ?? 0
 
   const shareUrl = `${window.location.origin}/blog/${post.slug}`
   const [shortUrl, setShortUrl] = useState(shareUrl)
 
-  // JSON-LD structured data for SEO
+  // JSON-LD structured data for SEO - use display counts for public
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -58,8 +62,8 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
     },
     "keywords": (post.tags || []).join(', '),
     "interactionStatistic": [
-      { "@type": "InteractionCounter", "interactionType": "https://schema.org/LikeAction", "userInteractionCount": post.likes_count },
-      { "@type": "InteractionCounter", "interactionType": "https://schema.org/ViewAction", "userInteractionCount": post.views_count }
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/LikeAction", "userInteractionCount": post.display_likes_count ?? post.likes_count ?? 0 },
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/ViewAction", "userInteractionCount": post.display_views_count ?? post.views_count ?? 0 }
     ]
   }
 
@@ -297,7 +301,7 @@ const BlogPost = memo(({ post, onBack }: BlogPostProps) => {
 
               <div className="flex items-center gap-2">
                 <Eye className="w-4 h-4 text-muted-foreground" />
-                <span>{(post.views_count ?? 0).toLocaleString()} views</span>
+                <span>{displayViews.toLocaleString()} views</span>
               </div>
             </div>
           </header>

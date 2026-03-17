@@ -24,7 +24,8 @@ interface BlogCardProps {
 
 const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
   const [liked, setLiked] = useState(false)
-  const [likesCount, setLikesCount] = useState(post.likes_count)
+  // Use display count if available, otherwise use real count
+  const [likesCount, setLikesCount] = useState(post.display_likes_count ?? post.likes_count)
   const [loading, setLoading] = useState(false)
   const [hasCheckedLike, setHasCheckedLike] = useState(false)
   const [showShareDialog, setShowShareDialog] = useState(false)
@@ -192,7 +193,7 @@ const BlogCard = memo(({ post, onClick, featured = false }: BlogCardProps) => {
 
               <div className="flex items-center gap-1.5 text-muted-foreground text-xs font-medium">
                 <Eye className="w-4 h-4" />
-                <span>{post.views_count}</span>
+                <span>{post.display_views_count ?? post.views_count}</span>
               </div>
             </div>
 

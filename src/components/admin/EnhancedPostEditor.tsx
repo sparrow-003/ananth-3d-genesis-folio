@@ -75,6 +75,8 @@ interface FormData {
   location: string
   views_count: number
   likes_count: number
+  display_views_count: number
+  display_likes_count: number
 }
 
 interface ValidationErrors {
@@ -162,7 +164,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
     author_name: 'Ananth',
     location: '',
     views_count: 0,
-    likes_count: 0
+    likes_count: 0,
+    display_views_count: 0,
+    display_likes_count: 0
   })
 
   const [publishDate, setPublishDate] = useState<Date | undefined>(undefined)
@@ -216,7 +220,9 @@ export const PostEditor = ({ post, onSave, onClose, onDelete }: PostEditorProps)
         author_name: post.author_name ?? 'Ananth',
         location: post.location || '',
         views_count: post.views_count ?? 0,
-        likes_count: post.likes_count ?? 0
+        likes_count: post.likes_count ?? 0,
+        display_views_count: post.display_views_count ?? post.views_count ?? 0,
+        display_likes_count: post.display_likes_count ?? post.likes_count ?? 0
       })
       
       if (post.publish_at) {

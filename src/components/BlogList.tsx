@@ -88,7 +88,11 @@ const BlogList = memo(({ onPostSelect }: BlogListProps) => {
         case 'oldest':
           return new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
         case 'popular':
-          return (b.likes_count + b.views_count) - (a.likes_count + a.views_count)
+          // Use display counts for sorting
+          return (
+            (b.display_likes_count ?? b.likes_count) + (b.display_views_count ?? b.views_count) -
+            (a.display_likes_count ?? a.likes_count) - (a.display_views_count ?? a.views_count)
+          )
         default:
           return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       }
